@@ -1,6 +1,7 @@
 <template>
       <USelect v-model="state.src" :options="availSrc" option-attribute="name"   placeholder="Select Source" />
-    <UInput v-model="state.name" size="md" placeholder="Give a name. Default Input X" />
+    
+      <UInput v-model="state.name" size="md" placeholder="Give a name. Default Output X" />
 
 </template>
 
@@ -22,9 +23,11 @@ const state = reactive({
 src: ''
 });
 // Emit formData updates when the reactive state changes
+// Emit formData updates when the reactive state changes
 watchEffect(() => {
-emit('update:formData', state);
+  emit('update:formData', { src: state.src, name: state.name });
 });
+
 
 </script>
 

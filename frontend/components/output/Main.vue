@@ -1,26 +1,17 @@
-
 <template>
-  <div v-if="!output.type.startsWith('preview')">
-    {{ output.name }} {{ output.type }} {{ output.state }}
-    <Icon name="uil:trash" color="red" size="24px" @click="submitRemove"/>   
-
-  </div>
+<div>
+  <Output v-for="output in outputs" :key="output.uid" :output="output" :mixers="mixers" />
+</div>  
 </template>
 
 <script setup>
+
+
+
 const props = defineProps({
-  output: Object,
-})
-
-const submitRemove = async () => {
-    const { data: responseData } = await useFetch('/api/outputs', {
-        method: 'delete',
-        body: { 
-          uid: props.output.uid,
-        }
-    })
-}
-
+    outputs: Object,
+    mixers: Object,
+  })
 </script>
 
 <style>

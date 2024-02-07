@@ -6,10 +6,10 @@
 
      {{ state }}
      <!-- toggle preview -->
-    <Icon name="uil:video-slash" color="black" size="24px"  v-if="!previewEnabled && inputEnabled" @click="$emit('enablePreview', false)"/>
-    <Icon name="uil:video" color="black" size="24px"  v-if="!previewEnabled && !inputEnabled"  @click="$emit('enablePreview', true)"/>    
+    <Icon name="uil:video-slash" color="black" size="24px"  v-if="!inputPreview && inputEnabled" @click="$emit('enablePreview', false)"/>
+    <Icon name="uil:video" color="black" size="24px"  v-if="!inputPreview && !inputEnabled"  @click="$emit('enablePreview', true)"/>    
     <Icon name="icomoon-free:loop" color="black" size="24px"  v-if="input.loop" />    
-
+    <div>{{ positionFormatted }}{{ durationFormatted }}</div>
     <div>
     <URange :modelValue="volume" @update:modelValue="handleVolumeChange" name="range" :min="0" :max="100" />
       Volume: {{  volume  }}          
@@ -38,15 +38,25 @@ watch(() => props.input.volume, (newValue) => {
     
 //const state = ref(input.state)
 
-const previewEnabled = useCookie('enablePreview')
-  
+const { inputPreview } = useUserState()
+
 function enablePreview() {
   inputEnabled = !prop.inputEnabled
 }
 
-import { useEntities } from '@/composables/entities'; // Adjust the import path as necessary
+import { useEntities } from '@/composables/useEntities'; // Adjust the import path as necessary
 const { sendWebSocketMessage } = useEntities();
+const duration = ref(props.input.duration)
+const position = ref(props.input.position)
+const durationFormatted = computed(() => {
+    return (!props.input.duration || props.input.duration == "00") ? "" : `/${useTimeFormatter(duration).value}`
+  })
+const positionFormatted = useTimeFormatter(position)
 
+watchEffect(() => {
+  duration.value = props.input.duration
+  position.value = props.input.position  
+})
 
 const handleVolumeChange = (newVolume) => {
   volume.value = newVolume;

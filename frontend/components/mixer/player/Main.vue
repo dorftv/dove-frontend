@@ -1,7 +1,7 @@
 <template>
   <div class="">
       <MixerPlayerHeader   :mixer="mixer" />
-      <VideoPlayer   v-if="previewEnabled || mixerEnabled" :uid="mixer.uid" />
+      <VideoPlayer   v-if="mixerPreview || mixerEnabled" :uid="mixer.uid" />
       <div 
         v-for="source in mergedSources" 
         :key="source.src" 
@@ -62,6 +62,7 @@ const mergedSources = computed(() => props.mixer.sources.map(source => ({
 
 
 console.log(props.mixer)
+const { mixerPreview } = useUserState()
 const previewEnabled = useCookie('enablePreview')
 const mixerEnabled = ref(false)
 const uid = props.mixer.uid

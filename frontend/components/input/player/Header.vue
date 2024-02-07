@@ -4,6 +4,8 @@
     {{ input.name }}
     ({{ input.type }})
 
+
+
   </UTooltip>
 
     <Icon name="uil:trash" color="red" size="24px" @click="submitRemove"/>   
@@ -11,11 +13,13 @@
 </template>
 
 <script setup>
+import useTimeFormatter from '@/composables/useTimeFormatter'
+
 const props = defineProps({
   input: Object,
   inputEnabled: Boolean
 })
-// <UButton type="submit" label="Create Input" @click="$emit('close', false)" />
+
 
 
 const previewEnabled = useCookie('enablePreview')

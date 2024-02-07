@@ -1,12 +1,21 @@
-// useEntities.js
-import { ref } from 'vue';
-import { useWebSocket } from './useWebSocket';
+import { ref, onMounted, onUnmounted } from 'vue';
+
+/**  Workaround until nitro supports proper ws proxy **/
+let wsUrl;
+if (import.meta.dev) {
+  wsUrl = "ws://localhost:5000/ws"      
+} else {
+   wsUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
+}
+
 
 export function useEntities() {
   const inputs = ref([]);
   const mixers = ref([]);
   const outputs = ref([]);
-  const { sendWebSocketMessage, error } = useWebSocket();
+  const webSocket = ref(null);
+  const error = ref(null);
+    
 
   const addEntity = (type, entity) => {
     entityMap[type].value.push(entity);
@@ -15,7 +24,8 @@ export function useEntities() {
   const updateEntity = (type, updatedEntity) => {
     const index = entityMap[type].value.findIndex((entity) => entity.uid === updatedEntity.uid);
     if (index !== -1) {
-      entityMap[type].value[index] = { ...entityMap[type].value[index], ...updatedEntity };
+      const updated = reactive({ ...entityMap[type].value[index], ...updatedEntity });
+      entityMap[type].value.splice(index, 1, updated);
     }
   };
 
@@ -32,8 +42,7 @@ export function useEntities() {
     output: outputs
   };
 
-  // Fetch entities from API
-  const fetchEntities = async () => {
+  onMounted(async () => {
     try {
       const inputsResponse = await useFetch('/api/inputs');
       if (inputsResponse.error.value) throw inputsResponse.error.value;
@@ -50,23 +59,40 @@ export function useEntities() {
       error.value = 'Failed to load entities: ' + e.message;
       console.error(error.value);
     }
-  };
 
-  // You may need to call this method to fetch entities when the component using this composable is mounted
-  // fetchEntities();
+    webSocket.value = new WebSocket(wsUrl);
+    webSocket.value.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      const action = {
+        CREATE: addEntity,
+        UPDATE: updateEntity,
+        DELETE: deleteEntity
+      }[message.channel];
+      
+      if (action && entityMap[message.type]) {
+        action(message.type, message.data);
+      } else {
+        console.warn('Unknown Type or Channel:', message.type, message.channel);
+      }
+    };
 
-  // Handle WebSocket messages
-  const handleWebSocketMessage = (message) => {
-    const action = {
-      CREATE: addEntity,
-      UPDATE: updateEntity,
-      DELETE: deleteEntity
-    }[message.channel];
-    
-    if (action && entityMap[message.type]) {
-      action(message.type, message.data);
+    webSocket.value.onerror = (wsError) => {
+      error.value = 'WebSocket error: ' + wsError.message;
+      console.error(error.value);
+    };
+  });
+
+  onUnmounted(() => {
+    if (webSocket.value) {
+      webSocket.value.close();
+    }
+  });
+
+  const sendWebSocketMessage = (message) => {
+    if (webSocket.value && webSocket.value.readyState === WebSocket.OPEN) {
+      webSocket.value.send(JSON.stringify(message));
     } else {
-      console.warn('Unknown Type or Channel:', message.type, message.channel);
+      error.value = 'WebSocket is not open. Cannot send message.';
     }
   };
 
@@ -75,8 +101,6 @@ export function useEntities() {
     mixers,
     outputs,
     sendWebSocketMessage,
-    handleWebSocketMessage,
-    error,
-    fetchEntities  // Expose the fetchEntities method if you need to call it from outside
+    error
   };
 }

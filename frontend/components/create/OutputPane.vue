@@ -19,6 +19,7 @@
         <UForm refs="inputForm" :state="state" class="space-y-4" @submit="submitCreate">
 
           <CreateOutputSrt v-if="item.key === 'srtsink'" @update:formData="handleUpdateFormData"/> 
+          <CreateOutputDecklink v-if="item.key === 'decklinksink'" @update:formData="handleUpdateFormData"/> 
           <CreateOutputFake v-if="item.key === 'fakesink'" @update:formData="handleUpdateFormData"/> 
 
           <CreateOutputCommon @update:formData="handleUpdateFormData"/>
@@ -44,7 +45,13 @@ const items = [{
   key: 'srtsink',
   label: 'SRT Output',
   description: 'Add srt output.'
-}, {
+},
+{
+  key: 'decklinksink',
+  label: 'Decklink Output',
+  description: 'Add decklink output.'
+},
+{
   key: 'fakesink',
   label: 'Fake Sink',
   description: 'Add fakesink output.'

@@ -18,10 +18,9 @@ const props = defineProps({
   mixer: Object
 })
 
-import { useEntities } from '@/composables/entities'; // Adjust the import path as necessary
+import { useEntities } from '@/composables/useEntities';
 const { sendWebSocketMessage } = useEntities();
 
-// Update the ref whenever the prop changes
 watch(() => props.source.alpha, (newValue) => {
   alpha.value = props.source.alpha * 100;
 });  

@@ -1,12 +1,13 @@
 <script setup>
-//const usePreviewEnabled = useState('enablePreview', () => true)
-// use cookie because SSR is disabled
-const usePreviewEnabled = useCookie('enablePreview')
+
+const { inputPreview, mixerPreview } = useUserState()
 </script>
 
 <template>
   <div>
-    Enable Preview
-    <UToggle v-model="usePreviewEnabled"/>
+    Input Preview
+    <UToggle v-model="inputPreview"/>
+    Mixer Preview
+    <UToggle v-model="mixerPreview"/>
   </div>
 </template>

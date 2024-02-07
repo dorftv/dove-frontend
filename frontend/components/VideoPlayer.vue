@@ -23,6 +23,11 @@ import { MediaPlayerElement } from 'vidstack/elements';
 
 const mediaPlayer = ref(null);
 
+const props = defineProps({
+  uid: String,
+  muted: String
+})
+
 onMounted(() => {
   const player = mediaPlayer.value;
 
@@ -58,10 +63,7 @@ player.addEventListener('can-play', () => {
 
 
 //console.log(player)
-const props = defineProps({
-  uid: String,
-  muted: String
-})
+
 
 </script>
  
