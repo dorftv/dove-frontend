@@ -1,22 +1,21 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
-/**  Workaround until nitro supports proper ws proxy **/
-let wsUrl;
-if (import.meta.dev) {
-  wsUrl = "ws://localhost:5000/ws"      
-} else {
-   wsUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
-}
-
-
 export function useEntities() {
   const inputs = ref([]);
   const mixers = ref([]);
   const outputs = ref([]);
   const webSocket = ref(null);
   const error = ref(null);
-    
 
+  
+  let wsUrl;
+  if (import.meta.dev) {
+    wsUrl = "ws://localhost:5000/ws"      
+  } else {
+     const url = useRequestURL()
+     wsUrl = `${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}/ws`;
+  }
+  
   const addEntity = (type, entity) => {
     entityMap[type].value.push(entity);
   };
@@ -100,6 +99,7 @@ export function useEntities() {
     inputs,
     mixers,
     outputs,
+    updateEntity,
     sendWebSocketMessage,
     error
   };

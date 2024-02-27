@@ -28,14 +28,12 @@
 
 <script setup>
 const isOpen = ref(false)
-console.log("MIXER")
 const submitCreateMixer = async () => {
     const { data: responseData } = await useFetch('/api/mixers', {
         method: 'put',
         body: { 
-          type: 'mixer',
+          type: 'scene',
         }
     })
-    console.log(responseData.value)
 }
 </script>

@@ -1,13 +1,17 @@
 <template>
-  <div class="">
+  <div class="flex justify-between">
     <UTooltip :text="input.uid" >
     {{ input.name }}
     ({{ input.type }})
-
-
-
   </UTooltip>
-
+  <UPopover :popper="{ arrow: true }">
+    <UButton color="white" label="Details" trailing-icon="i-heroicons-information-circle-20-solid" />
+    <template #panel>
+      <div class="p-4">
+        <pre>{{ inputDetails }}</pre>
+      </div>
+    </template>
+  </UPopover>
     <Icon name="uil:trash" color="red" size="24px" @click="submitRemove"/>   
   </div>
 </template>
@@ -21,6 +25,7 @@ const props = defineProps({
 })
 
 
+const inputDetails = computed(() => JSON.stringify(props.input, null, 2));
 
 const previewEnabled = useCookie('enablePreview')
 

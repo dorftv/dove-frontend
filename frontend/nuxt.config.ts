@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     devProxy: {
       '/api': 'http://192.168.23.129:5000/api',
       '/preview': 'http://192.168.23.129:5000/preview',
-      '/ws': 'http://fakeapi:9999',
     },
   },  
   devtools: { enabled: true },
@@ -29,6 +28,7 @@ export default defineNuxtConfig({
       },
     }
   },
+  
   modulesDir: ['./node_modules'],
   modules: ['@nuxt/ui', 'nuxt-icon'],
   link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],  

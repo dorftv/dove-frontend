@@ -36,7 +36,7 @@ if (!pending.value && !error.value && config.value) {
             </nav>
         </header>
 
-        <div class="grid grid-cols-12 px-4 py-8">
+        <div class="grid grid-cols-12 px-4 py-8  border-gray-200">
         <slot />
         </div>
     </div>
