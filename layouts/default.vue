@@ -4,10 +4,7 @@ const resolutions = "test"
 const { data: config, pending, error } = await useFetch('/api/config');
 
 if (!pending.value && !error.value && config.value) {
-      // Access the mixer_resolutions object
-     // const resolutions = config.value.mixer_resolutions;
-      console.log("hit")
-      console.log(resolutions)
+
 
 }
 

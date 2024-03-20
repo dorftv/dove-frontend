@@ -1,10 +1,10 @@
 <template>
-  <div :class="stateClass">
+  <div :class="input.state.toLowerCase()">
     <Icon name="uil:stop-circle" color="black" size="24px" @click="submitStop"/>
     <Icon name="uil:pause-circle" color="black" size="24px"  @click="submitPause" />
     <Icon name="uil:play-circle" color="black" size="24px" @click="submitPlay"/>
 
-     {{ state }}
+     {{ input.state }}
      <!-- toggle preview -->
     <Icon name="uil:video-slash" color="black" size="24px"  v-if="!inputPreview && inputEnabled" @click="$emit('enablePreview', false)"/>
     <Icon name="uil:video" color="black" size="24px"  v-if="!inputPreview && !inputEnabled"  @click="$emit('enablePreview', true)"/>    
@@ -16,132 +16,50 @@
     </div>    
   </div>
 </template>
-
 <script setup>
 
-import { inject } from 'vue';
-import { computed } from "@vue/reactivity"
+
 const props = defineProps({
   input: Object,
-  state: String,
-  uid: String,
-  inputEnabled: Boolean
-
-})
-
-const volume = ref(props.input.volume * 100)
-
-// Update the ref whenever the prop changes
-watch(() => props.input.volume, (newValue) => {
-  volume.value = props.input.volume * 100;
+  inputEnabled: Boolean,
 });
-    
-//const state = ref(input.state)
 
-const { inputPreview } = useUserState()
+const { inputPreview } = useUserState();
+
+const {
+  volume,
+  durationFormatted,
+  positionFormatted,
+  handleVolumeChange,
+  submitPlay,
+  submitPause,
+  submitStop,
+} = useInputControls(props);
 
 function enablePreview() {
-  inputEnabled = !prop.inputEnabled
+  inputEnabled = !prop.inputEnabled;
 }
-
-import { useEntities } from '@/composables/useEntities'; // Adjust the import path as necessary
-const { sendWebSocketMessage } = useEntities();
-const duration = ref(props.input.duration)
-const position = ref(props.input.position)
-const durationFormatted = computed(() => {
-    return (!props.input.duration || props.input.duration == "00") ? "" : `/${useTimeFormatter(duration).value}`
-  })
-const positionFormatted = useTimeFormatter(position)
-
-watchEffect(() => {
-  duration.value = props.input.duration
-  position.value = props.input.position  
-})
-
-const handleVolumeChange = (newVolume) => {
-  volume.value = newVolume;
-  const vol = newVolume / 100;
-
-  sendWebSocketMessage({
-    type: 'input',
-    action: 'UPDATE',
-    data: {
-      uid: props.uid,
-      volume: vol
-    }
-  });
-};
-
-const submitPlay = async () => {
-    const { data: responseData } = await useFetch('/api/inputs/delete', {
-        method: 'post',
-        body: { 
-          uid: props.uid,
-        }
-    })
-}
-
-const submitPause = async () => {
-    const { data: responseData } = await useFetch('/api/input/delete', {
-        method: 'post',
-        body: { 
-          uid: props.uid,
-        }
-    })
-}
-const submitStop = async () => {
-    const { data: responseData } = await useFetch('/api/input/delete', {
-        method: 'post',
-        body: { 
-          uid: props.uid,
-        }
-    })
-}
-
-const stateClass = computed(() => {
-switch (props.state) {
-  case 'PLAYING':
-    console.log("play")
-    return 'playing';
-  case 'BUFFERING':
-    console.log("buffer")
-    return 'buffering';
-  case 'PENDING':
-    console.log("pending")
-    return 'pending';
-  case 'PAUSED':
-    console.log("paused")
-    return 'paused';
-    case 'EOS':
-    console.log("eos")
-    return 'eos';    
-  default:
-    console.log("Status unknown")
-    return '';
-}
-});
-
-
 
 </script>
 
 <style scoped>
-
-
 .playing {
-background-color: green;
-
+  background-color: green;
 }
 
 .buffering {
-background-color: orange;
+  background-color: orange;
 }
 
 .pending {
-background-color: gray;
+  background-color: gray;
 }
 
-.paused, .eos {
-background-color: red;
+.paused {
+  background-color: orange;
+}
+
+.eos {
+  background-color: red;
 }
 </style>

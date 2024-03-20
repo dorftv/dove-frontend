@@ -5,9 +5,10 @@ export default defineNuxtConfig({
   static: true,
   nitro: {
     devProxy: {
-      '/api': 'http://192.168.23.129:5000/api',
-      '/preview': 'http://192.168.23.129:5000/preview',
+      '/api': process.env.DOVE_API ? process.env.DOVE_API + '/api' : 'http://localhost:5000/api',
+      '/preview': process.env.DOVE_API ? process.env.DOVE_API + '/preview' : 'http://localhost:5000/preview',
     },
+ 
   },  
   devtools: { enabled: true },
   css: ["@/assets/css/tailwind.css"],
