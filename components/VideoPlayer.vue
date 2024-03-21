@@ -2,7 +2,7 @@
 <template>
   <div>     
 
-    <media-player ref="mediaPlayer" :muted="muted" viewType="video" autoplay stream-type="live" load="custom" :title="`${uid}`"  :src="`/preview/hls/${uid}/index.m3u8`" class="aspect-video">
+    <media-player ref="mediaPlayer" :muted="muted" viewType="video" autoplay stream-type="live"  load="custom" :title="`${uid}`"  :src="`/preview/hls/${uid}/index.m3u8`" class="aspect-video">
       <media-provider></media-provider>
       <media-video-layout></media-video-layout>
 
@@ -36,10 +36,13 @@ onMounted(() => {
   if (provider?.type === 'hls') {
 
     provider.library = HLS;
+    provider.config = {
+      // Limit loading ahead to 30 seconds, this may affect playback experience.
+      maxMaxBufferLength: 3, 
+    };
     setTimeout(() => {
     const src = player.src
     player.startLoading();
-
     //  player.play();
 }, 1500);
   }

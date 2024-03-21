@@ -1,20 +1,31 @@
 <template>
-  <div class="col-span-8 grid grid-cols-8 gap-4">
-    <div 
-      class="col-span-3"
-      v-for="scene in sceneMixers"
-      :key="scene.uid"
-    >
-    
-      <SceneMain 
-        :scene="scene" 
-      />
-    </div>
-  </div>
+  <div class="col-span-4 gap-4">
+  Scenes
+  <UTabs :items="sceneMixers" orientation="vertical" :ui="{ wrapper: 'flex  gap-4', list: { width: 'w-100' } }">
+    <template v-slot:sceneMixer="{ item }">
+      <SceneMain :scene="item" />
+    </template>
+    <template #default="{ item, selected }">
+      <div class="flex gap-2 relative truncate">
+        <span class="truncate">{{ item.name }}</span>
+        <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
+      </div>
+    </template>
 
-  <div class="grid col-span-3"> 
-<!--     <MainOutputPlayer preview_uri="http://localhost:88/preview/playlist.m3u8" />-->
-  </div>
+    <template #item="{item, selected}">
+       <div 
+      class="col-span-3">
+      <SceneMain :scene="item" :active="selected" />
+       </div>
+    </template>
+  </UTabs>
+    </div>
+
+
+  <div class="grid col-span-1"> 
+    </div>
+
+     <ProgramMain />
 
   <div class="grid col-span-1">
     <OutputMain :outputs="outputs" />
@@ -36,6 +47,7 @@ useHead({
 })
 
 const { inputs, sceneMixers, outputs } = useEntities();
+
 
 
 </script>

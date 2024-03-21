@@ -1,12 +1,6 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 
-let entitiesInstance = null;
-
 export function useEntities() {
-  if (entitiesInstance) {
-    return entitiesInstance;
-  }
-
   const inputs = ref([]);
   const mixers = ref([]);
   const outputs = ref([]);
@@ -75,8 +69,8 @@ export function useEntities() {
     }
   };
 
-  onMounted(async () => {
-    await fetchEntities();
+  const connectWebSocket = () => {
+    if (webSocket.value) return; // Don't establish a new connection if one already exists
 
     webSocket.value = new WebSocket(wsUrl);
     webSocket.value.onmessage = (event) => {
@@ -98,12 +92,22 @@ export function useEntities() {
       error.value = 'WebSocket error: ' + wsError.message;
       console.error(error.value);
     };
+  };
+
+  const disconnectWebSocket = () => {
+    if (webSocket.value) {
+      webSocket.value.close();
+      webSocket.value = null;
+    }
+  };
+
+  onMounted(async () => {
+    await fetchEntities();
+    connectWebSocket();
   });
 
   onUnmounted(() => {
-    if (webSocket.value) {
-      webSocket.value.close();
-    }
+    disconnectWebSocket();
   });
 
   const sendWebSocketMessage = (message) => {
@@ -136,7 +140,7 @@ export function useEntities() {
     return mixers.value.filter(mixer => mixer.type === 'scene');
   });
 
-  entitiesInstance = {
+  return {
     inputs,
     mixers,
     outputs,
@@ -146,6 +150,4 @@ export function useEntities() {
     sendWebSocketMessage,
     error
   };
-
-  return entitiesInstance;
 }

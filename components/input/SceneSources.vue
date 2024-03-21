@@ -1,5 +1,6 @@
 <template>
   <div class="flex justify-between items-center">
+  <div>{{ scene.name }} </div> 
   <div>{{ source.sink }}</div>
   <div>{{inputName }}</div>
 

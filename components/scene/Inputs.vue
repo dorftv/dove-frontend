@@ -4,7 +4,7 @@
       {{ source.name }}
       <USelect 
         v-if="!source.src_locked && inputs?.length"
-        :key="source.sink" 
+        :key="source.src" 
         @update:modelValue="handleChange('src', $event)"  
         padding=false 
         :modelValue="src"
@@ -14,7 +14,6 @@
         value-attribute="id"
         size="md"
       />
-
       <div v-if="source.src_locked">
         {{(inputs.find(input => input.uid === src) || {}).name }}
       </div>
@@ -48,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useSceneSources } from '@/composables/useSceneSources';
 
 const props = defineProps({
@@ -59,6 +58,13 @@ const props = defineProps({
 const { inputs, removePad, handleChange, getMax, src, alpha, width, height, xpos, ypos, volume, mute } = useSceneSources(props.scene, props.source);
 
 const open = ref(false);
+
+// Watch for changes in source.src and update src accordingly
+watch(() => props.source.src, (newSrc) => {
+  if (newSrc !== src.value) {
+    src.value = newSrc;
+  }
+});
 </script>
 
 <style>

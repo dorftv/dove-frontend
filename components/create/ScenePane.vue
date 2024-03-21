@@ -7,7 +7,7 @@
   size="sm"
   color="primary"
   variant="solid"
-  label="Add Mixer"
+  label="Add Scene"
   :trailing="false"
   @click="isOpen = true"
 />

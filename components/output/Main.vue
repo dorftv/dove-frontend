@@ -1,5 +1,6 @@
 <template>
 <div>
+  Outputs:
   <Output v-for="output in outputs" :key="output.uid" :output="output" :mixers="mixers" />
 </div>  
 </template>

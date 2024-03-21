@@ -30,7 +30,9 @@
       </div>
     </template> 
   </UTabs>      
+
 </UModal>
+
 </div>
 </template>
 
@@ -64,6 +66,7 @@ const formData = reactive({});
 const state = reactive({
   type: '',
 });
+
 function handleUpdateFormData(updatedFormData) {
   Object.assign(formData, updatedFormData);
 }
