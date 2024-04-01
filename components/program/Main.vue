@@ -3,9 +3,8 @@
   <ProgramSwitch />
 </div>
 <div class="grid col-span-4">
-    <!--
+  Program
   <ProgramPlayer />
-  -->
 </div>
 </template>
 

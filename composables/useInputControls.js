@@ -35,12 +35,22 @@ export default function useInputControls(props) {
         volume: vol,
       });
     };
-  
+
+    const handlePositionChange = (newPosition) => {
+      position.value = newPosition;
+    
+      updateEntity('input', {
+        uid: props.input.uid,
+        position: newPosition,
+      });
+    };
+    
     const submitPlay = async () => {
       const { data: responseData } = await useFetch('/api/inputs', {
         method: 'put',
         body: {
           uid: props.input.uid,
+          type: 'update',
           state: 'PLAYING',
         },
       });
@@ -51,8 +61,7 @@ export default function useInputControls(props) {
         method: 'put',
         body: {
           uid: props.input.uid,
-          type: props.input.type,
-          uri: props.input.uri,
+          type: 'update',
           state: 'PAUSED',
         },
       });
@@ -69,9 +78,11 @@ export default function useInputControls(props) {
   
     return {
       volume,
+      position,
       durationFormatted,
       positionFormatted,
       handleVolumeChange,
+      handlePositionChange,
       submitPlay,
       submitPause,
       submitStop,

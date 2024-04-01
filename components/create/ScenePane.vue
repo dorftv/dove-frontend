@@ -13,11 +13,14 @@
 />
     <UModal v-model="isOpen" :transition="false">
       <UContainer>
-      <UForm  class="p-4 space-y-4" @submit="submitCreateMixer">
+      <UForm  class="p-4 space-y-4" @submit="submitCreateScene">
 
       <div class="p-4">
-        <UInput size="md" />
-        <UButton  type="submit" label="Create Mixer" @click="isOpen = false"   />
+        <UFormGroup label="Name">
+          <UInput v-model="state.name" />
+        </UFormGroup>        
+        <CreateResolutions />
+        <UButton  type="submit" label="Create Scene" @click="isOpen = false"   />
         <UButton color="red" label="Cancel" @click="isOpen = false" />
       </div>
     </UForm>
@@ -28,12 +31,20 @@
 
 <script setup>
 const isOpen = ref(false)
-const submitCreateMixer = async () => {
+
+const state = reactive({
+  type: 'scene',
+});
+
+const submitCreateScene = async () => {
     const { data: responseData } = await useFetch('/api/mixers', {
         method: 'put',
         body: { 
           type: 'scene',
+          name: state.name
         }
     })
+    
+    //setSelectedScene(responseData)
 }
 </script>

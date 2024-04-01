@@ -28,8 +28,8 @@ const dimensions = getResolutionDimensions(selectedResolution);
     state.width = dimensions.width;
     state.height = dimensions.height;
   }
-
-  emit('update:formData', state);
+// @TODO 
+//  emit('update:handleUpdateFormData', state);
 });
 
 </script>

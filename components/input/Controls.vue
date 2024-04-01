@@ -1,5 +1,8 @@
 <template>
   <div :class="input.state.toLowerCase()">
+    <div>{{ positionFormatted }}{{ durationFormatted }}</div>
+    <URange v-if="input.duration" :modelValue="position" @update:modelValue="handlePositionChange" name="range" :min="0" :max="input.duration" />
+
     <Icon name="uil:stop-circle" color="black" size="24px" @click="submitStop"/>
     <Icon name="uil:pause-circle" color="black" size="24px"  @click="submitPause" />
     <Icon name="uil:play-circle" color="black" size="24px" @click="submitPlay"/>
@@ -9,14 +12,16 @@
     <Icon name="uil:video-slash" color="black" size="24px"  v-if="!inputPreview && inputEnabled" @click="$emit('enablePreview', false)"/>
     <Icon name="uil:video" color="black" size="24px"  v-if="!inputPreview && !inputEnabled"  @click="$emit('enablePreview', true)"/>    
     <Icon name="icomoon-free:loop" color="black" size="24px"  v-if="input.loop" />    
-    <div>{{ positionFormatted }}{{ durationFormatted }}</div>
+
     <div>
-    <URange :modelValue="volume" @update:modelValue="handleVolumeChange" name="range" :min="0" :max="100" />
-      Volume: {{  volume  }}          
+    <div class="felx justify-between">
+    <URange :modelValue="volume" @update:modelValue="handleVolumeChange" name="range" :min="0" :max="100" />{{  volume  }}
+    </div>
     </div>    
   </div>
 </template>
 <script setup>
+
 
 
 const props = defineProps({
@@ -28,9 +33,11 @@ const { inputPreview } = useUserState();
 
 const {
   volume,
+  position,
   durationFormatted,
   positionFormatted,
   handleVolumeChange,
+  handlePositionChange,
   submitPlay,
   submitPause,
   submitStop,

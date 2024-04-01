@@ -2,6 +2,8 @@
       <USelect v-model="state.src" :options="availSrc" option-attribute="name"   placeholder="Select Source" />
     
       <UInput v-model="state.name" size="md" placeholder="Give a name. Default Output X" />
+          
+      <CreateResolutions />
 
 </template>
 

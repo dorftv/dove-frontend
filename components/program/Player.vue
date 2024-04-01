@@ -1,17 +1,19 @@
 <template>
-  <div>
-    Main Output
-    <VideoPlayer :preview_uri="preview_uri" />
+  <div v-if="programMixer">
+    <div v-if="activeScene">
+    {{ activeScene.name }}
+    </div>
+    <VideoPlayer :uid=" programMixer.uid" />
   </div>
+
+
 </template>
 
 <script setup>
 
 
-const props = defineProps({
-  preview_uri: String,
-})
-
+const { programMixer } = useEntities()
+const { activeScene } = useActiveScene()
 </script>
 
 <style scoped> 

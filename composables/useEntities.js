@@ -1,6 +1,12 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 
+let entitiesInstance = null;
+
 export function useEntities() {
+  if (entitiesInstance) {
+    return entitiesInstance;
+  }
+
   const inputs = ref([]);
   const mixers = ref([]);
   const outputs = ref([]);
@@ -139,15 +145,25 @@ export function useEntities() {
   const sceneMixers = computed(() => {
     return mixers.value.filter(mixer => mixer.type === 'scene');
   });
+  const programMixer = computed(() => {
+    return mixers.value.find(mixer => mixer.type === 'program');
+  });
 
-  return {
+
+
+
+
+  entitiesInstance = {
     inputs,
     mixers,
     outputs,
     sceneInputs,
     sceneMixers,
+    programMixer,
     updateEntity,
     sendWebSocketMessage,
     error
   };
+
+  return entitiesInstance;
 }

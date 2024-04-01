@@ -4,6 +4,7 @@
       <SceneHeader   :scene="scene" />
       <VideoPlayer v-if="(mixerPreview || mixerEnabled) && active" :uid="scene.uid" />
       <UButton color="white"  trailing-icon="i-heroicons-plus-circle" @click="addPad"/>
+      
       <div v-for="source in scene.sources" :modelValue="source.src" :key="source.sink">
         <SceneInputs :source="source"  :scene="scene" v-if="!source.src_locked"/>
       </div>

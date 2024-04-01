@@ -3,7 +3,6 @@
     <div>
         <div class="p-4">
           <h2></h2>
-            <CreateResolutions />                    
 
             <div>         
              <URange v-model="state.pattern" name="range" :min="0" :max="28" :step="1" />
@@ -18,6 +17,8 @@
             <UInput v-model="state.freq" size="md" placeholder="440.0" />
           </UFormGroup>
           
+          <CreateResolutions />
+
         </div>
     </div>
   </template>
@@ -32,26 +33,12 @@ const state = reactive({
   pattern: 0,
   wave: 1,
   freq: 440.1,
-  width: null,
-  height: null,
 });
 
 watchEffect(() => {
-  const resolution = state.defaultResolution; // or wherever you store the current resolution
-  const dimensions = getResolutionDimensions(resolution);
-  if (dimensions) {
-    state.width = dimensions.width;
-    state.height = dimensions.height;
-  }
-
   emit('update:formData', state);
 });
 
-
-const updateResolution = ({ width, height }) => {
-  state.width = width;
-  state.height = height;
-};
 
 
 </script>
