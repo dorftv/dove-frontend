@@ -1,7 +1,9 @@
 <template>
 <div>
   Outputs:
-  <Output v-for="output in outputs" :key="output.uid" :output="output" :mixers="mixers" />
+  <CreateOutputPane class="p-2"/>
+
+  <Output v-for="output in outputs" :key="output.uid" :output="output" class="px-4" />
 </div>  
 </template>
 
@@ -11,7 +13,6 @@
 
 const props = defineProps({
     outputs: Object,
-    mixers: Object,
   })
 </script>
 

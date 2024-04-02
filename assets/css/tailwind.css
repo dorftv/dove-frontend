@@ -10,3 +10,25 @@ div {
   padding: 0;
   margin: 0;
 }
+
+
+
+.playing {
+  background-color: green;
+}
+
+.buffering {
+  background-color: orange;
+}
+
+.pending {
+  background-color: gray;
+}
+
+.paused {
+  background-color: orange;
+}
+
+.eos {
+  background-color: red;
+}

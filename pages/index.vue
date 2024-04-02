@@ -1,6 +1,11 @@
 <template>
-  <div class="col-span-4 gap-4">
-    Scenes
+<div class="grid grid-cols-12 px-4 py-8  border-gray-200">
+
+  <div class="col-span-5 gap-4">
+    Scenes 
+    <CreateScenePane />
+
+
     <UTabs :items="sceneMixers" @change="onSceneChange" orientation="vertical" :ui="{ wrapper: 'flex  gap-4', list: { width: 'w-100' } }">
       <template v-slot:sceneMixer="{ item }">
         <SceneMain :scene="item" />
@@ -14,7 +19,7 @@
   
       <template #item="{item, selected}">
          <div 
-        class="col-span-3">
+        class="">
         <SceneMain :scene="item" :active="selected" />
          </div>
       </template>
@@ -22,22 +27,17 @@
   </div>
 
 
-  <div class="grid col-span-1"> 
-    </div>
-
+<div class="col-span-6">
      <ProgramMain />
+     </div>
 
-  <div class="grid col-span-1">
+  <div class="col-span-1 px-4">
     <OutputMain :outputs="outputs" />
   </div>
 
-  <div class="grid col-span-8 grid-cols-8 gap-4 py-12">
-    <div v-for="input in inputs" :key="input.uid" class="col-span-2">
+  <InputMain :input="input" />
 
-      <InputMain :input="input" />
-    </div>
-  </div>
-
+</div>
 </template>
 
 <script setup>

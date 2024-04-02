@@ -14,15 +14,16 @@
         value-attribute="id"
         size="md"
       />
+      
       <div v-if="source.src_locked">
         {{(inputs.find(input => input.uid === src) || {}).name }}
       </div>
 
-      <UButton v-if="!mute" color="white" trailing-icon="i-heroicons-speaker-wave" @click="handleChange('mute', true)" />
-      <UButton v-if="mute" color="white" trailing-icon="i-heroicons-speaker-x-mark" @click="handleChange('mute', false)" />
+      <UButton v-if="!mute && !scene.src_locked" color="white" trailing-icon="i-heroicons-speaker-wave" @click="handleChange('mute', true)" />
+      <UButton v-if="mute && !scene.src_locked" color="white" trailing-icon="i-heroicons-speaker-x-mark" @click="handleChange('mute', false)" />
 
-      <UButton v-if="!source.locked" color="white"  trailing-icon="i-heroicons-adjustments-horizontal" @click="open = !open"/>
-      <UButton v-if="source.locked" color="white"  trailing-icon="i-heroicons-lock-closed" />
+      <UButton v-if="!source.locked && !scene.src_locked" color="white"  trailing-icon="i-heroicons-adjustments-horizontal" @click="open = !open"/>
+      <UButton v-if="source.locked || scene.src_locked" color="white"  trailing-icon="i-heroicons-lock-closed" />
     </div>
     <div v-if="open" class="container">
       <UButton color="white"  trailing-icon="i-heroicons-minus-circle" @click="removePad"/>

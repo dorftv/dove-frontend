@@ -1,15 +1,17 @@
 <template>
-  <div>
+  <UTooltip text="Add Input">
+
     <UButton class="ma-0 pa-0"
-  icon="i-heroicons-pencil-square"
+  icon="i-heroicons-plus-circle"
   size="sm"
-  color="primary"
+  color="white"
   variant="solid"
-  label="Add Input"
+  label=""
   :trailing="false"
   @click="isOpen = true"
 
 />
+  </UTooltip>
 <UModal v-model="isOpen" :transition="false">
   <UTabs :items="items"  orientation="vertical">
     <template #item="{ item }">
@@ -33,7 +35,6 @@
 
 </UModal>
 
-</div>
 </template>
 
 <script setup>

@@ -8,11 +8,7 @@ const isOpen = ref(false)
         <header class="shadow-sm bg-white">
             <nav class="flex justify-between">
                 <NuxtLink to="/" class="font-bold">DOVE - Online Video Editor</NuxtLink>
-                <div class="flex" >
-                  <CreateInputPane class="p-2"/>
-                  <CreateScenePane class="p-2"/>
-                  <CreateOutputPane class="p-2"/>
-                </div>
+
                 <ul class="flex gap-4">
                     <li><NuxtLink to="/">Home</NuxtLink></li>
                     <li><NuxtLink to="/about">About</NuxtLink></li>
@@ -22,16 +18,14 @@ const isOpen = ref(false)
                 </ul>
                 <TogglePreview />
                 <a href="https://github.com/dorftv/dove">
-                  <Icon name="uil:github" color="black" size="36px" />
+                  <Icon name="mingcute:git-lab-fill" color="black" size="24px" />
                 </a>
             </nav>
         </header>
 
-        <div class="grid grid-cols-12 px-4 py-8  border-gray-200">
-              <keep-alive>
+      <keep-alive>
         <slot />
     </keep-alive>
-        </div>
     </div>
 </template>
 

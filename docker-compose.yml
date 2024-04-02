@@ -1,15 +1,21 @@
-version: "3.5"
+#version: "3.5"
 services:
   frontend:
     build:
       context: .
+    environment:
+     - DOVE_API=http://dove:5000
     working_dir: /var/www/html/app/
     entrypoint: npm run dev -- -o --host
     ports:
-      - 3001:3000
+      - 3000:3000
     volumes:
       - .:/var/www/html/app
     tty: true
+    networks:
+      - dove_dove
 networks:
-  dove:
+  dove_dove:
+    external: true
+
 

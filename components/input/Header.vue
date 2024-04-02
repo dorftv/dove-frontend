@@ -12,7 +12,7 @@
       </div>
     </template>
   </UPopover>
-    <Icon name="uil:trash" color="red" size="24px" @click="submitRemove"/>   
+    <Icon v-if="!input.locked" name="uil:trash" color="red" size="24px" @click="submitRemove"/>   
   </div>
 </template>
 

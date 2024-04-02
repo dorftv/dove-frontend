@@ -145,16 +145,26 @@ export function useEntities() {
   const sceneMixers = computed(() => {
     return mixers.value.filter(mixer => mixer.type === 'scene');
   });
+
   const programMixer = computed(() => {
     return mixers.value.find(mixer => mixer.type === 'program');
   });
 
+  const inputsPreview = computed(() => {
+    return inputs.value.filter(input => input.preview === true);
+  })
+  
+  const inputsNoPreview = computed(() => {
+    return inputs.value.filter(input => input.preview === false);
+  })
 
 
 
 
   entitiesInstance = {
     inputs,
+    inputsPreview,
+    inputsNoPreview,
     mixers,
     outputs,
     sceneInputs,

@@ -1,16 +1,18 @@
 
 
 <template>
-  <div>
+      <UTooltip text="Add Scene">
     <UButton class="ma-0 pa-0"
-  icon="i-heroicons-pencil-square"
+  icon="i-heroicons-plus"
   size="sm"
-  color="primary"
+  color="white"
   variant="solid"
-  label="Add Scene"
+  label=""
+  tooltip="xx"
   :trailing="false"
   @click="isOpen = true"
 />
+      </UTooltip>
     <UModal v-model="isOpen" :transition="false">
       <UContainer>
       <UForm  class="p-4 space-y-4" @submit="submitCreateScene">
@@ -26,7 +28,6 @@
     </UForm>
     </UContainer>      
     </UModal>
-  </div>
 </template>
 
 <script setup>
@@ -34,6 +35,7 @@ const isOpen = ref(false)
 
 const state = reactive({
   type: 'scene',
+
 });
 
 const submitCreateScene = async () => {
