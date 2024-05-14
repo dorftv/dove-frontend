@@ -1,11 +1,11 @@
 <template>
   <div class="flex justify-between items-center">
-  <div>{{ scene.name }} </div> 
+  <div>{{ scene.name }} </div>
   <div>{{ source.sink }}</div>
   <div>{{inputName }}</div>
 
   <div class="flex space-x-4">
-    <Icon  v-if="!isInSceneSources" name="heroicons:scissors" color="red" size="24px" @click="submitAddSource" class="w-6"/>   
+    <Icon  v-if="!isInSceneSources" name="heroicons:scissors" color="red" size="24px" @click="submitAddSource" class="w-6"/>
     <Icon v-if="isInSceneSources" name="lets-icons:remove-fill" color="red" size="24px" @click="submitRemoveSource"/>
   </div>
 </div>
@@ -33,10 +33,10 @@ const isInSceneSources = computed(() => {
 const submitAddSource = async () => {
     const { data: responseData } = await useFetch('/api/mixer/add_source', {
         method: 'post',
-        body: { 
+        body: {
           src: props.input.uid,
           target: props.scene.uid,
-          sink: props.source.sink
+          index: props.source.index
         }
     })
 }
@@ -44,10 +44,10 @@ const submitAddSource = async () => {
 const submitRemoveSource = async () => {
     const { data: responseData } = await useFetch('/api/mixer/remove_source', {
         method: 'post',
-        body: { 
+        body: {
           src: "None",
           target: props.scene.uid,
-          sink: props.source.sink
+          index: props.source.index
         }
     })
 }

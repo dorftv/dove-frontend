@@ -16,6 +16,6 @@ const { programMixer } = useEntities()
 const { activeScene } = useActiveScene()
 </script>
 
-<style scoped> 
+<style scoped>
 
 </style>

@@ -1,4 +1,3 @@
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
@@ -6,17 +5,18 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       '/api': process.env.DOVE_API ? process.env.DOVE_API + '/api' : 'http://localhost:5000/api',
+      '/proxy': process.env.DOVE_API ? process.env.DOVE_API + '/proxy' : 'http://localhost:5000/proxy',
       '/preview': process.env.DOVE_API ? process.env.DOVE_API + '/preview' : 'http://localhost:5000/preview',
     },
- 
-  },  
+
+  },
   devtools: { enabled: true },
   css: ["@/assets/css/tailwind.css"],
   postcss: {
     plugins: {
       "postcss-import": {},
       "tailwindcss/nesting": {},
-      tailwindcss: {},  
+      tailwindcss: {},
       autoprefixer: {},
     },
   },
@@ -29,9 +29,9 @@ export default defineNuxtConfig({
       },
     }
   },
-  
+
   modulesDir: ['./node_modules'],
   modules: ['@nuxt/ui', 'nuxt-icon'],
-  link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],  
-})
 
+
+})

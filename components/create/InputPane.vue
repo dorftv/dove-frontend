@@ -19,19 +19,20 @@
 
         <UForm refs="inputForm"  :state="state" class="space-y-4" @submit="submitCreate">
 
-          <CreateInputUri v-if="item.key === 'uri'" @update:formData="handleUpdateFormData"/> 
-          <CreateInputYtDlp v-if="item.key === 'ytdlp'" @update:formData="handleUpdateFormData"/> 
-          <CreateInputWpe v-if="item.key === 'wpe'" @update:formData="handleUpdateFormData"/> 
-          <CreateInputTestsrc  v-if="item.key === 'testsrc'"   @update:formData="handleUpdateFormData"/> 
-  
-          <CreateInputCommon @update:formData="handleUpdateFormData"/>
+          <CreateInputUri :state="state"  v-if="item.key === 'uri'" @update:formData="handleUpdateFormData"/>
+          <CreateInputYtDlp v-if="item.key === 'ytdlp'" @update:formData="handleUpdateFormData"/>
+          <CreateInputWpe v-if="item.key === 'wpe'" @update:formData="handleUpdateFormData"/>
+          <CreateInputTestsrc  v-if="item.key === 'testsrc'"   @update:formData="handleUpdateFormData"/>
+
+          <CreateInputCommon :state="state" @update:formData="handleUpdateFormData"/>
+          <UInput v-model="state.name" size="md" placeholder="Give a name. Default Input X" />
 
           <UButton type="submit" label="Create Input"  />
-          <UButton color="red" label="Cancel" @click="isOpen = false" />        
+          <UButton color="red" label="Cancel" @click="isOpen = false" />
         </UForm>
       </div>
-    </template> 
-  </UTabs>      
+    </template>
+  </UTabs>
 
 </UModal>
 
@@ -66,6 +67,7 @@ const formData = reactive({});
 
 const state = reactive({
   type: '',
+  name:''
 });
 
 function handleUpdateFormData(updatedFormData) {

@@ -64,10 +64,10 @@ export function useSceneSources(scene, source) {
         mute.value = newValue;
         break;
     }
-  
+
     updateEntityInEntities('mixer', {
       uid: scene.uid,
-      sink: source.sink,
+      index: source.index,
       [prop]: newValue
     });
   };
@@ -82,16 +82,16 @@ export function useSceneSources(scene, source) {
       'ypos': scene.height,
       'volume': 150,
     };
-    
+
     return typeMaxMap[type];
   };
 
-  const removePad = async () => {
-    const { data: responseData } = await useFetch('/api/mixer/remove_pad', {
+  const removeSlot = async () => {
+    const { data: responseData } = await useFetch('/api/mixer/remove_slot', {
       method: 'post',
-      body: { 
+      body: {
         uid: scene.uid,
-        sink: { sink: source.sink }
+        index: source.index
       }
     });
   };
@@ -99,7 +99,7 @@ export function useSceneSources(scene, source) {
   return {
     inputs,
     updateEntity: handleChange,
-    removePad,
+    removeSlot,
     handleChange,
     getMax,
     src,
@@ -109,6 +109,6 @@ export function useSceneSources(scene, source) {
     xpos,
     ypos,
     volume,
-    mute 
+    mute
   };
 }

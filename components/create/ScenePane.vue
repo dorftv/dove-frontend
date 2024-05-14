@@ -15,18 +15,18 @@
       </UTooltip>
     <UModal v-model="isOpen" :transition="false">
       <UContainer>
-      <UForm  class="p-4 space-y-4" @submit="submitCreateScene">
+      <UForm  class="p-4 space-y-4"  :state="state" @submit="submitCreateScene">
 
       <div class="p-4">
         <UFormGroup label="Name">
           <UInput v-model="state.name" />
-        </UFormGroup>        
+        </UFormGroup>
         <CreateResolutions />
         <UButton  type="submit" label="Create Scene" @click="isOpen = false"   />
         <UButton color="red" label="Cancel" @click="isOpen = false" />
       </div>
     </UForm>
-    </UContainer>      
+    </UContainer>
     </UModal>
 </template>
 
@@ -41,12 +41,13 @@ const state = reactive({
 const submitCreateScene = async () => {
     const { data: responseData } = await useFetch('/api/mixers', {
         method: 'put',
-        body: { 
+        body: {
           type: 'scene',
           name: state.name
+
         }
     })
-    
+
     //setSelectedScene(responseData)
 }
 </script>

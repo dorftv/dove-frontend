@@ -1,15 +1,15 @@
 <template>
   <div class="isolate">
-    
+
       <SceneHeader   :scene="scene" />
-      <VideoPlayer v-if="(mixerPreview || mixerEnabled) && active" :uid="scene.uid" />
-      <UButton v-if="!scene.src_locked" color="white"  trailing-icon="i-heroicons-plus-circle" @click="addPad"/>
-      
+      <VideoPlayer v-if="(mixerPreview || mixerEnabled)" :uid="scene.uid" />
+      <UButton v-if="!scene.src_locked" color="white"  trailing-icon="i-heroicons-plus-circle" @click="addSlot"/>
+
       <div v-for="source in scene.sources" :modelValue="source.src" :key="source.sink">
         <SceneInputs :source="source"  :scene="scene" />
       </div>
   </div>
-</template> 
+</template>
 
 <script setup>
 
@@ -22,11 +22,12 @@ const props = defineProps({
   active: Boolean
 })
 
-const addPad = async () => {
-    const { data: responseData } = await useFetch('/api/mixer/add_pad', {
+const addSlot = async () => {
+    const { data: responseData } = await useFetch('/api/mixer/add_slot', {
         method: 'post',
-        body: { 
+        body: {
           uid: props.scene.uid,
+ //         slot: {name: 'xxx', mute: true}
         }
     })
 }

@@ -6,6 +6,7 @@ export default function useDoveConfig() {
   const config = ref(null);
   const error = ref(null);
   const defaultResolution = ref(null);
+  const proxyTypes = ref(false);
 
   const fetchConfig = async () => {
     try {
@@ -16,6 +17,8 @@ export default function useDoveConfig() {
       }
 
       config.value = data.value;
+      console.log(config)
+      proxyTypes.value = Object.keys(config.value.proxy);
       defaultResolution.value = config.value.main.default_resolution;
     } catch (err) {
       error.value = err.message;
@@ -59,6 +62,7 @@ export default function useDoveConfig() {
     config,
     error,
     fetchConfig,
+    proxyTypes,
     resolutionOptions: computed(getResolutionOptions),
     defaultResolution,
     getResolutionDimensions,

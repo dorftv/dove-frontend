@@ -1,5 +1,9 @@
 <script setup>
 const isOpen = ref(false)
+useHead({
+  titleTemplate: (title) => `DOVE - Online Video Editor`,
+  link: [{ rel: 'icon', type: 'image/png', href: '/favicon.png' }],
+})
 
 </script>
 

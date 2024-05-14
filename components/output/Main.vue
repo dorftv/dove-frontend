@@ -1,19 +1,15 @@
 <template>
 <div>
   Outputs:
-  <CreateOutputPane class="p-2"/>
+  <CreateOutputPane />
 
-  <Output v-for="output in outputs" :key="output.uid" :output="output" class="px-4" />
-</div>  
+  <Output v-for="output in outputs" :key="output.uid" :output="output"/>
+</div>
 </template>
 
 <script setup>
+const { outputs } = useEntities();
 
-
-
-const props = defineProps({
-    outputs: Object,
-  })
 </script>
 
 <style>
