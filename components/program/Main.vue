@@ -4,9 +4,6 @@
   <ProgramSwitch />
 </div>
 <div class="col-span-4">
-  Program
-{{ activeScene }}
-
   <ProgramPlayer />
 </div>
 </div>

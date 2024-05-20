@@ -1,8 +1,15 @@
 <template>
   <div v-if="programMixer">
     <div v-if="activeScene">
-    {{ activeScene.name }}
     </div>
+    <UPopover :popper="{ arrow: true }">
+    <UButton color="white" label="Details" trailing-icon="i-heroicons-information-circle-20-solid" />
+    <template #panel>
+      <div class="p-4">
+        {{ programMixer}}
+      </div>
+    </template>
+  </UPopover>
     <VideoPlayer :uid=" programMixer.uid" />
   </div>
 
@@ -12,8 +19,10 @@
 <script setup>
 
 
+
 const { programMixer } = useEntities()
 const { activeScene } = useActiveScene()
+
 </script>
 
 <style scoped>
