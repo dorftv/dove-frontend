@@ -1,6 +1,6 @@
 <template>
   <div v-if="selectedScene" class="box-border p-4 border-4">
-Active: <div class="red">  {{ activeScene.name }}</div>
+Active: <div v-if="activeScene" class="red">  {{ activeScene.name }}</div>
 
 
     <USelect v-model="switchmode" :options="switchemodes" class="px-4 py-24" />

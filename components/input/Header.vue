@@ -12,7 +12,9 @@
       </div>
     </template>
   </UPopover>
-    <Icon v-if="!input.locked" name="uil:trash" color="red" size="24px" @click="submitRemove"/>   
+  <div>
+    <Icon v-if="!input.locked" name="uil:trash" color="red" size="24px" @click="submitRemove"/>
+  </div>
   </div>
 </template>
 
@@ -36,7 +38,7 @@ function enablePreview() {
 const submitRemove = async () => {
     const { data: responseData } = await useFetch('/api/inputs', {
         method: 'delete',
-        body: { 
+        body: {
           uid: props.input.uid,
         }
     })

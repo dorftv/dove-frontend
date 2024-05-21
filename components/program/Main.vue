@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-  const { activeScene, onSceneChange } = useActiveScene()
+
 </script>
 
 <style>
