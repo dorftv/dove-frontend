@@ -30,6 +30,7 @@
                       :name="field.name"
                       :label="field.label"
                       :placeholder="field.placeholder"
+                      :required="field.required"
                     />
                   </div>
                   <div v-if="field.type === 'integer'">
@@ -38,6 +39,7 @@
                       :name="field.name"
                       :label="field.label"
                       :placeholder="field.placeholder"
+                      :required="field.required"
                     />
                   </div>
                   <div v-if="field.type === 'boolean'">
@@ -45,23 +47,41 @@
                       v-model="formData[item.label][field.name]"
                       :name="field.name"
                       :label="field.label"
+                      :required="field.required"
                     />
                   </div>
                 </UFormGroup>
 
 
               </div>
-              <hr />
+              <hr /> <!-- Generic Fields -->
+              <UFormGroup label="Source" required>
+                <USelect required
+                  name="src"
+                  v-model="formData[item.label]['src']"
+                  :options="availSrc"
+                  option-attribute="name"
+                  placeholder="Select Source"
+                />
+              </UFormGroup>
 
-              <USelect label="xxx" name="src" v-model="formData[item.label]['src']" :options="availSrc" option-attribute="name"   placeholder="Select Source" />
+              <UFormGroup label="Resolution" required>
+                <USelect name="resolution"
+                  v-model="selectedResolution"
+                  :options="resolutionOptions"
+                  option-attribute="label"
+                  value-attribute="key"
+                />
+              </UFormGroup>
 
-
-              <UInput
-                v-model="formData[item.label]['name']"
-                name="name"
-                size="md"
-                placeholder="Give a name. Default Output X"
-              />
+              <UFormGroup label="Name">
+                <UInput label="Name"
+                  v-model="formData[item.label]['name']"
+                  name="name"
+                  size="md"
+                  placeholder="Give a name. Default Output X"
+                />
+              </UFormGroup>
 
               <UButton type="submit" label="Create Output" />
               <UButton color="red" label="Cancel" @click="isOpen = false" />
@@ -76,80 +96,17 @@
 
 <script setup>
 
-
-const isOpen = ref(false);
-
-const handleClose = (closing) => {
-  isOpen.value = closing;
-};
-
-const formData = reactive({
-  'src': ''
-});
-
-const { types, isLoading, fetchError } = useOutputTypes();
-
-// Initialize the form data structure dynamically based on types
-watch(types, (newTypes) => {
-  newTypes.forEach((type) => {
-    if (!(type.key in formData)) {
-      formData[type.key] = {};
-      if (Array.isArray(type.fields)) {
-        type.fields.forEach((field) => {
-          formData[type.key][field.name] = field.type === 'boolean' ? false : '';
-        });
-      }
-    }
-  });
-});
-// Function to initialize form data if not already initialized
-const initializeFormData = (type) => {
-  if (!formData[type.label]) {
-    formData[type.label] = {};
-    if (Array.isArray(type.fields)) {
-      type.fields.forEach((field) => {
-        formData[type.label][field.name] = field.type === 'boolean' ? false : '';
-      });
-    }
-  }
-};
-
-// Watch types and initialize form data
-watch(types, (newTypes) => {
-  newTypes.forEach((type) => {
-    initializeFormData(type);
-  });
-}, { immediate: true });
-
-
-const submitCreate = async (itemType) => {
-  try {
-    const responseData = await $fetch(`/api/outputs/${itemType}`, {
-      method: 'PUT',
-      body: formData[itemType],
-    });
-    handleClose();
-    // Handle success response if needed
-  } catch (error) {
-    console.error('Failed to create output:', error);
-    // Handle error if needed
-  }
-};
-
-
-const { data: availMixers, pending, error } = await useFetch('/api/mixers');
-
-const availSrc = ref([])
-
-watchEffect(() => {
-  if (availMixers.value && availMixers.value.length > 0) {
-    availSrc.value = availMixers.value.map(item => {
-      return { name: item.name, value: item.uid }
-    });
-  }
-});
-const emit = defineEmits(['update:formData']);
-
-
+const entityType = 'outputs';
+const {
+  isOpen,
+  isLoading,
+  fetchError,
+  types,
+  formData,
+  availSrc,
+  submitCreate,
+  selectedResolution,
+  resolutionOptions,
+} = useCreateEntity(entityType);
 
 </script>
