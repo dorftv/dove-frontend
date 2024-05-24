@@ -1,7 +1,7 @@
 
 
 <template>
-      <UTooltip text="Add Scene">
+      <UTooltip text="Add Scene" v-if="addScene">
     <UButton class="ma-0 pa-0"
   icon="i-heroicons-plus"
   size="sm"
@@ -37,6 +37,9 @@ const state = reactive({
   type: 'scene',
 
 });
+
+const { addScene} = useDoveConfig()
+
 
 const submitCreateScene = async () => {
     const { data: responseData } = await useFetch('/api/mixers', {

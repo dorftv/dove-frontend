@@ -11,7 +11,7 @@ export const useCreateEntity = (entityType) => {
 
   const { mixers } = useEntities();
 
-  const { resolutionOptions, defaultResolution, getResolutionDimensions } = useDoveConfig();
+  const { getUIConfig, resolutionOptions, defaultResolution, getResolutionDimensions } = useDoveConfig();
 
   const selectedResolution = ref(defaultResolution);
   const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
@@ -38,9 +38,16 @@ export const useCreateEntity = (entityType) => {
 
     types.forEach((type) => {
       if (!(type.key in formData)) {
-        formData[type.key] = {
+        if (entityType === "inputs") {
+          formData[type.key] = {
+            volume: 0.8,
+          };
+        }
+        if (entityType === "outputs") {
+          formData[type.key] = {
 
-        };
+          };
+        }
         if (Array.isArray(type.fields)) {
           type.fields.forEach((field) => {
             formData[type.key][field.name] = field.type === 'boolean' ? false : '';
@@ -62,14 +69,15 @@ export const useCreateEntity = (entityType) => {
       const responseJson = await response.json();
       isOpen.value = false;
     } catch (error) {
-      console.error(`Failed to create ${entityType}:`, error);
+      isOpen.value = false;
     }
   };
-  // Watcher for isOpen
+
   watch(isOpen, (newValue) => {
     if (newValue === false) {
       Object.keys(formData).forEach(key => delete formData[key]);
       initializeFormData(types.value);
+      // @TODO: resetting is not working as expected
       selectedResolution.value = defaultResolution.value;
     }
   });

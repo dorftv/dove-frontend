@@ -1,5 +1,5 @@
 <template>
-  <UTooltip text="Add Output">
+  <UTooltip text="Add Output" v-if="addOutput">
     <UButton
       class="ma-0 pa-0"
       icon="i-heroicons-plus-circle"
@@ -108,5 +108,7 @@ const {
   selectedResolution,
   resolutionOptions,
 } = useCreateEntity(entityType);
+
+const { addOutput} = useDoveConfig()
 
 </script>

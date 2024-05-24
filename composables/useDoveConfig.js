@@ -7,6 +7,10 @@ export default function useDoveConfig() {
   const error = ref(null);
   const defaultResolution = ref(null);
   const proxyTypes = ref(false);
+  const addInput = ref(true)
+  const addOutput = ref(true)
+  const addScene = ref(true)
+
 
   const fetchConfig = async () => {
     try {
@@ -17,9 +21,12 @@ export default function useDoveConfig() {
       }
 
       config.value = data.value;
-      console.log(config)
-      proxyTypes.value = Object.keys(config.value.proxy);
+      proxyTypes.value = config.value.proxy;
       defaultResolution.value = config.value.main.default_resolution;
+      addInput.value = config.value.ui.add_input;
+      addOutput.value = config.value.ui.add_output;
+      addScene.value = config.value.ui.add_scene;
+
     } catch (err) {
       error.value = err.message;
       console.error('Error fetching config:', err);
@@ -68,5 +75,8 @@ export default function useDoveConfig() {
     getResolutionDimensions,
     getMainConfig,
     getUIConfig,
+    addInput,
+    addOutput,
+    addScene,
   };
 }
