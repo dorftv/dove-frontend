@@ -28,7 +28,7 @@
             </div>
             <UForm :state="formData" class="space-y-4" @submit="submitCreate(item.label)">
               <div v-for="field in item.fields" :key="field.name">
-                <div v-if="field.name!='type'">
+                <div v-if="field.name!='type' && field.hidden!=true">
                   <UFormGroup :label="field.label" :required="field.required" :description="field.description" :help="field.help">
 
                     <div v-if="field.type === 'string'">
@@ -64,25 +64,30 @@
 
                     </div>
                   </UFormGroup>
-                    <!-- Check if the field has a proxy defined for retrieving values -->
-                  <div v-for="(proxy, proxyType) in proxyTypes" :key="proxyType">
-                    <div v-if="item.label === proxy.type && field.name === proxy.field">
-                      {{ proxyType }}
-                      <a href="#" @click="fetchItems(proxyType)">
-                        <Icon  name="heroicons:arrow-path" color="green" size="18px"/>
-                      </a>
-                    <div v-if="items.length > 0">
-                      <USelect
+
+
+                  <div v-if="items.length > 0">
+                    <USelect
                         color="primary"
-                        placeholder="Select Stream"
+                        placeholder="Select Stream from Proxy"
                         v-model="formData[item.label][field.name]"
                         variant="outline"
                         :options="items"
                         optionAttribute="name"
-                        :valueAttribute="field.name"
-                        @change="handleFieldChange(item.label, field.name, formData[item.label][field.name])"
-                      />
-                    </div>
+                        valueAttribute="url"
+                             @change="handleFieldChange(item.label, field.name, $event)"
+
+
+                    />
+                  </div>
+                  <div class="flex justify">
+                    <div v-for="(proxy, proxyType) in proxyTypes" :key="proxyType" >
+                      <div v-if="item.key === proxy.type && field.name === proxy.field">
+                        {{ proxyType }}
+                        <a href="#" @click="fetchItems(proxyType)">
+                          <Icon  name="heroicons:arrow-path" color="green" size="18px"/>
+                        </a>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -138,14 +143,13 @@ const {
   resolutionOptions,
 } = useCreateEntity(entityType);
 
-const { addInput} = useDoveConfig()
 
-const { config, proxyTypes } = useDoveConfig();
+const {addInput, config, proxyTypes } = useDoveConfig();
 let refresh = null;
 const items = ref([]);
 
-const handleFieldChange = (itemLabel, fieldName, fieldValue) => {
-  const selectedItem = items.value.find(item => item.uri === fieldValue);
+const handleFieldChange = (itemLabel, fieldName, selectedValue) => {
+  const selectedItem = items.value.find(item => item.url === selectedValue);
   if (selectedItem) {
     formData[itemLabel]['name'] = selectedItem.name;
   }
@@ -155,12 +159,17 @@ async function fetchItems(proxyType) {
   const { data, error, execute, refresh: refreshFunc } = await useFetch(() => `/proxy/${proxyType}`);
   refresh = refreshFunc;
   if (error.value) {
+    items.value = []
     console.error('Failed to fetch items:', error.value);
   } else {
     items.value = data.value;
   }
 }
 
-
+watch(isOpen, (newValue) => {
+  if (!newValue) {
+    items.value = [];
+  }
+});
 
 </script>

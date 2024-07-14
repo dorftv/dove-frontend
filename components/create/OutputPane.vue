@@ -23,35 +23,36 @@
 
             <UForm :state="formData" class="space-y-4" @submit="submitCreate(item.label)">
               <div v-for="field in item.fields" :key="field.name">
-                <UFormGroup :label="field.label" :required="field.required">
-                  <div v-if="field.type === 'string'">
-                    <UInput
-                      v-model="formData[item.label][field.name]"
-                      :name="field.name"
-                      :label="field.label"
-                      :placeholder="field.placeholder"
-                      :required="field.required"
-                    />
-                  </div>
-                  <div v-if="field.type === 'integer'">
-                    <UInput
-                      v-model="formData[item.label][field.name]"
-                      :name="field.name"
-                      :label="field.label"
-                      :placeholder="field.placeholder"
-                      :required="field.required"
-                    />
-                  </div>
-                  <div v-if="field.type === 'boolean'">
-                    <UCheckbox
-                      v-model="formData[item.label][field.name]"
-                      :name="field.name"
-                      :label="field.label"
-                      :required="field.required"
-                    />
-                  </div>
-                </UFormGroup>
-
+                <div v-if="field.name!='type'">
+                  <UFormGroup :label="field.label" :required="field.required">
+                    <div v-if="field.type === 'string'">
+                      <UInput
+                        v-model="formData[item.label][field.name]"
+                        :name="field.name"
+                        :label="field.label"
+                        :placeholder="field.placeholder"
+                        :required="field.required"
+                      />
+                    </div>
+                    <div v-if="field.type === 'integer'">
+                      <UInput
+                        v-model="formData[item.label][field.name]"
+                        :name="field.name"
+                        :label="field.label"
+                        :placeholder="field.placeholder"
+                        :required="field.required"
+                      />
+                    </div>
+                    <div v-if="field.type === 'boolean'">
+                      <UCheckbox
+                        v-model="formData[item.label][field.name]"
+                        :name="field.name"
+                        :label="field.label"
+                        :required="field.required"
+                      />
+                    </div>
+                  </UFormGroup>
+                </div>
 
               </div>
               <hr /> <!-- Generic Fields -->
