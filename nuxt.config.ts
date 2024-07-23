@@ -34,7 +34,7 @@ export default defineNuxtConfig({
   },
 
   modulesDir: ['./node_modules'],
-  modules: ['@nuxt/ui', 'nuxt-icon'],
+  modules: ['@nuxt/ui', 'nuxt-icon', "nuxt-icon-tw"],
 
 
 })
