@@ -17,7 +17,7 @@
     <div v-if="isLoading">Loading...</div>
     <div v-else-if="fetchError">Error: {{ fetchError.message }}</div>
     <div v-else>
-      <UTabs :items="types" orientation="vertical">
+      <UTabs :items="types" orientation="vertical"  @change="onTabChange">
         <template #item="{ item }">
           <div class="p-4">
             <div>
@@ -66,23 +66,22 @@
                   </UFormGroup>
 
 
-                  <div v-if="items.length > 0">
-                    <USelect
-                        color="primary"
-                        placeholder="Select Stream from Proxy"
-                        v-model="formData[item.label][field.name]"
-                        variant="outline"
-                        :options="items"
-                        optionAttribute="name"
-                        valueAttribute="url"
-                             @change="handleFieldChange(item.label, field.name, $event)"
-
-
-                    />
-                  </div>
+                  <!-- Show proxies if configured. -->
                   <div class="flex justify">
                     <div v-for="(proxy, proxyType) in proxyTypes" :key="proxyType" >
                       <div v-if="item.key === proxy.type && field.name === proxy.field">
+                        <div v-if="proxyItems[proxyType] && proxyItems[proxyType].length > 0">
+                          <USelect
+                            color="primary"
+                            placeholder="Select Stream from Proxy"
+                            v-model="formData[item.label][field.name]"
+                            variant="outline"
+                            :options="proxyItems[proxyType]"
+                            optionAttribute="name"
+                            valueAttribute="url"
+                            @change="handleProxyName(item.label, field.name, proxyType, $event)"
+                          />
+                        </div>
                         {{ proxyType }}
                         <a href="#" @click="fetchItems(proxyType)">
                           <Icon  name="heroicons:arrow-path" color="green" size="18px"/>
@@ -90,6 +89,8 @@
                       </div>
                   </div>
                 </div>
+
+
               </div>
             </div>
             <hr />
@@ -146,29 +147,33 @@ const {
 
 const {addInput, config, proxyTypes } = useDoveConfig();
 let refresh = null;
-const items = ref([]);
+const proxyItems = ref({});
 
-const handleFieldChange = (itemLabel, fieldName, selectedValue) => {
-  const selectedItem = items.value.find(item => item.url === selectedValue);
+const handleProxyName = (itemLabel, fieldName,  proxyType, selectedValue) => {
+  const selectedItem = proxyItems.value[proxyType].find(item => item.url === selectedValue);
   if (selectedItem) {
     formData[itemLabel]['name'] = selectedItem.name;
   }
 };
 
+function onTabChange (index) {
+  proxyItems.value = []
+}
+
 async function fetchItems(proxyType) {
   const { data, error, execute, refresh: refreshFunc } = await useFetch(() => `/proxy/${proxyType}`);
   refresh = refreshFunc;
   if (error.value) {
-    items.value = []
+    proxyItems.value = []
     console.error('Failed to fetch items:', error.value);
   } else {
-    items.value = data.value;
+    proxyItems.value[proxyType] = data.value;
   }
 }
 
 watch(isOpen, (newValue) => {
   if (!newValue) {
-    items.value = [];
+    proxyItems.value = [];
   }
 });
 
