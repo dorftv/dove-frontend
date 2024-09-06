@@ -5,7 +5,7 @@
     ({{ input.type }})
   </UTooltip>
   <UPopover :popper="{ arrow: true }">
-    <UButton color="white" label="Details" trailing-icon="i-heroicons-information-circle-20-solid" />
+    <UButton color="white" label="Details" trailing-icon="heroicons-information-circle-20-solid" />
     <template #panel>
       <div class="p-4">
         <pre>{{ inputDetails }}</pre>

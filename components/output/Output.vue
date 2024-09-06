@@ -1,18 +1,18 @@
 
 <template>
     <div :class="output.state.toLowerCase()" v-if="!output.type.startsWith('preview')">
-      
+
        {{ output.type }}
       <UPopover :popper="{ arrow: true }">
-        <UButton color="white" trailing-icon="i-heroicons-information-circle-20-solid" />
+        <UButton color="white" trailing-icon="heroicons-information-circle-20-solid" />
         <template #panel>
             <pre>{{ outputDetails }}</pre>
         </template>
-      </UPopover>      
-      <Icon v-if="!output.locked" name="uil:trash" color="red" size="24px" @click="submitRemove"/>   
+      </UPopover>
+      <Icon v-if="!output.locked" name="uil:trash" color="red" size="24px" @click="submitRemove"/>
     </div>
   </template>
-  
+
   <script setup>
   const props = defineProps({
     output: Object,
@@ -27,14 +27,14 @@
   const submitRemove = async () => {
       const { data: responseData } = await useFetch('/api/outputs', {
           method: 'delete',
-          body: { 
+          body: {
             uid: props.output.uid,
           }
       })
   }
-  
+
   </script>
-  
+
   <style>
 
   </style>

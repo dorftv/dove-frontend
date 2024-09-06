@@ -3,7 +3,7 @@
 
       <SceneHeader   :scene="scene" />
       <VideoPlayer v-if="(mixerPreview || mixerEnabled)" :uid="scene.uid" />
-      <UButton v-if="!scene.src_locked" color="white"  trailing-icon="i-heroicons-plus-circle" @click="addSlot"/>
+      <UButton v-if="!scene.src_locked" color="white"  trailing-icon="heroicons-plus-circle" @click="addSlot"/>
 
       <div v-for="source in scene.sources" :modelValue="source.src" :key="source.sink">
         <SceneInputs :source="source"  :scene="scene" />

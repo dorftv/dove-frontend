@@ -3,7 +3,7 @@
 <template>
       <UTooltip text="Add Scene" v-if="addScene">
     <UButton class="ma-0 pa-0"
-  icon="i-heroicons-plus"
+  icon="heroicons-plus-circle"
   size="sm"
   color="white"
   variant="solid"

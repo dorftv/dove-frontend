@@ -2,7 +2,7 @@
   <UTooltip text="Add Output" v-if="addOutput">
     <UButton
       class="ma-0 pa-0"
-      icon="i-heroicons-plus-circle"
+      icon="heroicons-plus-circle"
       size="sm"
       color="white"
       variant="solid"
