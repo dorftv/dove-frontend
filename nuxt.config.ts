@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 
   },
   devtools: { enabled: true },
-  css: ["@/assets/css/tailwind.css"],
+  css: ["@/assets/css/tailwind.css", "primeicons/primeicons.css"],
   postcss: {
     plugins: {
       "postcss-import": {},
