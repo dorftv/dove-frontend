@@ -1,4 +1,5 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import Aura from '@primevue/themes/aura';
+
 export default defineNuxtConfig({
   experimental: {
     appManifest: false,
@@ -34,7 +35,15 @@ export default defineNuxtConfig({
   },
 
   modulesDir: ['./node_modules'],
-  modules: ['@nuxt/ui', 'nuxt-icon', "nuxt-icon-tw"],
+  modules: ['@nuxt/ui', '@primevue/nuxt-module', "@nuxt/icon"],
+
+  primevue: {
+    options: {
+        theme: {
+            preset: Aura
+        }
+    }
+  }
 
 
 })
