@@ -142,6 +142,16 @@ export function useEntities() {
     };
   });
 
+  const sceneMixerSource = (uid) => {
+    const mixer = sceneMixers.value.find(mixer => mixer.uid === uid)
+    if (!mixer) return []
+
+    return Object.values(mixer.sources || {}).map(source => ({
+      name: source.name,
+      index: source.index
+    }))
+  }
+
   const sceneMixers = computed(() => {
     return mixers.value.filter(mixer => mixer.type === 'scene');
   });
@@ -153,7 +163,7 @@ export function useEntities() {
   const inputsPreview = computed(() => {
     return inputs.value.filter(input => input.preview === true);
   })
-  
+
   const inputsNoPreview = computed(() => {
     return inputs.value.filter(input => input.preview === false);
   })
@@ -168,6 +178,7 @@ export function useEntities() {
     mixers,
     outputs,
     sceneInputs,
+    sceneMixerSource,
     sceneMixers,
     programMixer,
     updateEntity,

@@ -7,14 +7,21 @@ export const useCreateEntity = (entityType) => {
   const formData = reactive({});
   const availSrc = ref([]);
   const types = ref([]);
+  const selectedSceneActive = ref(false);
+  const selectedSceneProgram = ref(false);
 
 
-  const { mixers } = useEntities();
+  const { mixers, sceneMixerSource } = useEntities();
 
   const { getUIConfig, resolutionOptions, defaultResolution, getResolutionDimensions } = useDoveConfig();
 
   const selectedResolution = ref(defaultResolution);
   const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
+
+  const selectedScene = reactive({
+    uid: null,
+    slot: null
+ });
 
   const fetchTypes = async () => {
     isLoading.value = true;
@@ -57,6 +64,55 @@ export const useCreateEntity = (entityType) => {
     });
   };
 
+
+  const submitCutProgram = async () => {
+    if (selectedSceneProgram.value) {
+      try {
+        const cutProgramResponse = await fetch(`/api/mixer/cut_program`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            src: selectedScene.uid
+          }),
+        });
+        const cutProgramResponseJson = await cutProgramResponse.json();
+
+
+        console.log('Cut Scene to Program response:', cutProgramResponseJson);
+      } catch (error) {
+        console.error('Error cut Program:', error);
+        }
+    }
+  }
+
+  const submitAddToScene = async (responseJson) => {
+    if (selectedScene.uid && selectedScene.slot !== null) {
+
+    try {
+      const cutSceneResponse = await fetch(`/api/mixer/add_source`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          src: responseJson.uid,
+          target: selectedScene.uid,
+          index: selectedScene.slot
+        }),
+      });
+      const cutSceneResponseJson = await cutSceneResponse.json();
+
+      await submitCutProgram();
+      console.log('Cut Scene to Source response:', cutSceneResponseJson);
+    } catch (error) {
+      console.error('Error in cut Input to Scene:', error);
+      }
+    }
+  }
+
+
   const submitCreate = async (itemType) => {
     try {
       const response = await fetch(`${path}/${itemType}`, {
@@ -67,6 +123,8 @@ export const useCreateEntity = (entityType) => {
         body: JSON.stringify(formData[itemType]),
       });
       const responseJson = await response.json();
+      await submitAddToScene(responseJson);
+
       isOpen.value = false;
     } catch (error) {
       isOpen.value = false;
@@ -126,6 +184,11 @@ const resolutionWatcher = () => {
     });
   };
 
+  const currentSources = computed(() => {
+    if (!selectedScene.uid) return []
+    return sceneMixerSource(selectedScene.uid)
+  })
+
   onMounted(() => {
     fetchTypes();
     resolutionWatcher();
@@ -141,6 +204,9 @@ const resolutionWatcher = () => {
     types,
     resolutionOptions,
     selectedResolution,
+    selectedScene,
+    currentSources,
+    selectedSceneProgram,
     fetchTypes,
     submitCreate,
     resolutionWatcher,

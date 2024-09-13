@@ -1,8 +1,8 @@
 <template>
-  <UTooltip text="Add Output" v-if="addInput">
+  <UTooltip text="Add Input" v-if="addInput">
     <UButton
       class="ma-0 pa-0"
-      icon="i-heroicons-plus-circle"
+      icon="heroicons-plus-circle"
       size="sm"
       color="white"
       variant="solid"
@@ -12,7 +12,6 @@
 
     />
   </UTooltip>
-
   <UModal v-model="isOpen" :transition="false">
     <div v-if="isLoading">Loading...</div>
     <div v-else-if="fetchError">Error: {{ fetchError.message }}</div>
@@ -117,6 +116,16 @@
                 />
               </UFormGroup>
 
+              <div>
+                <Select v-model="selectedScene.uid" :options="sceneMixers" optionLabel="name"  optionValue="uid" showClear placeholder="Add Input to Scene" class="w-full md:w-56" />
+                <div v-if="selectedScene.uid">
+                  <Select v-model="selectedScene.slot" :options="currentSources" optionLabel="name"  optionValue="index" showClear placeholder="Select a Slot" class="md:w-56" />
+                  <div v-if="selectedScene.slot !== null">
+                    <UCheckbox v-model="selectedSceneProgram" name="setprogram" label="Set Program" />
+                  </div>
+                </div>
+              </div>
+
               <UButton type="submit" label="Create Input" />
               <UButton color="red" label="Cancel" @click="isOpen = false" />
             </UForm>
@@ -142,7 +151,18 @@ const {
   submitCreate,
   selectedResolution,
   resolutionOptions,
+  selectedSceneProgram,
+  currentSources,
+  selectedScene,
 } = useCreateEntity(entityType);
+
+
+const {
+    sceneInputs,
+    sceneMixers,
+    programMixer
+} = useEntities()
+
 
 
 const {addInput, config, proxyTypes } = useDoveConfig();
@@ -174,6 +194,9 @@ async function fetchItems(proxyType) {
 watch(isOpen, (newValue) => {
   if (!newValue) {
     proxyItems.value = [];
+    selectedScene.uid = null;
+    selectedScene.slot = null;
+    selectedSceneProgram.value = false;
   }
 });
 
