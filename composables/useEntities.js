@@ -76,7 +76,7 @@ export function useEntities() {
   };
 
   const connectWebSocket = () => {
-    if (webSocket.value) return; // Don't establish a new connection if one already exists
+    if (webSocket.value) return;
 
     webSocket.value = new WebSocket(wsUrl);
     webSocket.value.onmessage = (event) => {
@@ -161,13 +161,16 @@ export function useEntities() {
   });
 
   const inputsPreview = computed(() => {
-    return inputs.value.filter(input => input.preview === true);
+    return inputs.value.filter(input => input.preview === true && input.type !== 'nodecg');
   })
 
   const inputsNoPreview = computed(() => {
-    return inputs.value.filter(input => input.preview === false);
+    return inputs.value.filter(input => input.preview === false  && input.type !== 'nodecg');
   })
 
+  const inputsNodecg = computed(() => {
+    return inputs.value.filter(input => input.type === 'nodecg');
+  })
 
 
 
@@ -175,6 +178,7 @@ export function useEntities() {
     inputs,
     inputsPreview,
     inputsNoPreview,
+    inputsNodecg,
     mixers,
     outputs,
     sceneInputs,
