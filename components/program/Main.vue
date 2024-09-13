@@ -5,6 +5,7 @@
 </div>
 <div class="col-span-4">
   <ProgramPlayer />
+  <ProgramOverlays />
 </div>
 </div>
 </template>
