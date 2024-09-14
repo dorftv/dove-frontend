@@ -1,55 +1,32 @@
 <template>
-  <div class="flex flex-col">
-    <SceneHeader :scene="scene" />
-    <div v-if="mixerPreview || mixerEnabled" class="w-full aspect-video">
-      <VideoPlayer :uid="scene.uid" class="w-full h-full" />
-    </div>
-    <div class="flex justify-start mt-2">
-      <Button
-        v-if="!scene.src_locked"
-        label="Add Slot"
-        icon="pi pi-plus"
-        class="p-button-text p-button-sm text-xs py-1 px-2"
-        @click="addSlot"
-      />
-    </div>
-    <div v-for="source in scene.sources" :key="source.sink">
-      <SceneInputs :source="source" :scene="scene" />
+  <div class="col-span-5">
+    <div class="flex">
+      <div class="w-48 border-r border-gray-200">
+        <CreateScenePane />
+        <button
+          v-for="(scene, index) in sceneMixers"
+          :key="scene.uid"
+          @click="handleSceneClick(index)"
+          class="w-full text-left py-2 px-4 hover:bg-gray-100 focus:outline-none"
+          :class="{ 'bg-blue-100': index === activeIndex }"
+        >
+          {{ scene.name }}
+        </button>
+      </div>
+      <div class="flex-grow p-4">
+        <SceneScenes
+          v-if="sceneMixers[activeIndex]"
+          :scene="sceneMixers[activeIndex]"
+          :active="true"
+        />
+      </div>
     </div>
   </div>
 </template>
 
-
 <script setup>
 
-const props = defineProps({
-  scene: Object,
-  inputs: Object,
-  active: Boolean
-});
 
-const { mixerPreview } = useUserState();
-const mixerEnabled = ref(false);
-
-const addSlot = async () => {
-  try {
-    const response = await fetch('/api/mixer/add_slot', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        uid: props.scene.uid,
-      }),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to add slot');
-    }
-    // @TODO: add Toast later
-  } catch (error) {
-    // @TODO: add Toast later
-  }
-};
-
-
+const { sceneMixers } = useEntities();
+const { activeIndex, handleSceneClick, selectedScene  } = useActiveScene();
 </script>

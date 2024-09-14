@@ -1,6 +1,5 @@
 <template>
 <div>
-  Outputs:
   <CreateOutputPane />
 
   <Output v-for="output in outputs" :key="output.uid" :output="output"/>

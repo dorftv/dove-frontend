@@ -6,7 +6,7 @@
     <div class="col-span-4  px-4 flex flex-col">
       <ProgramHeader class="" />
       <ProgramPlayer class="w-full" />
-      <ProgramOverlays class="" />
+      <ProgramOverlays />
     </div>
   </div>
 </template>

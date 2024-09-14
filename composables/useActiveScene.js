@@ -1,41 +1,77 @@
-const selectedScene = ref(null)
+
+const activeIndex = ref(0);
+const selectedScene = ref(null);
 
 export default function useActiveScene() {
-  const { sceneMixers, programMixer } = useEntities()
+  const { sceneMixers, programMixer } = useEntities();
 
   const activeScene = computed(() => {
-    if (programMixer.value && programMixer.value.sources && sceneMixers.value) {
-      const activeSource = programMixer.value.sources.find(
-        source => source.index === programMixer.value.active
-      )
-      if (activeSource) {
-        return sceneMixers.value.find(
-          sceneMixer => sceneMixer.uid === activeSource.src
-        )
+    if (programMixer.value &&
+        programMixer.value.active !== undefined &&
+        programMixer.value.sources &&
+        sceneMixers.value) {
+      const activeSourceIndex = programMixer.value.active;
+      const activeSource = programMixer.value.sources[activeSourceIndex];
+      if (activeSource && activeSource.src) {
+        const scene = sceneMixers.value.find(sceneMixer => sceneMixer.uid === activeSource.src);
+        return scene;
       }
     }
-    return null
-  })
+    return null;
+  });
 
-  const setSelectedScene = scene => {
-    selectedScene.value = scene
-  }
 
-  const onSceneChange = index => {
-    const item = sceneMixers.value[index]
-    setSelectedScene(item)
-  }
-
-  watch(sceneMixers, newSceneMixers => {
-    if (newSceneMixers.length > 0 && !selectedScene.value) {
-      setSelectedScene(newSceneMixers[0])
+  const handleSceneClick = (index) => {
+    if (index >= 0 && index < sceneMixers.value.length) {
+      activeIndex.value = index;
+      selectedScene.value = sceneMixers.value[index];
     }
-  }, { immediate: true })
+  };
+
+  const cutSceneToProgram = async () => {
+    if (!selectedScene.value) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/mixer/cut_program', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ src: selectedScene.value.uid })
+      });
+
+      if (!response.ok) {
+        throw new Error('Server responded with an error');
+      }
+
+      const data = await response.json();
+      if (data && data.src) {
+        // @TODO: Add Toast later for success
+      } else {
+        // @TODO: Add Toast later for failure
+      }
+    } catch (error) {
+      console.error('Failed to switch scene:', error);
+      // @TODO: Add Toast later for error
+    }
+  };
+
+  // Watch for changes to activeIndex and sceneMixers and update selectedScene
+  watch([activeIndex, sceneMixers], ([newIndex, newSceneMixers]) => {
+    if (newSceneMixers && newSceneMixers.length > newIndex) {
+      selectedScene.value = newSceneMixers[newIndex];
+    } else {
+      selectedScene.value = null;
+    }
+  }, { immediate: true });
 
   return {
     selectedScene,
-    setSelectedScene,
     activeScene,
-    onSceneChange
-  }
+    activeIndex,
+    handleSceneClick,
+    cutSceneToProgram,
+  };
 }

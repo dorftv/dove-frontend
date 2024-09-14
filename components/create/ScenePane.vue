@@ -1,6 +1,7 @@
 <template>
   <Button
-    class="p-button-rounded p-button-text"
+    label="Add Scene"
+    class="p-button-rounded p-button-text text-xs"
     icon="pi pi-plus-circle"
     v-if="addScene"
     @click="isOpen = true"

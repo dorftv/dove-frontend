@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-12 p-2">Inputs <CreateInputPane /></div>
+  <div class="col-span-12 p-2"><CreateInputPane /></div>
 
 <div v-for="input in inputsPreview" :key="input.uid" class="col-span-2 px-4">
       <InputHeader :input="input" />

@@ -1,6 +1,7 @@
 <template>
   <Button
-    class="p-button-rounded p-button-text"
+    label="Add Output"
+    class="p-button-rounded p-button-text text-xs"
     icon="pi pi-plus-circle"
     v-if="addOutput"
     @click="isOpen = true"

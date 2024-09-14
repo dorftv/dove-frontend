@@ -1,6 +1,7 @@
 <template>
   <Button
-    class="p-button-rounded p-button-text"
+    label="Add Input"
+    class="p-button-rounded p-button-text text-xs"
     icon="pi pi-plus-circle"
     v-if="addInput"
     @click="isOpen = true"
