@@ -1,8 +1,8 @@
 <template>
-{{ addScene }}
   <Button
     class="p-button-rounded p-button-text"
     icon="pi pi-plus-circle"
+    v-if="addScene"
     @click="isOpen = true"
   />
   <Dialog v-model:visible="isOpen" :modal="true" class="scene-pane-dialog">

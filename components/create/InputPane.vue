@@ -2,6 +2,7 @@
   <Button
     class="p-button-rounded p-button-text"
     icon="pi pi-plus-circle"
+    v-if="addInput"
     @click="isOpen = true"
   />
   <Dialog v-model:visible="isOpen" :modal="true" class="input-pane-dialog">
