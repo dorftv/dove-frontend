@@ -1,144 +1,148 @@
 <template>
-  <UTooltip text="Add Input" v-if="addInput">
-    <UButton
-      class="ma-0 pa-0"
-      icon="heroicons-plus-circle"
-      size="sm"
-      color="white"
-      variant="solid"
-      label=""
-      :trailing="false"
-      @click="isOpen = true"
+  <Button
+    class="p-button-rounded p-button-text"
+    icon="pi pi-plus-circle"
+    @click="isOpen = true"
+  />
+  <Dialog v-model:visible="isOpen" :modal="true" class="input-pane-dialog">
+    <template #header>
+      <h3 class="text-lg font-semibold">Add Input</h3>
+    </template>
+    <Tabs :value="activeTabIndex" @tab-change="onTabChange" class="input-tabs">
+      <TabList>
+        <Tab v-for="(item, index) in types" :key="item.label" :value="index">
+          {{ item.fields['type'].label }}
+        </Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel v-for="(item, index) in types" :key="item.label" :value="index">
+        <div class="p-2 bg-gray-100 rounded-lg">
+          <h2 class="text-base font-bold mb-1">{{ item.fields['type'].label }}</h2>
+          <p class="text-xs italic mb-2">{{ item.fields['type'].description }}</p>
+          <form @submit.prevent="submitCreate(item.label)" class="space-y-2">
+            <div v-for="field in item.fields" :key="field.name">
+              <div v-if="field.name !== 'type' && field.hidden !== true" class="mb-2">
+                <label :for="field.name" class="block font-bold text-sm mb-1">{{ field.label }}</label>
+                <InputText
+                  v-if="field.type === 'string'"
+                  v-model="formData[item.label][field.name]"
+                  :id="field.name"
+                  :aria-describedby="`${field.name}-description`"
+                  :placeholder="field.placeholder"
+                  :required="field.required"
+                  class="w-full text-sm"
+                />
+                <InputNumber
+                  v-if="field.type === 'integer' || field.type === 'number'"
+                  v-model="formData[item.label][field.name]"
+                  :id="field.name"
+                  :placeholder="field.placeholder"
+                  :required="field.required"
+                  class="w-full text-sm"
+                />
+                <Checkbox
+                  v-if="field.type === 'boolean'"
+                  v-model="formData[item.label][field.name]"
+                  :id="field.name"
+                  :binary="true"
+                />
+                <small :id="`${field.name}-description`" class="block mt-1 text-xs text-gray-500 italic">{{ field.description }}</small>
 
-    />
-  </UTooltip>
-  <UModal v-model="isOpen" :transition="false">
-    <div v-if="isLoading">Loading...</div>
-    <div v-else-if="fetchError">Error: {{ fetchError.message }}</div>
-    <div v-else>
-      <UTabs :items="types" orientation="vertical"  @change="onTabChange">
-        <template #item="{ item }">
-          <div class="p-4">
-            <div>
-            <b>{{ item.fields['type'].label}}</b>
-            </div>
-            <div>
-            <i>{{ item.fields['type'].description }}</i>
-            </div>
-            <UForm :state="formData" class="space-y-4" @submit="submitCreate(item.label)">
-              <div v-for="field in item.fields" :key="field.name">
-                <div v-if="field.name!='type' && field.hidden!=true">
-                  <UFormGroup :label="field.label" :required="field.required" :description="field.description" :help="field.help">
-
-                    <div v-if="field.type === 'string'">
-
-                      <UInput
-                        v-model="formData[item.label][field.name]"
-                        :name="field.name"
-                        :label="field.label"
-                        :placeholder="field.placeholder"
-                        :required="field.required"
-                      />
-
-                    </div>
-                    <div v-if="field.type === 'integer' || field.type ==='number'">
-
-                      <UInput
-                        v-model="formData[item.label][field.name]"
-                        :name="field.name"
-                        :label="field.label"
-                        :placeholder="field.placeholder"
-                        :required="field.required"
-                      />
-
-                    </div>
-                    <div v-if="field.type === 'boolean'">
-
-                      <UCheckbox
-                        v-model="formData[item.label][field.name]"
-                        :name="field.name"
-                        :label="field.label"
-                        :required="field.required"
-                      />
-
-                    </div>
-                  </UFormGroup>
-
-
-                  <!-- Show proxies if configured. -->
-                  <div class="flex justify">
-                    <div v-for="(proxy, proxyType) in proxyTypes" :key="proxyType" >
-                      <div v-if="item.key === proxy.type && field.name === proxy.field">
-                        <div v-if="proxyItems[proxyType] && proxyItems[proxyType].length > 0">
-                          <USelect
-                            color="primary"
-                            placeholder="Select Stream from Proxy"
-                            v-model="formData[item.label][field.name]"
-                            variant="outline"
-                            :options="proxyItems[proxyType]"
-                            optionAttribute="name"
-                            valueAttribute="url"
-                            @change="handleProxyName(item.label, field.name, proxyType, $event)"
-                          />
-                        </div>
-                        {{ proxyType }}
-                        <a href="#" @click="fetchItems(proxyType)">
-                          <Icon  name="heroicons:arrow-path" color="green" size="18px"/>
-                        </a>
+                <!-- Show proxies if configured. -->
+                <div class="mt-1">
+                  <div v-for="(proxy, proxyType) in proxyTypes" :key="proxyType" class="mb-1">
+                    <div v-if="item.key === proxy.type && field.name === proxy.field" class="flex items-center space-x-1">
+                      <div v-if="proxyItems[proxyType] && proxyItems[proxyType].length > 0" class="flex-grow">
+                        <Select
+                          v-model="formData[item.label][field.name]"
+                          :options="proxyItems[proxyType]"
+                          optionLabel="name"
+                          optionValue="url"
+                          placeholder="Select Stream"
+                          @change="(e) => handleProxyNameChange(item.label, proxy.field, proxyType, e.value)"
+                          class="text-xs w-full"
+                        />
                       </div>
+                      <Button icon="pi pi-refresh" @click="fetchItems(proxyType)" class="p-button-outlined p-button-sm" />
+                      <span class="text-xs text-gray-600">{{ proxyType }}</span>
+                    </div>
                   </div>
                 </div>
-
-
               </div>
             </div>
-            <hr />
+
+            <hr class="my-2" />
 
             <!-- Generic Fields -->
-          <URange v-model="formData[item.label]['volume']" name="range" :min="0" :max="1" :step="0.05" />
-          Volume: {{  formData[item.label].volume  * 100 }}
-
-              <UFormGroup label="Resolution">
-                <USelect name="resolution"
-                  v-model="selectedResolution"
-                  :options="resolutionOptions"
-                  option-attribute="label"
-                  value-attribute="key"
-                />
-              </UFormGroup>
-
-              <UFormGroup label="Name">
-                <UInput label="Name"
-                  v-model="formData[item.label]['name']"
-                  name="name"
-                  size="md"
-                  placeholder="Give a name. Default Output X"
-                />
-              </UFormGroup>
+            <div class="space-y-2">
+              <div>
+                <label class="block font-bold text-sm mb-1">Volume</label>
+                <Slider v-model="formData[item.label]['volume']" :min="0" :max="1" :step="0.05" class="w-full" />
+                <span class="text-xs text-gray-600">Volume: {{ Math.round(formData[item.label].volume * 100) }}%</span>
+              </div>
 
               <div>
-                <Select v-model="selectedScene.uid" :options="sceneMixers" optionLabel="name"  optionValue="uid" showClear placeholder="Add Input to Scene" class="w-full md:w-56" />
-                <div v-if="selectedScene.uid">
-                  <Select v-model="selectedScene.slot" :options="currentSources" optionLabel="name"  optionValue="index" showClear placeholder="Select a Slot" class="md:w-56" />
-                  <div v-if="selectedScene.slot !== null">
-                    <UCheckbox v-model="selectedSceneProgram" name="setprogram" label="Set Program" />
+                <label class="block font-bold text-sm mb-1">Resolution</label>
+                <Select
+                  v-model="selectedResolution"
+                  :options="resolutionOptions"
+                  optionLabel="label"
+                  optionValue="key"
+                  placeholder="Select Resolution"
+                  class="w-full text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block font-bold text-sm mb-1">Name</label>
+                <InputText
+                  v-model="formData[item.label]['name']"
+                  placeholder="Give a name. Default Output X"
+                  class="w-full text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block font-bold text-sm mb-1">Scene</label>
+                <Select
+                  v-model="selectedScene.uid"
+                  :options="sceneMixers"
+                  optionLabel="name"
+                  optionValue="uid"
+                  placeholder="Add Input to Scene"
+                  showClear
+                  class="w-full text-sm mb-1"
+                />
+                <div v-if="selectedScene.uid" class="mt-1">
+                  <Select
+                    v-model="selectedScene.slot"
+                    :options="currentSources"
+                    optionLabel="name"
+                    optionValue="index"
+                    placeholder="Select a Slot"
+                    class="w-full text-sm mb-1"
+                  />
+                  <div v-if="selectedScene.slot !== null" class="flex items-center mt-1">
+                    <Checkbox v-model="selectedSceneProgram" binary class="mr-1" />
+                    <label class="text-sm">Set Program</label>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <UButton type="submit" label="Create Input" />
-              <UButton color="red" label="Cancel" @click="isOpen = false" />
-            </UForm>
-          </div>
-        </template>
-      </UTabs>
-    </div>
-  </UModal>
+            <div class="flex justify-end space-x-2 mt-4">
+              <Button type="button" label="Cancel" class="p-button-outlined p-button-sm" @click="isOpen = false" />
+              <Button type="submit" label="Create Input" class="p-button-primary p-button-sm" />
+            </div>
+          </form>
+        </div>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
+  </Dialog>
 </template>
 
-
 <script setup>
-
 
 const entityType = 'inputs';
 const {
@@ -156,35 +160,35 @@ const {
   selectedScene,
 } = useCreateEntity(entityType);
 
+const activeTabIndex = ref(0);
+const onTabChange = (event) => {
+  activeTabIndex.value = event.index;
+  proxyItems.value = {};
+};
 
-const {
-    sceneInputs,
-    sceneMixers,
-    programMixer
-} = useEntities()
+const { sceneInputs, sceneMixers, programMixer } = useEntities();
 
-
-
-const {addInput, config, proxyTypes } = useDoveConfig();
+const { addInput, config, proxyTypes } = useDoveConfig();
 let refresh = null;
 const proxyItems = ref({});
 
-const handleProxyName = (itemLabel, fieldName,  proxyType, selectedValue) => {
-  const selectedItem = proxyItems.value[proxyType].find(item => item.url === selectedValue);
+function handleProxyNameChange(itemLabel, field, proxyType, value) {
+  const selectedItem = proxyItems.value[proxyType]?.find(item => item.url === value);
   if (selectedItem) {
+    formData[itemLabel][field] = value;
     formData[itemLabel]['name'] = selectedItem.name;
   }
-};
-
-function onTabChange (index) {
-  proxyItems.value = []
 }
+
+watch(activeTabIndex, (newIndex) => {
+  proxyItems.value = {};
+});
 
 async function fetchItems(proxyType) {
   const { data, error, execute, refresh: refreshFunc } = await useFetch(() => `/proxy/${proxyType}`);
   refresh = refreshFunc;
   if (error.value) {
-    proxyItems.value = []
+    proxyItems.value = [];
     console.error('Failed to fetch items:', error.value);
   } else {
     proxyItems.value[proxyType] = data.value;
@@ -193,11 +197,25 @@ async function fetchItems(proxyType) {
 
 watch(isOpen, (newValue) => {
   if (!newValue) {
-    proxyItems.value = [];
+    proxyItems.value = {};
     selectedScene.uid = null;
     selectedScene.slot = null;
     selectedSceneProgram.value = false;
   }
 });
 
+watch(() => selectedScene.uid, (newUid) => {
+  if (newUid) {
+    const sources = currentSources.value;
+    const firstAvailableSlot = sources.find(source => !source.id);
+    if (firstAvailableSlot) {
+      selectedScene.slot = firstAvailableSlot.index;
+    }
+  } else {
+    selectedScene.slot = null;
+  }
+});
 </script>
+
+<style scoped>
+</style>

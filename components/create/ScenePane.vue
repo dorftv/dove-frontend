@@ -1,56 +1,65 @@
-
-
 <template>
-      <UTooltip text="Add Scene" v-if="addScene">
-    <UButton class="ma-0 pa-0"
-  icon="heroicons-plus-circle"
-  size="sm"
-  color="white"
-  variant="solid"
-  label=""
-  tooltip="xx"
-  :trailing="false"
-  @click="isOpen = true"
-/>
-      </UTooltip>
-    <UModal v-model="isOpen" :transition="false">
-      <UContainer>
-      <UForm  class="p-4 space-y-4"  :state="state" @submit="submitCreateScene">
+{{ addScene }}
+  <Button
+    class="p-button-rounded p-button-text"
+    icon="pi pi-plus-circle"
+    @click="isOpen = true"
+  />
+  <Dialog v-model:visible="isOpen" :modal="true" class="scene-pane-dialog">
+    <template #header>
+      <h3 class="text-lg font-semibold">Add Scene</h3>
+    </template>
+    <div class="p-2 bg-gray-100 rounded-lg">
+      <form @submit.prevent="submitCreate('scene')" class="space-y-2">
+        <div class="mb-2">
+          <label for="name" class="block font-bold text-sm mb-1">Name</label>
+          <InputText
+            v-model="formData.scene.name"
+            id="name"
+            placeholder="Enter scene name"
+            class="w-full text-sm"
+          />
+        </div>
 
-      <div class="p-4">
-        <UFormGroup label="Name">
-          <UInput v-model="state.name" />
-        </UFormGroup>
-        <CreateResolutions />
-        <UButton  type="submit" label="Create Scene" @click="isOpen = false"   />
-        <UButton color="red" label="Cancel" @click="isOpen = false" />
-      </div>
-    </UForm>
-    </UContainer>
-    </UModal>
+        <div>
+          <label class="block font-bold text-sm mb-1">Resolution</label>
+          <Select
+            v-model="selectedResolution"
+            :options="resolutionOptions"
+            optionLabel="label"
+            optionValue="key"
+            placeholder="Select Resolution"
+            class="w-full text-sm"
+          />
+        </div>
+
+        <div class="flex justify-end space-x-2 mt-4">
+          <Button type="button" label="Cancel" class="p-button-outlined p-button-sm" @click="isOpen = false" />
+          <Button type="submit" label="Create Scene" class="p-button-primary p-button-sm" />
+        </div>
+      </form>
+    </div>
+  </Dialog>
 </template>
 
 <script setup>
-const isOpen = ref(false)
 
-const state = reactive({
-  type: 'scene',
+const entityType = 'mixers';
+const {
+  isOpen,
+  isLoading,
+  fetchError,
+  types,
+  formData,
+  submitCreate,
+  selectedResolution,
+  resolutionOptions,
+} = useCreateEntity(entityType);
 
-});
+const { addScene } = useDoveConfig();
 
-const { addScene} = useDoveConfig()
-
-
-const submitCreateScene = async () => {
-    const { data: responseData } = await useFetch('/api/mixers', {
-        method: 'put',
-        body: {
-          type: 'scene',
-          name: state.name
-
-        }
-    })
-
-    //setSelectedScene(responseData)
-}
 </script>
+
+<style scoped>
+
+</style>

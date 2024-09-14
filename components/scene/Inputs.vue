@@ -48,8 +48,6 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { useSceneSources } from '@/composables/useSceneSources';
 
 const props = defineProps({
   source: Object,
@@ -60,7 +58,6 @@ const { inputs, removeSlot, handleChange, getMax, src, alpha, width, height, xpo
 
 const open = ref(false);
 
-// Watch for changes in source.src and update src accordingly
 watch(() => props.source.src, (newSrc) => {
   if (newSrc !== src.value) {
     src.value = newSrc;

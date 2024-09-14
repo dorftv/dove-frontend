@@ -1,99 +1,101 @@
 <template>
-  <UTooltip text="Add Output" v-if="addOutput">
-    <UButton
-      class="ma-0 pa-0"
-      icon="heroicons-plus-circle"
-      size="sm"
-      color="white"
-      variant="solid"
-      label=""
-      :trailing="false"
-      @click="isOpen = true"
-    />
-  </UTooltip>
-
-  <UModal v-model="isOpen" :transition="false">
-    <div v-if="isLoading">Loading...</div>
-    <div v-else-if="fetchError">Error: {{ fetchError.message }}</div>
-    <div v-else>
-      <UTabs :items="types" orientation="vertical">
-        <template #item="{ item }">
-          <div class="p-4">
-            <b>{{ item.label }}</b>
-
-            <UForm :state="formData" class="space-y-4" @submit="submitCreate(item.label)">
+  <Button
+    class="p-button-rounded p-button-text"
+    icon="pi pi-plus-circle"
+    @click="isOpen = true"
+  />
+  <Dialog v-model:visible="isOpen" :modal="true" class="output-pane-dialog">
+    <template #header>
+      <h3 class="text-lg font-semibold">Add Output</h3>
+    </template>
+    <Tabs :value="activeTabIndex" @tab-change="onTabChange" class="output-tabs">
+      <TabList>
+        <Tab v-for="(item, index) in types" :key="item.label" :value="index">
+          {{ item.label }}
+        </Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel v-for="(item, index) in types" :key="item.label" :value="index">
+          <div class="p-2 bg-gray-100 rounded-lg">
+            <h2 class="text-base font-bold mb-1">{{ item.label }}</h2>
+            <form @submit.prevent="submitCreate(item.label)" class="space-y-2">
               <div v-for="field in item.fields" :key="field.name">
-                <div v-if="field.name!='type'">
-                  <UFormGroup :label="field.label" :required="field.required">
-                    <div v-if="field.type === 'string'">
-                      <UInput
-                        v-model="formData[item.label][field.name]"
-                        :name="field.name"
-                        :label="field.label"
-                        :placeholder="field.placeholder"
-                        :required="field.required"
-                      />
-                    </div>
-                    <div v-if="field.type === 'integer'">
-                      <UInput
-                        v-model="formData[item.label][field.name]"
-                        :name="field.name"
-                        :label="field.label"
-                        :placeholder="field.placeholder"
-                        :required="field.required"
-                      />
-                    </div>
-                    <div v-if="field.type === 'boolean'">
-                      <UCheckbox
-                        v-model="formData[item.label][field.name]"
-                        :name="field.name"
-                        :label="field.label"
-                        :required="field.required"
-                      />
-                    </div>
-                  </UFormGroup>
+                <div v-if="field.name !== 'type'" class="mb-2">
+                  <label :for="field.name" class="block font-bold text-sm mb-1">{{ field.label }}</label>
+                  <InputText
+                    v-if="field.type === 'string'"
+                    v-model="formData[item.label][field.name]"
+                    :id="field.name"
+                    :placeholder="field.placeholder"
+                    :required="field.required"
+                    class="w-full text-sm"
+                  />
+                  <InputNumber
+                    v-if="field.type === 'integer'"
+                    v-model="formData[item.label][field.name]"
+                    :id="field.name"
+                    :placeholder="field.placeholder"
+                    :required="field.required"
+                    class="w-full text-sm"
+                  />
+                  <Checkbox
+                    v-if="field.type === 'boolean'"
+                    v-model="formData[item.label][field.name]"
+                    :id="field.name"
+                    :binary="true"
+                  />
+                </div>
+              </div>
+
+              <hr class="my-2" />
+              <!-- Generic Fields -->
+              <div class="space-y-2">
+                <div>
+                  <label class="block font-bold text-sm mb-1">Source</label>
+                  <Select
+                    v-model="formData[item.label]['src']"
+                    :options="availSrc"
+                    optionLabel="name"
+                    optionValue="value"
+                    placeholder="Select Source"
+                    required
+                    class="w-full text-sm"
+                  />
                 </div>
 
+                <div>
+                  <label class="block font-bold text-sm mb-1">Resolution</label>
+                  <Select
+                    v-model="selectedResolution"
+                    :options="resolutionOptions"
+                    optionLabel="label"
+                    optionValue="key"
+                    placeholder="Select Resolution"
+                    class="w-full text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label class="block font-bold text-sm mb-1">Name</label>
+                  <InputText
+                    v-model="formData[item.label]['name']"
+                    placeholder="Give a name. Default Output X"
+                    class="w-full text-sm"
+                  />
+                </div>
               </div>
-              <hr /> <!-- Generic Fields -->
-              <UFormGroup label="Source" required>
-                <USelect required
-                  name="src"
-                  v-model="formData[item.label]['src']"
-                  :options="availSrc"
-                  option-attribute="name"
-                  placeholder="Select Source"
-                />
-              </UFormGroup>
 
-              <UFormGroup label="Resolution" required>
-                <USelect name="resolution"
-                  v-model="selectedResolution"
-                  :options="resolutionOptions"
-                  option-attribute="label"
-                  value-attribute="key"
-                />
-              </UFormGroup>
-
-              <UFormGroup label="Name">
-                <UInput label="Name"
-                  v-model="formData[item.label]['name']"
-                  name="name"
-                  size="md"
-                  placeholder="Give a name. Default Output X"
-                />
-              </UFormGroup>
-
-              <UButton type="submit" label="Create Output" />
-              <UButton color="red" label="Cancel" @click="isOpen = false" />
-            </UForm>
+              <div class="flex justify-end space-x-2 mt-4">
+                <Button type="button" label="Cancel" class="p-button-outlined p-button-sm" @click="isOpen = false" />
+                <Button type="submit" label="Create Output" class="p-button-primary p-button-sm" />
+              </div>
+            </form>
           </div>
-        </template>
-      </UTabs>
-    </div>
-  </UModal>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
+  </Dialog>
 </template>
-
 
 <script setup>
 
@@ -110,6 +112,45 @@ const {
   resolutionOptions,
 } = useCreateEntity(entityType);
 
-const { addOutput} = useDoveConfig()
+const { addOutput, getResolutionDimensions } = useDoveConfig();
 
+const activeTabIndex = ref(0);
+const onTabChange = (event) => {
+  activeTabIndex.value = event.index;
+};
+
+watch(selectedResolution, (newResolution) => {
+  const dimensions = getResolutionDimensions(newResolution);
+  if (dimensions) {
+    types.value.forEach((type) => {
+      if (formData[type.label]) {
+        formData[type.label].width = dimensions.width;
+        formData[type.label].height = dimensions.height;
+      }
+    });
+  }
+});
+
+onMounted(() => {
+  if (availSrc.value.length > 0) {
+    types.value.forEach((type) => {
+      if (formData[type.label] && !formData[type.label].src) {
+        formData[type.label].src = availSrc.value[0].value;
+      }
+    });
+  }
+});
+
+watch(() => availSrc.value, (newAvailSrc) => {
+  if (newAvailSrc.length > 0) {
+    types.value.forEach((type) => {
+      if (formData[type.label] && !formData[type.label].src) {
+        formData[type.label].src = newAvailSrc[0].value;
+      }
+    });
+  }
+}, { immediate: true });
 </script>
+
+<style scoped>
+</style>
