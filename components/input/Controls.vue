@@ -1,7 +1,15 @@
 <template>
   <div :class="input.state.toLowerCase()">
     <div>{{ positionFormatted }}{{ durationFormatted }}</div>
-    <Slider v-if="input.duration" :modelValue="position" @update:modelValue="handlePositionChange" step="1"  :min="0" :max="input.duration"  name="range"  />
+    <Slider
+      v-if="input.duration"
+      :modelValue="position"
+      @update:modelValue="handlePositionChange"
+      :step="1"
+      :min="0"
+      :max="input.duration"
+      class="mb-2"
+    />
     <Icon name="uil:stop-circle" color="black" size="24px" @click="submitStop"/>
     <Icon name="uil:pause-circle" color="black" size="24px"  @click="submitPause" />
     <Icon name="uil:play-circle" color="black" size="24px" @click="submitPlay"/>

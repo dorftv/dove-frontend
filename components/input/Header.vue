@@ -10,9 +10,9 @@
       </span>
     </div>
     <div class="flex-shrink-0 flex items-center">
-      <OverlayPanel ref="op" appendTo="body">
+      <Popover ref="op" appendTo="body">
         <pre>{{ inputDetails }}</pre>
-      </OverlayPanel>
+      </Popover>
       <button
         @click="op.toggle($event)"
         class="flex items-center justify-center w-7 h-7 rounded-full text-gray-600 hover:bg-gray-200 transition-colors duration-200 mr-2"

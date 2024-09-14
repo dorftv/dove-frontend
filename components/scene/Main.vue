@@ -4,15 +4,21 @@
     <div v-if="mixerPreview || mixerEnabled" class="w-full aspect-video">
       <VideoPlayer :uid="scene.uid" class="w-full h-full" />
     </div>
-    <Button v-if="!scene.src_locked"
-            icon="pi pi-plus"
-            class="p-button-text"
-            @click="addSlot" />
+    <div class="flex justify-start mt-2">
+      <Button
+        v-if="!scene.src_locked"
+        label="Add Slot"
+        icon="pi pi-plus"
+        class="p-button-text p-button-sm text-xs py-1 px-2"
+        @click="addSlot"
+      />
+    </div>
     <div v-for="source in scene.sources" :key="source.sink">
       <SceneInputs :source="source" :scene="scene" />
     </div>
   </div>
 </template>
+
 
 <script setup>
 

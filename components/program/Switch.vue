@@ -1,59 +1,68 @@
 <template>
   <div v-if="selectedScene" class="box-border p-4 border-4">
-Active Scene <div v-if="activeScene" class="red">  {{ activeScene.name }}</div>
+    <div class="mb-4">
+      Active Scene: <span v-if="activeScene" class="text-red-500 font-bold">{{ activeScene.name }}</span>
+    </div>
 
+    <Dropdown v-model="switchmode" :options="switchemodes" optionLabel="name" class="w-full mb-4" />
 
-    <USelect v-model="switchmode" :options="switchemodes" class="px-4 py-24" />
-    <div class="justify-center px-4 py-2">
-      <div v-if="switchmode === 'Crossfade'">
+    <div class="flex flex-col items-center">
+      <div v-if="switchmode === 'Crossfade'" class="mb-4">
         Nothing to see yet. Use Cut
         <!--
-        <UButton color="white" trailing-icon="i-heroicons-minus" @click="duration.value--" />
-        <UInput :modelValue="duration.value" color="white" variant="outline" class="max-w-24" />
-        <UButton color="white" trailing-icon="i-heroicons-plus" @click="duration.value++" />
+        <div class="flex items-center">
+          <Button icon="pi pi-minus" @click="duration--" class="p-button-text" />
+          <InputNumber v-model="duration" :min="0" :max="10" class="w-24 mx-2" />
+          <Button icon="pi pi-plus" @click="duration++" class="p-button-text" />
+        </div>
         -->
       </div>
-      <UButton color="white" variant="solid" @click="cut">
+      <Button @click="cut" class="p-button-lg">
         Switch to {{ selectedScene.name }}
-      </UButton>
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 
-const switchemodes = ['Cut', 'Crossfade']
-const switchmode = ref(switchemodes[0])
-const duration = ref(2)
+const switchemodes = [
+  { name: 'Cut', value: 'Cut' },
+  { name: 'Crossfade', value: 'Crossfade' }
+];
+const switchmode = ref(switchemodes[0]);
+const duration = ref(2);
 
-const { activeSceneUid, activeScene, selectedScene } = useActiveScene()
+const { activeSceneUid, activeScene, selectedScene } = useActiveScene();
 
 const cut = async () => {
   if (!selectedScene.value) {
-    return
+    return;
   }
 
   try {
-    const response = await $fetch('/api/mixer/cut_program', {
+    const response = await fetch('/api/mixer/cut_program', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         src: selectedScene.value.uid
       })
     });
 
-    if (response && response.src) {
+    if (!response.ok) {
+      throw new Error('Server responded with an error');
+    }
+
+    const data = await response.json();
+    if (data && data.src) {
+      // @TODO: Add Toast later
     } else {
-      throw new Error('Invalid response from server')
+      // @TODO: Add Toast later
     }
   } catch (error) {
-    console.error('Error:', error);
+      // @TODO: Add Toast later
   }
-}
+};
 </script>
-
-<style scoped>
-.red {
-  color: red;
-}
-</style>
