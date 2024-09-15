@@ -19,6 +19,8 @@ useHead({
                     <li><NuxtLink to="/help">Help</NuxtLink></li>
                     <li><NuxtLink to="/websockets">Websockets</NuxtLink></li>
                     <li><NuxtLink to="/api/debug" external target="_blank">Pipelines</NuxtLink></li>
+                    <li><NuxtLink to="/docs" external target="_blank">Openapi</NuxtLink></li>
+
                 </ul>
                 <TogglePreview />
                 <a href="https://github.com/dorftv/dove">

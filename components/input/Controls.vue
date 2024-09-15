@@ -1,43 +1,55 @@
 <template>
-  <div :class="input.state.toLowerCase()">
-    <div>{{ positionFormatted }}{{ durationFormatted }}</div>
+  <div :class="input.state.toLowerCase() + ' p-4 rounded-lg'">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center space-x-4">
+        <div>{{ positionFormatted }} / {{ durationFormatted }}</div>
+        <div>{{ input.state }}</div>
+        <div class="relative">
+          <Icon name="icomoon-free:loop" color="black" size="16px" />
+          <div v-if="!input.loop" class="strikethrough"></div>
+        </div>
+      </div>
+    </div>
+
     <Slider
       v-if="input.duration"
-      :modelValue="position"
-      @update:modelValue="handlePositionChange"
+      :model-value="position"
+      @update:model-value="handlePositionChange"
       :step="1"
       :min="0"
       :max="input.duration"
-      class="mb-2"
+      class="w-full mb-2"
     />
-    <Icon name="uil:stop-circle" color="black" size="24px" @click="submitStop"/>
-    <Icon name="uil:pause-circle" color="black" size="24px"  @click="submitPause" />
-    <Icon name="uil:play-circle" color="black" size="24px" @click="submitPlay"/>
 
-     {{ input.state }}
-     <!-- toggle preview -->
-    <Icon name="uil:video-slash" color="black" size="24px"  v-if="!inputPreview && inputEnabled" @click="$emit('enablePreview', false)"/>
-    <Icon name="uil:video" color="black" size="24px"  v-if="!inputPreview && !inputEnabled"  @click="$emit('enablePreview', true)"/>
-    <Icon name="icomoon-free:loop" color="black" size="24px"  v-if="input.loop" />
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <Icon name="uil:stop-circle" color="black" size="24px" @click="submitStop" class="cursor-pointer" />
+        <Icon name="uil:play-circle" color="black" size="24px" @click="submitPlay" class="cursor-pointer" />
+        <Icon name="uil:pause-circle" color="black" size="24px" @click="submitPause" class="cursor-pointer" />
+      </div>
 
-    <div>
-    <div class="felx justify-between">
-    <Slider  :modelValue="volume" @update:modelValue="handleVolumeChange" name="range" :min="0" :max="100"   />{{  volume  }}
-
-    </div>
+      <div class="flex items-center text-lg text-black">
+        <Knob
+          :model-value="volume"
+          @update:model-value="handleVolumeChange"
+          name="volume"
+          :min="0"
+          :max="100"
+          value-template="{value}"
+          :size="40"
+          class="text-black text-lg"
+        />
+      </div>
     </div>
   </div>
 </template>
+
+
 <script setup>
-
-
 
 const props = defineProps({
   input: Object,
-  inputEnabled: Boolean,
 });
-
-const { inputPreview } = useUserState();
 
 const {
   volume,
@@ -51,30 +63,39 @@ const {
   submitStop,
 } = useInputControls(props);
 
-function enablePreview() {
-  inputEnabled = !prop.inputEnabled;
-}
+
 
 </script>
 
 <style scoped>
+.ready {
+  background-color: #f8f8f8;
+  color: #333;
+}
+
 .playing {
-  background-color: green;
-}
-
-.buffering {
-  background-color: orange;
-}
-
-.pending {
-  background-color: gray;
+  background-color: #e0ffe0;
+  color: #333;
 }
 
 .paused {
-  background-color: orange;
+  background-color: #ffebcc;
+  color: #333;
 }
 
-.eos {
-  background-color: red;
+.stopped {
+  background-color: #fff0f0;
+  color: #333;
+}
+
+/* Strikethrough style */
+.strikethrough {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgb(0, 0, 0); /* Change color as needed */
+  transform: rotate(-45deg);
 }
 </style>

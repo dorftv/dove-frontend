@@ -21,11 +21,13 @@
       </button>
       <button
         v-if="!input.locked"
-        @click="submitRemove"
+        @click="submitRemoveInput"
         class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 transition-colors duration-200"
       >
         <i class="pi pi-trash text-sm"></i>
       </button>
+    <Icon name="uil:video-slash" color="black" size="24px"  v-if="!inputPreview && inputEnabled" @click="$emit('enablePreview', false)"/>
+    <Icon name="uil:video" color="black" size="24px"  v-if="!inputPreview && !inputEnabled"  @click="$emit('enablePreview', true)"/>
     </div>
   </div>
 </template>
@@ -39,15 +41,16 @@ const props = defineProps({
 
 const op = ref();
 
+
 const inputDetails = computed(() => JSON.stringify(props.input, null, 2));
 
-const previewEnabled = useCookie('enablePreview');
+const { inputPreview } = useUserState();
 
 function enablePreview() {
-  props.inputEnabled = !props.inputEnabled;
+  inputEnabled = !prop.inputEnabled;
 }
 
-const submitRemove = async () => {
+const submitRemoveInput = async () => {
   try {
     const response = await fetch('/api/inputs', {
       method: 'DELETE',

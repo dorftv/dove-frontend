@@ -5,10 +5,10 @@ export default defineNuxtConfig({
     appManifest: false,
   },
   ssr: false,
-  static: true,
   nitro: {
     devProxy: {
       '/api': process.env.DOVE_API ? process.env.DOVE_API + '/api' : 'http://localhost:5000/api',
+      '/docs': process.env.DOVE_API ? process.env.DOVE_API + '/docs' : 'http://localhost:5000/docs',
       '/proxy': process.env.DOVE_API ? process.env.DOVE_API + '/proxy' : 'http://localhost:5000/proxy',
       '/preview': process.env.DOVE_API ? process.env.DOVE_API + '/preview' : 'http://localhost:5000/preview',
     },
@@ -35,7 +35,7 @@ export default defineNuxtConfig({
   },
 
   modulesDir: ['./node_modules'],
-  modules: ['@nuxt/ui', '@primevue/nuxt-module', "@nuxt/icon"],
+  modules: ["@primevue/nuxt-module", "@nuxt/icon"],
 
   primevue: {
     options: {

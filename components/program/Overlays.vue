@@ -19,5 +19,24 @@ const getInputInfo = (uid) => {
 </script>
 
 <style>
+.ready {
+  background-color: #f8f8f8;
+  color: #333;
+}
+
+.playing {
+  background-color: #e0ffe0;
+  color: #333;
+}
+
+.paused {
+  background-color: #ffebcc;
+  color: #333;
+}
+
+.stopped {
+  background-color: #fff0f0;
+  color: #333;
+}
 
 </style>
