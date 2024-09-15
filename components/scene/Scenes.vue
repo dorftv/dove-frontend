@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col" v-if="scene">
     <SceneHeader :scene="scene" />
     <div v-if="mixerPreview || mixerEnabled" class="w-full aspect-video">
       <VideoPlayer :uid="scene.uid" class="w-full h-full" />
