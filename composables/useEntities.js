@@ -161,20 +161,23 @@ export function useEntities() {
   });
 
   const inputsPreview = computed(() => {
-    return inputs.value.filter(input => input.preview === true);
+    return inputs.value.filter(input => input.preview === true && input.type !== 'nodecg');
   })
 
   const inputsNoPreview = computed(() => {
-    return inputs.value.filter(input => input.preview === false);
+    return inputs.value.filter(input => input.preview === false && input.type !== 'nodecg');
   })
 
-
+  const inputsNodecg = computed(() => {
+    return inputs.value.filter(input => input.type === 'nodecg');
+  })
 
 
   entitiesInstance = {
     inputs,
     inputsPreview,
     inputsNoPreview,
+    inputsNodecg,
     mixers,
     outputs,
     sceneInputs,
