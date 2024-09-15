@@ -7,10 +7,12 @@ export const useCreateEntity = (entityType) => {
   const types = ref([]);
   const selectedSceneActive = ref(false);
   const selectedSceneProgram = ref(false);
+  const activeTabIndex = ref(0);
+  const proxyItems = ref({});
 
-  const { mixers, sceneMixerSource } = useEntities();
+  const { mixers, sceneMixerSource, sceneInputs, sceneMixers, programMixer } = useEntities();
 
-  const { getUIConfig, resolutionOptions, defaultResolution, getResolutionDimensions } = useDoveConfig();
+  const { getUIConfig, resolutionOptions, defaultResolution, getResolutionDimensions, addInput, config, proxyTypes } = useDoveConfig();
 
   const selectedResolution = ref(defaultResolution);
   const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
@@ -160,11 +162,38 @@ export const useCreateEntity = (entityType) => {
     }
   };
 
+  const onTabChange = (event) => {
+    activeTabIndex.value = event.index;
+    proxyItems.value = {};
+  };
+
+  const handleProxyNameChange = (itemLabel, field, proxyType, value) => {
+    const selectedItem = proxyItems.value[proxyType]?.find(item => item.url === value);
+    if (selectedItem) {
+      formData[itemLabel][field] = value;
+      formData[itemLabel]['name'] = selectedItem.name;
+    }
+  };
+
+  const fetchItems = async (proxyType) => {
+    const { data, error } = await useFetch(() => `/proxy/${proxyType}`);
+    if (error.value) {
+      proxyItems.value[proxyType] = [];
+      console.error('Failed to fetch items:', error.value);
+    } else {
+      proxyItems.value[proxyType] = data.value;
+    }
+  };
+
   watch(isOpen, (newValue) => {
     if (newValue === false) {
       Object.keys(formData).forEach(key => delete formData[key]);
       initializeFormData(types.value);
       selectedResolution.value = defaultResolution.value;
+      proxyItems.value = {};
+      selectedScene.uid = null;
+      selectedScene.slot = null;
+      selectedSceneProgram.value = false;
     }
   });
 
@@ -179,7 +208,6 @@ export const useCreateEntity = (entityType) => {
 
   watch(selectedResolution, updateResolutionDimensions);
 
-  // For inputs: Set selectedScene.slot when selectedScene.uid changes
   watch(() => selectedScene.uid, (newUid) => {
     if (newUid && entityType === 'inputs') {
       const sources = sceneMixerSource(newUid);
@@ -187,7 +215,13 @@ export const useCreateEntity = (entityType) => {
       if (firstAvailableSlot) {
         selectedScene.slot = firstAvailableSlot.index;
       }
+    } else {
+      selectedScene.slot = null;
     }
+  });
+
+  watch(activeTabIndex, () => {
+    proxyItems.value = {};
   });
 
   const currentSources = computed(() => {
@@ -214,5 +248,13 @@ export const useCreateEntity = (entityType) => {
     selectedSceneProgram,
     fetchTypes,
     submitCreate,
+    activeTabIndex,
+    onTabChange,
+    proxyItems,
+    handleProxyNameChange,
+    fetchItems,
+    addInput,
+    proxyTypes,
+    sceneMixers,
   };
 };

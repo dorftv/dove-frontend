@@ -145,6 +145,7 @@
 </template>
 
 <script setup>
+import { useCreateEntity } from '../composables/useCreateEntity';
 
 const entityType = 'inputs';
 const {
@@ -160,63 +161,15 @@ const {
   selectedSceneProgram,
   currentSources,
   selectedScene,
+  activeTabIndex,
+  onTabChange,
+  proxyItems,
+  handleProxyNameChange,
+  fetchItems,
+  addInput,
+  proxyTypes,
+  sceneMixers,
 } = useCreateEntity(entityType);
-
-const activeTabIndex = ref(0);
-const onTabChange = (event) => {
-  activeTabIndex.value = event.index;
-  proxyItems.value = {};
-};
-
-const { sceneInputs, sceneMixers, programMixer } = useEntities();
-
-const { addInput, config, proxyTypes } = useDoveConfig();
-let refresh = null;
-const proxyItems = ref({});
-
-function handleProxyNameChange(itemLabel, field, proxyType, value) {
-  const selectedItem = proxyItems.value[proxyType]?.find(item => item.url === value);
-  if (selectedItem) {
-    formData[itemLabel][field] = value;
-    formData[itemLabel]['name'] = selectedItem.name;
-  }
-}
-
-watch(activeTabIndex, (newIndex) => {
-  proxyItems.value = {};
-});
-
-async function fetchItems(proxyType) {
-  const { data, error, execute, refresh: refreshFunc } = await useFetch(() => `/proxy/${proxyType}`);
-  refresh = refreshFunc;
-  if (error.value) {
-    proxyItems.value = [];
-    console.error('Failed to fetch items:', error.value);
-  } else {
-    proxyItems.value[proxyType] = data.value;
-  }
-}
-
-watch(isOpen, (newValue) => {
-  if (!newValue) {
-    proxyItems.value = {};
-    selectedScene.uid = null;
-    selectedScene.slot = null;
-    selectedSceneProgram.value = false;
-  }
-});
-
-watch(() => selectedScene.uid, (newUid) => {
-  if (newUid) {
-    const sources = currentSources.value;
-    const firstAvailableSlot = sources.find(source => !source.id);
-    if (firstAvailableSlot) {
-      selectedScene.slot = firstAvailableSlot.index;
-    }
-  } else {
-    selectedScene.slot = null;
-  }
-});
 </script>
 
 <style scoped>
