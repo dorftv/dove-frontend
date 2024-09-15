@@ -69,13 +69,30 @@ export default function useInputControls(props) {
     };
 
     const submitStop = async () => {
-      const { data: responseData } = await useFetch('/api/input/delete', {
-        method: 'post',
+      const { data: responseData } = await useFetch('/api/inputs', {
+        method: 'put',
         body: {
           uid: props.input.uid,
+          type: 'update',
+          state: 'NULL',
         },
       });
     };
+
+    const submitLoop = async (loopState) => {
+      const response = await useFetch('/api/inputs', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: {
+          uid: props.input.uid,
+          type: 'update',
+          loop: loopState,
+        },
+      });
+    };
+
 
     const inputName = computed(() => {
       const input = inputs.value.find(input => input.uid === props.source?.src);
@@ -148,6 +165,7 @@ export default function useInputControls(props) {
       submitPlay,
       submitPause,
       submitStop,
+      submitLoop,
       inputName,
       isInSceneSources,
       submitAddInputToScene,
