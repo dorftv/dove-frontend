@@ -12,21 +12,21 @@
     </template>
     <Tabs :value="activeTabIndex" @tab-change="onTabChange" class="output-tabs">
       <TabList>
-        <Tab v-for="(item, index) in types" :key="item.label" :value="index">
+        <Tab v-for="(item, index) in types" :key="item.key" :value="index">
           {{ item.label }}
         </Tab>
       </TabList>
       <TabPanels>
-        <TabPanel v-for="(item, index) in types" :key="item.label" :value="index">
+        <TabPanel v-for="(item, index) in types" :key="item.key" :value="index">
           <div class="p-2 bg-gray-100 rounded-lg">
             <h2 class="text-base font-bold mb-1">{{ item.label }}</h2>
-            <form @submit.prevent="submitCreate(item.label)" class="space-y-2">
+            <form @submit.prevent="submitCreate(item.key)" class="space-y-2">
               <div v-for="field in item.fields" :key="field.name">
                 <div v-if="field.name !== 'type'" class="mb-2">
                   <label :for="field.name" class="block font-bold text-sm mb-1">{{ field.label }}</label>
                   <InputText
                     v-if="field.type === 'string'"
-                    v-model="formData[item.label][field.name]"
+                    v-model="formData[item.key][field.name]"
                     :id="field.name"
                     :placeholder="field.placeholder"
                     :required="field.required"
@@ -34,7 +34,7 @@
                   />
                   <InputNumber
                     v-if="field.type === 'integer'"
-                    v-model="formData[item.label][field.name]"
+                    v-model="formData[item.key][field.name]"
                     :id="field.name"
                     :placeholder="field.placeholder"
                     :required="field.required"
@@ -42,7 +42,7 @@
                   />
                   <Checkbox
                     v-if="field.type === 'boolean'"
-                    v-model="formData[item.label][field.name]"
+                    v-model="formData[item.key][field.name]"
                     :id="field.name"
                     :binary="true"
                   />
@@ -55,7 +55,7 @@
                 <div>
                   <label class="block font-bold text-sm mb-1">Source</label>
                   <Select
-                    v-model="formData[item.label]['src']"
+                    v-model="formData[item.key]['src']"
                     :options="availSrc"
                     optionLabel="name"
                     optionValue="value"
@@ -80,7 +80,7 @@
                 <div>
                   <label class="block font-bold text-sm mb-1">Name</label>
                   <InputText
-                    v-model="formData[item.label]['name']"
+                    v-model="formData[item.key]['name']"
                     placeholder="Give a name. Default Output X"
                     class="w-full text-sm"
                   />
@@ -112,46 +112,10 @@ const {
   submitCreate,
   selectedResolution,
   resolutionOptions,
+  activeTabIndex,
+  onTabChange,
+  addOutput,
 } = useCreateEntity(entityType);
-
-const { addOutput, getResolutionDimensions } = useDoveConfig();
-
-const activeTabIndex = ref(0);
-const onTabChange = (event) => {
-  activeTabIndex.value = event.index;
-};
-
-watch(selectedResolution, (newResolution) => {
-  const dimensions = getResolutionDimensions(newResolution);
-  if (dimensions) {
-    types.value.forEach((type) => {
-      if (formData[type.label]) {
-        formData[type.label].width = dimensions.width;
-        formData[type.label].height = dimensions.height;
-      }
-    });
-  }
-});
-
-onMounted(() => {
-  if (availSrc.value.length > 0) {
-    types.value.forEach((type) => {
-      if (formData[type.label] && !formData[type.label].src) {
-        formData[type.label].src = availSrc.value[0].value;
-      }
-    });
-  }
-});
-
-watch(() => availSrc.value, (newAvailSrc) => {
-  if (newAvailSrc.length > 0) {
-    types.value.forEach((type) => {
-      if (formData[type.label] && !formData[type.label].src) {
-        formData[type.label].src = newAvailSrc[0].value;
-      }
-    });
-  }
-}, { immediate: true });
 </script>
 
 <style scoped>

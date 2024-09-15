@@ -12,7 +12,7 @@ export const useCreateEntity = (entityType) => {
 
   const { mixers, sceneMixerSource, sceneInputs, sceneMixers, programMixer } = useEntities();
 
-  const { getUIConfig, resolutionOptions, defaultResolution, getResolutionDimensions, addInput, config, proxyTypes } = useDoveConfig();
+  const { getUIConfig, resolutionOptions, defaultResolution, getResolutionDimensions, addInput, addOutput, config, proxyTypes } = useDoveConfig();
 
   const selectedResolution = ref(defaultResolution);
   const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
@@ -152,7 +152,7 @@ export const useCreateEntity = (entityType) => {
         body: JSON.stringify(body),
       });
       const responseJson = await response.json();
-      if (entityType !== 'mixers') {
+      if (entityType !== 'mixers' && entityType !== 'outputs') {
         await submitAddToScene(responseJson);
       }
       isOpen.value = false;
@@ -224,6 +224,16 @@ export const useCreateEntity = (entityType) => {
     proxyItems.value = {};
   });
 
+  watch(() => availSrc.value, (newAvailSrc) => {
+    if (newAvailSrc.length > 0 && entityType === 'outputs') {
+      types.value.forEach((type) => {
+        if (formData[type.key] && !formData[type.key].src) {
+          formData[type.key].src = newAvailSrc[0].value;
+        }
+      });
+    }
+  }, { immediate: true });
+
   const currentSources = computed(() => {
     if (!selectedScene.uid) return []
     return sceneMixerSource(selectedScene.uid)
@@ -254,6 +264,7 @@ export const useCreateEntity = (entityType) => {
     handleProxyNameChange,
     fetchItems,
     addInput,
+    addOutput,
     proxyTypes,
     sceneMixers,
   };
