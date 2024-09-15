@@ -4,7 +4,7 @@
       <div class="flex items-center space-x-4">
         <div>{{ positionFormatted }} / {{ durationFormatted }}</div>
         <div>{{ input.state }}</div>
-        <div class="relative">
+        <div v-if="input.hasOwnProperty('loop')" class="relative cursor-pointer" @click="submitLoop(!input.loop)">
           <Icon name="icomoon-free:loop" color="black" size="16px" />
           <div v-if="!input.loop" class="strikethrough"></div>
         </div>
@@ -61,6 +61,7 @@ const {
   submitPlay,
   submitPause,
   submitStop,
+  submitLoop,
 } = useInputControls(props);
 
 
