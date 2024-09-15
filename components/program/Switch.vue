@@ -4,7 +4,7 @@
       Active Scene: <span v-if="activeScene" class="text-red-500 font-bold">{{ activeScene ? activeScene.name : 'None' }}</span>
     </div>
 
-    <Dropdown v-model="switchmode" :options="switchemodes" optionLabel="name" class="w-full mb-4" />
+    <Select v-model="switchmode" :options="switchemodes" optionLabel="name" class="w-full mb-4" />
 
     <div class="flex flex-col items-center">
       <div v-if="switchmode === 'Crossfade'" class="mb-4">
