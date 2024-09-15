@@ -21,7 +21,7 @@
         <div class="p-2 bg-gray-100 rounded-lg">
           <h2 class="text-base font-bold mb-1">{{ item.fields['type'].label }}</h2>
           <p class="text-xs italic mb-2">{{ item.fields['type'].description }}</p>
-          <form @submit.prevent="submitCreate(item.label)" class="space-y-2">
+          <form @submit.prevent="submitCreateInput(item.label)" class="space-y-2">
             <div v-for="field in item.fields" :key="field.name">
               <div v-if="field.name !== 'type' && field.hidden !== true" class="mb-2">
                 <label :for="field.name" class="block font-bold text-sm mb-1">{{ field.label }}</label>
@@ -145,31 +145,29 @@
 </template>
 
 <script setup>
-import { useCreateEntity } from '../composables/useCreateEntity';
 
-const entityType = 'inputs';
 const {
   isOpen,
   isLoading,
   fetchError,
-  types,
   formData,
   availSrc,
-  submitCreate,
-  selectedResolution,
+  types,
   resolutionOptions,
-  selectedSceneProgram,
-  currentSources,
-  selectedScene,
+  selectedResolution,
   activeTabIndex,
   onTabChange,
+  selectedSceneProgram,
   proxyItems,
+  selectedScene,
+  currentSources,
+  submitCreateInput,
   handleProxyNameChange,
   fetchItems,
   addInput,
   proxyTypes,
   sceneMixers,
-} = useCreateEntity(entityType);
+} = useCreateInput();
 </script>
 
 <style scoped>

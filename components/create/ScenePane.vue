@@ -45,19 +45,14 @@
 
 <script setup>
 
-const entityType = 'mixers';
 const {
   isOpen,
-  isLoading,
-  fetchError,
-  types,
   formData,
   submitCreate,
   selectedResolution,
   resolutionOptions,
-} = useCreateEntity(entityType);
-
-const { addScene } = useDoveConfig();
+  addScene,
+} = useCreateScene();
 
 </script>
 

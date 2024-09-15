@@ -106,16 +106,18 @@ const {
   isOpen,
   isLoading,
   fetchError,
-  types,
   formData,
   availSrc,
-  submitCreate,
-  selectedResolution,
+  types,
   resolutionOptions,
+  selectedResolution,
+  fetchTypes,
+  submitCreate,
   activeTabIndex,
   onTabChange,
   addOutput,
-} = useCreateEntity(entityType);
+} = useCreateOutput();
+
 </script>
 
 <style scoped>

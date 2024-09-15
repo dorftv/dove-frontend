@@ -5,22 +5,13 @@ export const useCreateEntity = (entityType) => {
   const formData = reactive({});
   const availSrc = ref([]);
   const types = ref([]);
-  const selectedSceneActive = ref(false);
-  const selectedSceneProgram = ref(false);
   const activeTabIndex = ref(0);
-  const proxyItems = ref({});
 
-  const { mixers, sceneMixerSource, sceneInputs, sceneMixers, programMixer } = useEntities();
-
-  const { getUIConfig, resolutionOptions, defaultResolution, getResolutionDimensions, addInput, addOutput, config, proxyTypes } = useDoveConfig();
+  const { mixers } = useEntities();
+  const { resolutionOptions, defaultResolution, getResolutionDimensions } = useDoveConfig();
 
   const selectedResolution = ref(defaultResolution);
   const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
-
-  const selectedScene = reactive({
-    uid: null,
-    slot: null
-  });
 
   const updateResolutionDimensions = () => {
     const dimensions = getResolutionDimensions(selectedResolution.value);
@@ -66,13 +57,7 @@ export const useCreateEntity = (entityType) => {
   const initializeFormData = (types) => {
     types.forEach((type) => {
       if (!(type.key in formData)) {
-        if (entityType === "inputs") {
-          formData[type.key] = {
-            volume: 0.8,
-          };
-        } else if (entityType === "outputs" || entityType === "mixers") {
-          formData[type.key] = {};
-        }
+        formData[type.key] = {};
         if (Array.isArray(type.fields)) {
           type.fields.forEach((field) => {
             formData[type.key][field.name] = field.type === 'boolean' ? false : '';
@@ -94,49 +79,6 @@ export const useCreateEntity = (entityType) => {
     }
   };
 
-  const submitCutProgram = async () => {
-    if (selectedSceneProgram.value) {
-      try {
-        const cutProgramResponse = await fetch(`/api/mixer/cut_program`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            src: selectedScene.uid
-          }),
-        });
-        const cutProgramResponseJson = await cutProgramResponse.json();
-        console.log('Cut Scene to Program response:', cutProgramResponseJson);
-      } catch (error) {
-        console.error('Error cut Program:', error);
-      }
-    }
-  }
-
-  const submitAddToScene = async (responseJson) => {
-    if (selectedScene.uid && selectedScene.slot !== null) {
-      try {
-        const cutSceneResponse = await fetch(`/api/mixer/add_source`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            src: responseJson.uid,
-            target: selectedScene.uid,
-            index: selectedScene.slot
-          }),
-        });
-        const cutSceneResponseJson = await cutSceneResponse.json();
-        await submitCutProgram();
-        console.log('Cut Scene to Source response:', cutSceneResponseJson);
-      } catch (error) {
-        console.error('Error in cut Input to Scene:', error);
-      }
-    }
-  }
-
   const submitCreate = async (itemType) => {
     try {
       const body = { ...formData[itemType] };
@@ -152,37 +94,16 @@ export const useCreateEntity = (entityType) => {
         body: JSON.stringify(body),
       });
       const responseJson = await response.json();
-      if (entityType !== 'mixers' && entityType !== 'outputs') {
-        await submitAddToScene(responseJson);
-      }
       isOpen.value = false;
+      return responseJson;
     } catch (error) {
-      console.error('Error creating entity:', error);
+      // @TODO Add Toast
       isOpen.value = false;
     }
   };
 
   const onTabChange = (event) => {
     activeTabIndex.value = event.index;
-    proxyItems.value = {};
-  };
-
-  const handleProxyNameChange = (itemLabel, field, proxyType, value) => {
-    const selectedItem = proxyItems.value[proxyType]?.find(item => item.url === value);
-    if (selectedItem) {
-      formData[itemLabel][field] = value;
-      formData[itemLabel]['name'] = selectedItem.name;
-    }
-  };
-
-  const fetchItems = async (proxyType) => {
-    const { data, error } = await useFetch(() => `/proxy/${proxyType}`);
-    if (error.value) {
-      proxyItems.value[proxyType] = [];
-      console.error('Failed to fetch items:', error.value);
-    } else {
-      proxyItems.value[proxyType] = data.value;
-    }
   };
 
   watch(isOpen, (newValue) => {
@@ -190,10 +111,6 @@ export const useCreateEntity = (entityType) => {
       Object.keys(formData).forEach(key => delete formData[key]);
       initializeFormData(types.value);
       selectedResolution.value = defaultResolution.value;
-      proxyItems.value = {};
-      selectedScene.uid = null;
-      selectedScene.slot = null;
-      selectedSceneProgram.value = false;
     }
   });
 
@@ -208,40 +125,9 @@ export const useCreateEntity = (entityType) => {
 
   watch(selectedResolution, updateResolutionDimensions);
 
-  watch(() => selectedScene.uid, (newUid) => {
-    if (newUid && entityType === 'inputs') {
-      const sources = sceneMixerSource(newUid);
-      const firstAvailableSlot = sources.find(source => !source.id);
-      if (firstAvailableSlot) {
-        selectedScene.slot = firstAvailableSlot.index;
-      }
-    } else {
-      selectedScene.slot = null;
-    }
-  });
-
-  watch(activeTabIndex, () => {
-    proxyItems.value = {};
-  });
-
-  watch(() => availSrc.value, (newAvailSrc) => {
-    if (newAvailSrc.length > 0 && entityType === 'outputs') {
-      types.value.forEach((type) => {
-        if (formData[type.key] && !formData[type.key].src) {
-          formData[type.key].src = newAvailSrc[0].value;
-        }
-      });
-    }
-  }, { immediate: true });
-
-  const currentSources = computed(() => {
-    if (!selectedScene.uid) return []
-    return sceneMixerSource(selectedScene.uid)
-  })
-
   onMounted(() => {
     fetchTypes();
-    selectedResolution.value = defaultResolution.value
+    selectedResolution.value = defaultResolution.value;
   });
 
   return {
@@ -253,19 +139,10 @@ export const useCreateEntity = (entityType) => {
     types,
     resolutionOptions,
     selectedResolution,
-    selectedScene,
-    currentSources,
-    selectedSceneProgram,
     fetchTypes,
     submitCreate,
     activeTabIndex,
     onTabChange,
-    proxyItems,
-    handleProxyNameChange,
-    fetchItems,
-    addInput,
-    addOutput,
-    proxyTypes,
-    sceneMixers,
+    initializeFormData,
   };
 };
