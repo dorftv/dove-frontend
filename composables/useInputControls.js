@@ -1,5 +1,6 @@
 export default function useInputControls(props) {
     const volume = ref(props.input.volume * 100);
+    const { inputs } = useEntities();
 
     watch(
       () => props.input.volume,
@@ -76,6 +77,37 @@ export default function useInputControls(props) {
       });
     };
 
+    const inputName = computed(() => {
+      const input = inputs.value.find(input => input.uid === props.source?.src);
+      return input ? input.name : '';
+    });
+
+    const isInSceneSources = computed(() => {
+      return props.scene?.sources.some(source => source.src === props.input?.uid && source.sink === props.source?.sink);
+    });
+
+    const submitAddInputToScene = async () => {
+      const { data: responseData } = await useFetch('/api/mixer/add_source', {
+        method: 'post',
+        body: {
+          src: props.input.uid,
+          target: props.scene.uid,
+          index: props.source.index
+        }
+      });
+    };
+
+    const submitRemoveInputFromScene = async () => {
+      const { data: responseData } = await useFetch('/api/mixer/remove_source', {
+        method: 'post',
+        body: {
+          src: "None",
+          target: props.scene.uid,
+          index: props.source.index
+        }
+      });
+    };
+
     return {
       volume,
       position,
@@ -86,5 +118,10 @@ export default function useInputControls(props) {
       submitPlay,
       submitPause,
       submitStop,
+      inputName,
+      isInSceneSources,
+      submitAddInputToScene,
+      submitRemoveInputFromScene,
+
     };
   }
