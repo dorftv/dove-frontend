@@ -107,6 +107,36 @@ export default function useInputControls(props) {
         }
       });
     };
+    const inputInfoPopover = ref();
+
+    const inputDetails = computed(() => JSON.stringify(props.input, null, 2));
+
+    const { inputPreview } = useUserState();
+
+    const submitRemoveInput = async () => {
+      try {
+        const response = await fetch('/api/inputs', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            uid: props.input.uid,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to remove input');
+        }
+        // @TODO: add Toast Later
+      } catch (error) {
+        // @TODO: add Toast Later
+      }
+    };
+
+    const toggleInputPreview = () => {
+      return !props.inputEnabled;
+    };
 
     return {
       volume,
@@ -122,6 +152,11 @@ export default function useInputControls(props) {
       isInSceneSources,
       submitAddInputToScene,
       submitRemoveInputFromScene,
+      inputInfoPopover,
+      inputDetails,
+      inputPreview,
+      submitRemoveInput,
+      toggleInputPreview,
 
     };
   }
