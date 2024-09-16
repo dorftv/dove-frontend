@@ -22,7 +22,7 @@
     />
 
     <div class="flex items-center justify-between">
-      <div class="flex items-center space-x-4">
+      <div v-if="input.show_controls" class="flex items-center space-x-4">
         <Icon name="uil:stop-circle" color="black" size="24px" @click="submitStop" class="cursor-pointer" />
         <Icon name="uil:play-circle" color="black" size="24px" @click="submitPlay" class="cursor-pointer" />
         <Icon name="uil:pause-circle" color="black" size="24px" @click="submitPause" class="cursor-pointer" />
