@@ -169,9 +169,21 @@ export function useEntities() {
   })
 
   const inputsNodeCG = computed(() => {
-    return inputs.value.filter(input => input.type === 'nodecg');
-  })
-
+    return inputs.value
+      .filter(input => input.type === 'nodecg')
+      .sort((a, b) => {
+        if (a.index !== undefined && b.index !== undefined) {
+          return a.index - b.index;
+        }
+        if (a.index !== undefined) {
+          return -1;
+        }
+        if (b.index !== undefined) {
+          return 1;
+        }
+        return 0;
+      });
+  });
 
   entitiesInstance = {
     inputs,

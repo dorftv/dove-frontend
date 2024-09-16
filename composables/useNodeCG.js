@@ -32,7 +32,6 @@ export function useNodeCG() {
   watch(activeTab, () => {
     initializeHeight();
   });
-
   return {
     inputsNodeCG,
     container,
