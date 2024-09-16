@@ -18,7 +18,6 @@ const props = defineProps({
   source: Object
 })
 
-const { inputs } = useEntities();
 
 const {
   inputName,

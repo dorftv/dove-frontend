@@ -1,8 +1,15 @@
 <template>
   <div v-if="programMixer">
     <div v-for="overlay in programMixer.sources" :key="overlay.src">
-      <div v-if="overlay.index >= 2" class="flex flex-col" :class="getInputInfo(overlay.src).state.toLowerCase()">
-        {{ getInputInfo(overlay.src).name }} ({{ getInputInfo(overlay.src).type }})
+      <div v-if="overlay.index >= 2" class="flex flex-col">
+        <template v-if="getInputInfo(overlay.src)">
+          <div :class="getInputInfo(overlay.src).state.toLowerCase()">
+            {{ getInputInfo(overlay.src).name }} ({{ getInputInfo(overlay.src).type }})
+          </div>
+        </template>
+        <template v-else>
+          <div>Unknown Overlay ({{ overlay.src }})</div>
+        </template>
       </div>
     </div>
   </div>
@@ -10,12 +17,9 @@
 
 <script setup>
 
-const { programMixer, inputs  } = useEntities()
+const { programMixer, overlays, getInputInfo } = useProgram();
 
-const getInputInfo = (uid) => {
-  const matchingInput = inputs.value.find(input => input.uid === uid)
-  return matchingInput ? { name: matchingInput.name, type: matchingInput.type, state: matchingInput.state } : null
-}
+
 </script>
 
 <style>

@@ -168,7 +168,7 @@ export function useEntities() {
     return inputs.value.filter(input => input.preview === false && input.type !== 'nodecg');
   })
 
-  const inputsNodecg = computed(() => {
+  const inputsNodeCG = computed(() => {
     return inputs.value.filter(input => input.type === 'nodecg');
   })
 
@@ -177,7 +177,7 @@ export function useEntities() {
     inputs,
     inputsPreview,
     inputsNoPreview,
-    inputsNodecg,
+    inputsNodeCG,
     mixers,
     outputs,
     sceneInputs,

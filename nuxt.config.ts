@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     appManifest: false,
   },
   ssr: false,
+  target: 'static',
   nitro: {
     devProxy: {
       '/api': process.env.DOVE_API ? process.env.DOVE_API + '/api' : 'http://localhost:5000/api',
