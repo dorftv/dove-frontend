@@ -4,7 +4,6 @@
       <TabList>
         <Tab v-for="(input, index) in inputsNodeCG" :key="input.uid" :value="index">
           {{ input.name }}
-          {{ input.index }}
         </Tab>
       </TabList>
       <TabPanels>

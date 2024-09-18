@@ -1,8 +1,7 @@
 <template>
-  <div :class="output.state.toLowerCase()" v-if="!output.type.startsWith('preview')">
-
-    {{ output.type }}
-          <Popover ref="op" appendTo="body">
+  <div :class="output.state.toLowerCase()" v-if="!output.type.startsWith('preview')" class="flex flex-col">
+    <div class="flex items-center justify-end mb-2">
+      <Popover ref="op" appendTo="body">
         <pre>{{ outputDetails }}</pre>
       </Popover>
       <button
@@ -18,12 +17,16 @@
       >
         <i class="pi pi-trash text-sm"></i>
       </button>
-    <i
-      v-if="!output.locked"
-      class="pi pi-trash"
-      style="color: red; font-size: 1.5rem;"
-      @click="submitRemove"
-    ></i>
+    </div>
+    <div class="flex-grow overflow-hidden">
+      <span
+        v-tooltip="output.name + ' (' + output.type + ')'"
+        :id="'outputName_' + output.uid"
+        class="truncate inline-block w-full cursor-help"
+      >
+        {{ output.name }}
+      </span>
+    </div>
   </div>
 </template>
 

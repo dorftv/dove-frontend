@@ -12,7 +12,7 @@
     </div>
 
     <Slider
-      v-if="input.duration"
+      v-if="input.duration && input.show_controls"
       :model-value="position"
       @update:model-value="handlePositionChange"
       :step="1"
