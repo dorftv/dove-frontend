@@ -33,14 +33,20 @@
         </div>
       </div>
     </div>
-
     <div v-if="inputsNodeCG.length > 0 || inputsNoPreview.length > 0"
          class="col-span-4">
       <div v-if="inputsNodeCG.length > 0 && showNodeCG">
         <InputNodeCG />
       </div>
       <div v-else class="grid grid-cols-2 gap-2">
-        <div v-for="input in inputsNoPreview" :key="input.uid" class="px-2">
+        <div v-for="input in inputsNoPreview" :key="input.id">
+
+          <InputHeader :input="input" />
+          <InputControls :state="input.state" :uid="input.uid" :input="input" />
+          <InputScenes :input="input" />
+        </div>
+        <div v-for="input in inputsNodeCG" :key="input.id">
+
           <InputHeader :input="input" />
           <InputControls :state="input.state" :uid="input.uid" :input="input" />
           <InputScenes :input="input" />
