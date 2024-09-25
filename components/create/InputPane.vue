@@ -13,7 +13,7 @@
     <Tabs :value="activeTabIndex" @tab-change="onTabChange" class="input-tabs">
       <TabList>
         <Tab v-for="(item, index) in types" :key="item.label" :value="index">
-          {{ item.fields['type'].label }}
+          {{ item.label }}
         </Tab>
       </TabList>
       <TabPanels>
