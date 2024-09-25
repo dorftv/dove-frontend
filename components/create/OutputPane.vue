@@ -37,46 +37,47 @@
         <label :for="field.name" class="font-bold text-sm whitespace-nowrap">{{ field.label }}</label>
         <Select
           :model-value="getEncoderValue(item.key, field.name, 'name')"
-          @update:model-value="(value) => setEncoderValue(item.key, field.name, 'name', value)"
+          @update:model-value="(value) => updateEncoderField(item.key, field.name, value)"
           :options="getEncoderOptions(field)"
           optionLabel="name"
           optionValue="name"
           :placeholder="`Select ${field.label}`"
           class="flex-grow text-sm"
-          @change="updateEncoderOptions(item.key, field.name)"
         />
       </div>
-      <div v-if="formData[item.key][field.name]" class="mt-2">
-        <div v-for="(encfield, index) in (formData[item.key][field.name].fields || {})" :key="index" class="ml-2">
-          <template v-if="!encfield.hidden && encfield.name !=='element' && encfield.name !=='name' && encfield.name !=='type'">
-            <label :for="`${field.name}_${encfield.name}`" class="block font-bold text-sm mt-2">{{ encfield.label }}</label>
-            <InputText
-              v-if="encfield.type === 'string'"
-              :model-value="getEncoderValue(item.key, field.name, encfield.name)"
-              @update:model-value="(value) => setEncoderValue(item.key, field.name, encfield.name, value)"
-              :id="`${field.name}_${encfield.name}`"
-              :placeholder="encfield.placeholder"
-              :required="encfield.required"
-              class="w-full text-sm"
-            />
-            <InputNumber
-              v-if="encfield.type === 'integer'"
-              :model-value="getEncoderValue(item.key, field.name, encfield.name)"
-              @update:model-value="(value) => setEncoderValue(item.key, field.name, encfield.name, value)"
-              :id="`${field.name}_${encfield.name}`"
-              :placeholder="encfield.placeholder"
-              :required="encfield.required"
-              class="w-full text-sm"
-            />
-            <Checkbox
-              v-if="encfield.type === 'boolean'"
-              :model-value="getEncoderValue(item.key, field.name, encfield.name)"
-              @update:model-value="(value) => setEncoderValue(item.key, field.name, encfield.name, value)"
-              :id="`${field.name}_${encfield.name}`"
-              :binary="true"
-            />
-            <small id="encoderfield-help">{{ encfield.description }}</small>
-          </template>
+      <div class="mt-2">
+        <div v-if="getSelectedEncoder(item.key, field.name)">
+          <div v-for="(encfield, index) in getSelectedEncoder(item.key, field.name).fields" :key="index" class="ml-2">
+            <template v-if="!encfield.hidden && encfield.name !== 'element' && encfield.name !== 'name' && encfield.name !== 'type'">
+              <label :for="`${field.name}_${encfield.name}`" class="block font-bold text-sm mt-2">{{ encfield.label }}</label>
+              <InputText
+                v-if="encfield.type === 'string'"
+                :model-value="getEncoderValue(item.key, field.name, encfield.name)"
+                @update:model-value="(value) => setEncoderValue(item.key, field.name, encfield.name, value)"
+                :id="`${field.name}_${encfield.name}`"
+                :placeholder="encfield.placeholder"
+                :required="encfield.required"
+                class="w-full text-sm"
+              />
+              <InputNumber
+                v-if="encfield.type === 'integer'"
+                :model-value="getEncoderValue(item.key, field.name, encfield.name)"
+                @update:model-value="(value) => setEncoderValue(item.key, field.name, encfield.name, value)"
+                :id="`${field.name}_${encfield.name}`"
+                :placeholder="encfield.placeholder"
+                :required="encfield.required"
+                class="w-full text-sm"
+              />
+              <Checkbox
+                v-if="encfield.type === 'boolean'"
+                :model-value="getEncoderValue(item.key, field.name, encfield.name)"
+                @update:model-value="(value) => setEncoderValue(item.key, field.name, encfield.name, value)"
+                :id="`${field.name}_${encfield.name}`"
+                :binary="true"
+              />
+              <small id="encoderfield-help">{{ encfield.description }}</small>
+            </template>
+          </div>
         </div>
       </div>
     </Panel>
@@ -173,24 +174,13 @@ const {
   onTabChange,
   addOutput,
   isEncoderField,
-  getSelectedEncoder,
-  updateEncoderOptions,
   getEncoderOptions,
+  updateEncoderField,
+  getSelectedEncoder,
   getEncoderValue,
   setEncoderValue,
-
 } = useCreateOutput();
 
-onMounted(() => {
-  // This will ensure that encoder fields are properly initialized after the component is mounted
-  types.value.forEach((type) => {
-    type.fields.forEach((field) => {
-      if (isEncoderField(field.name)) {
-        updateEncoderOptions(type.key, field.name);
-      }
-    });
-  });
-});
 
 </script>
 

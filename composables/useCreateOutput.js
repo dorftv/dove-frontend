@@ -1,4 +1,3 @@
-
 export const useCreateOutput = () => {
   const baseCreate = useCreateEntity('outputs');
   const { addOutput } = useDoveConfig();
@@ -8,11 +7,6 @@ export const useCreateOutput = () => {
     video_encoder: [],
     mux: []
   });
-
-  const getEncoderOptions = (field) => {
-    const options = encoderOptions[field.name] || [];
-    return options.filter(option => field.options.includes(option.name));
-  };
 
   const fetchEncoderOptions = async () => {
     try {
@@ -28,28 +22,8 @@ export const useCreateOutput = () => {
 
   const isEncoderField = (fieldName) => ['audio_encoder', 'video_encoder', 'mux'].includes(fieldName);
 
-  const getSelectedEncoder = (itemKey, fieldName) => {
-    const selectedEncoderName = baseCreate.formData[itemKey][fieldName];
-    return encoderOptions[fieldName].find(encoder => encoder.name === selectedEncoderName);
-  };
-
-  const updateEncoderOptions = (itemKey, fieldName) => {
-    const selectedEncoder = getSelectedEncoder(itemKey, fieldName);
-    if (selectedEncoder) {
-      if (!baseCreate.formData[itemKey][fieldName]) {
-        baseCreate.formData[itemKey][fieldName] = {};
-      }
-      baseCreate.formData[itemKey][fieldName] = {
-        ...baseCreate.formData[itemKey][fieldName],
-        ...selectedEncoder,
-      };
-      Object.keys(selectedEncoder.fields || {}).forEach(fieldKey => {
-        const field = selectedEncoder.fields[fieldKey];
-        if (!field.hidden) {
-          baseCreate.formData[itemKey][fieldName][fieldKey] = field.default;
-        }
-      });
-    }
+  const getEncoderOptions = (field) => {
+    return encoderOptions[field.name] || [];
   };
 
   const initializeEncoderFields = () => {
@@ -57,42 +31,54 @@ export const useCreateOutput = () => {
       if (!baseCreate.formData[type.key]) {
         baseCreate.formData[type.key] = {};
       }
-      if (Array.isArray(type.fields)) {
-        type.fields.forEach((field) => {
-          if (isEncoderField(field.name) && Array.isArray(field.options) && field.options.length > 0) {
-            // Initialize the encoder field with a default value
+      type.fields.forEach((field) => {
+        if (isEncoderField(field.name)) {
+          const options = getEncoderOptions(field);
+          if (options.length > 0) {
             baseCreate.formData[type.key][field.name] = {
-              name: field.options[0],
-              element: field.options[0],
-              // Add other default properties as needed
+              name: options[0].name,
+              element: options[0].name,
+              ...Object.fromEntries(
+                Object.entries(options[0].fields || {})
+                  .filter(([key, subField]) => !subField.hidden)
+                  .map(([key, subField]) => [key, subField.default])
+              )
             };
-            // Trigger updateEncoderOptions to set default values for encoder fields
-            updateEncoderOptions(type.key, field.name);
           }
-        });
-      }
+        }
+      });
     });
   };
+
+  const updateEncoderField = (itemKey, fieldName, value) => {
+    const selectedEncoder = encoderOptions[fieldName].find(encoder => encoder.name === value);
+    if (selectedEncoder) {
+      baseCreate.formData[itemKey][fieldName] = {
+        name: value,
+        element: value,
+        ...Object.fromEntries(
+          Object.entries(selectedEncoder.fields || {})
+            .filter(([key, field]) => !field.hidden)
+            .map(([key, field]) => [key, field.default])
+        )
+      };
+    }
+  };
+
+  const getSelectedEncoder = (itemKey, fieldName) => {
+    const selectedEncoderName = baseCreate.formData[itemKey][fieldName]?.name;
+    return encoderOptions[fieldName].find(encoder => encoder.name === selectedEncoderName);
+  };
+
   const getEncoderValue = (itemKey, fieldName, subFieldName) => {
-    if (!baseCreate.formData[itemKey]) {
-      baseCreate.formData[itemKey] = {};
-    }
-    if (!baseCreate.formData[itemKey][fieldName]) {
-      baseCreate.formData[itemKey][fieldName] = {};
-    }
-    return baseCreate.formData[itemKey][fieldName][subFieldName];
+    return baseCreate.formData[itemKey]?.[fieldName]?.[subFieldName];
   };
 
   const setEncoderValue = (itemKey, fieldName, subFieldName, value) => {
-    if (!baseCreate.formData[itemKey]) {
-      baseCreate.formData[itemKey] = {};
-    }
-    if (!baseCreate.formData[itemKey][fieldName]) {
-      baseCreate.formData[itemKey][fieldName] = {};
-    }
+    if (!baseCreate.formData[itemKey]) baseCreate.formData[itemKey] = {};
+    if (!baseCreate.formData[itemKey][fieldName]) baseCreate.formData[itemKey][fieldName] = {};
     baseCreate.formData[itemKey][fieldName][subFieldName] = value;
   };
-
 
   watch(() => baseCreate.types.value, (newTypes) => {
     if (newTypes.length > 0) {
@@ -100,19 +86,16 @@ export const useCreateOutput = () => {
     }
   }, { immediate: true });
 
-  onMounted(async () => {
-    await fetchEncoderOptions();
-    initializeEncoderFields();
-  });
+  fetchEncoderOptions();
 
   return {
     ...baseCreate,
     addOutput,
     encoderOptions,
     isEncoderField,
-    getSelectedEncoder,
-    updateEncoderOptions,
     getEncoderOptions,
+    updateEncoderField,
+    getSelectedEncoder,
     getEncoderValue,
     setEncoderValue,
   };
