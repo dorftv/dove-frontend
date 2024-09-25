@@ -179,9 +179,13 @@ const {
   getSelectedEncoder,
   getEncoderValue,
   setEncoderValue,
+    initializeForm,
+
 } = useCreateOutput();
 
-
+onMounted(() => {
+  initializeForm();
+});
 </script>
 
 <style scoped>

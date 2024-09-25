@@ -26,27 +26,41 @@ export const useCreateOutput = () => {
     return encoderOptions[field.name] || [];
   };
 
+  const initializeEncoderField = (type, field) => {
+    if (isEncoderField(field.name) && Array.isArray(field.options) && field.options.length > 0) {
+      const defaultEncoderName = field.options[0];
+      const defaultEncoder = encoderOptions[field.name].find(encoder => encoder.name === defaultEncoderName);
+
+      if (defaultEncoder) {
+        if (!baseCreate.formData[type.key]) {
+          baseCreate.formData[type.key] = {};
+        }
+        baseCreate.formData[type.key][field.name] = {
+          name: defaultEncoderName,
+          element: defaultEncoderName,
+          ...Object.fromEntries(
+            Object.entries(defaultEncoder.fields || {})
+              .filter(([key, subField]) => !subField.hidden)
+              .map(([key, subField]) => [key, subField.default])
+          )
+        };
+      }
+    }
+  };
+
   const initializeEncoderFields = () => {
     baseCreate.types.value.forEach((type) => {
-      if (!baseCreate.formData[type.key]) {
-        baseCreate.formData[type.key] = {};
-      }
-      type.fields.forEach((field) => {
-        if (isEncoderField(field.name)) {
-          const options = getEncoderOptions(field);
-          if (options.length > 0) {
-            baseCreate.formData[type.key][field.name] = {
-              name: options[0].name,
-              element: options[0].name,
-              ...Object.fromEntries(
-                Object.entries(options[0].fields || {})
-                  .filter(([key, subField]) => !subField.hidden)
-                  .map(([key, subField]) => [key, subField.default])
-              )
-            };
-          }
+      if (type.fields) {
+        if (Array.isArray(type.fields)) {
+          type.fields.forEach((field) => {
+            initializeEncoderField(type, field);
+          });
+        } else if (typeof type.fields === 'object') {
+          Object.values(type.fields).forEach((field) => {
+            initializeEncoderField(type, field);
+          });
         }
-      });
+      }
     });
   };
 
@@ -66,12 +80,26 @@ export const useCreateOutput = () => {
   };
 
   const getSelectedEncoder = (itemKey, fieldName) => {
-    const selectedEncoderName = baseCreate.formData[itemKey][fieldName]?.name;
+    const selectedEncoderName = baseCreate.formData[itemKey]?.[fieldName]?.name;
     return encoderOptions[fieldName].find(encoder => encoder.name === selectedEncoderName);
   };
 
   const getEncoderValue = (itemKey, fieldName, subFieldName) => {
-    return baseCreate.formData[itemKey]?.[fieldName]?.[subFieldName];
+    if (!baseCreate.formData[itemKey] || !baseCreate.formData[itemKey][fieldName]) {
+      // If the encoder hasn't been initialized yet, return the first option
+      const type = baseCreate.types.value.find(type => type.key === itemKey);
+      if (type && type.fields) {
+        const field = Array.isArray(type.fields)
+          ? type.fields.find(f => f.name === fieldName)
+          : type.fields[fieldName];
+
+        if (field && Array.isArray(field.options) && field.options.length > 0) {
+          return subFieldName === 'name' ? field.options[0] : '';
+        }
+      }
+      return '';
+    }
+    return baseCreate.formData[itemKey][fieldName][subFieldName];
   };
 
   const setEncoderValue = (itemKey, fieldName, subFieldName, value) => {
@@ -80,13 +108,26 @@ export const useCreateOutput = () => {
     baseCreate.formData[itemKey][fieldName][subFieldName] = value;
   };
 
+  const initializeForm = async () => {
+    await fetchEncoderOptions();
+    initializeEncoderFields();
+  };
+
   watch(() => baseCreate.types.value, (newTypes) => {
     if (newTypes.length > 0) {
-      initializeEncoderFields();
+      initializeForm();
     }
   }, { immediate: true });
 
-  fetchEncoderOptions();
+  watch(() => baseCreate.availSrc.value, (newAvailSrc) => {
+    if (newAvailSrc.length > 0) {
+      baseCreate.types.value.forEach((type) => {
+        if (baseCreate.formData[type.key] && !baseCreate.formData[type.key].src) {
+          baseCreate.formData[type.key].src = newAvailSrc[0].value;
+        }
+      });
+    }
+  }, { immediate: true });
 
   return {
     ...baseCreate,
@@ -98,5 +139,6 @@ export const useCreateOutput = () => {
     getSelectedEncoder,
     getEncoderValue,
     setEncoderValue,
+    initializeForm,
   };
 };
