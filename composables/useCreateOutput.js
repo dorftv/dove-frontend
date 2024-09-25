@@ -141,6 +141,18 @@ export const useCreateOutput = () => {
     baseCreate.formData[itemKey][fieldName][subFieldName] = value;
   };
 
+  const hasEncoderFields = (type) => {
+    if (!type.fields) return false;
+
+    const fields = Array.isArray(type.fields) ? type.fields : Object.values(type.fields);
+
+    return fields.some(field =>
+      field.name === 'video_encoder' ||
+      field.name === 'audio_encoder' ||
+      field.name === 'mux'
+    );
+  };
+
   const initializeForm = async () => {
     await fetchEncoderOptions();
     initializeEncoderFields();
@@ -183,5 +195,6 @@ export const useCreateOutput = () => {
     initializeForm,
     toggleEncoderFields,
     isEncoderFieldsVisible,
+    hasEncoderFields
   };
 };
