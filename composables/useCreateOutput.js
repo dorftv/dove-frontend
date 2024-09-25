@@ -42,7 +42,10 @@ export const useCreateOutput = () => {
     }
 
     if (Array.isArray(field.options) && field.options.length > 0) {
-      return encoderOptions[field.name].filter(encoder => field.options.includes(encoder.name));
+      // Filter and sort encoder options based on field.options
+      return field.options
+        .map(optionName => encoderOptions[field.name].find(encoder => encoder.name === optionName))
+        .filter(Boolean); // Remove any undefined entries
     }
 
     return encoderOptions[field.name];
@@ -71,22 +74,24 @@ export const useCreateOutput = () => {
   const initializeEncoderFields = () => {
     baseCreate.types.value.forEach((type) => {
       if (type.fields) {
-        if (Array.isArray(type.fields)) {
-          type.fields.forEach((field) => {
-            initializeEncoderField(type, field);
-          });
-        } else if (typeof type.fields === 'object') {
-          Object.values(type.fields).forEach((field) => {
-            initializeEncoderField(type, field);
-          });
-        }
+        (Array.isArray(type.fields) ? type.fields : Object.values(type.fields)).forEach((field) => {
+          if (isEncoderField(field.name)) {
+            const availableOptions = getEncoderOptions(field);
+            if (availableOptions.length > 0) {
+              updateEncoderField(type.key, field.name, availableOptions[0].name);
+            }
+          }
+        });
       }
     });
   };
 
   const updateEncoderField = (itemKey, fieldName, value) => {
-    const selectedEncoder = encoderOptions[fieldName].find(encoder => encoder.name === value);
+    const selectedEncoder = getEncoderOptions({ name: fieldName, options: [value] })[0];
     if (selectedEncoder) {
+      if (!baseCreate.formData[itemKey]) {
+        baseCreate.formData[itemKey] = {};
+      }
       baseCreate.formData[itemKey][fieldName] = {
         name: value,
         element: value,
@@ -95,9 +100,11 @@ export const useCreateOutput = () => {
             .filter(([key, field]) => !field.hidden)
             .map(([key, field]) => [key, field.default])
         )
+
       };
     }
   };
+
 
   const getSelectedEncoder = (itemKey, fieldName) => {
     const selectedEncoderName = baseCreate.formData[itemKey]?.[fieldName]?.name;
