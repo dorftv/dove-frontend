@@ -7,6 +7,20 @@ export const useCreateOutput = () => {
     video_encoder: [],
     mux: []
   });
+  const visibleEncoderFields = ref({});
+
+  const toggleEncoderFields = (fieldName) => {
+    visibleEncoderFields.value[fieldName] = !visibleEncoderFields.value[fieldName];
+  };
+
+  const isEncoderFieldsVisible = (fieldName) => {
+    return visibleEncoderFields.value[fieldName] || false;
+  };
+
+  const resetVisibleEncoderFields = () => {
+    visibleEncoderFields.value = {};
+  };
+
 
   const fetchEncoderOptions = async () => {
     try {
@@ -40,13 +54,15 @@ export const useCreateOutput = () => {
       const availableOptions = getEncoderOptions(field);
       if (availableOptions.length > 0) {
         const defaultEncoderName = availableOptions[0].name;
+        const defaultEncoderElement = availableOptions[0].element;
+
 
         if (!baseCreate.formData[type.key]) {
           baseCreate.formData[type.key] = {};
         }
         baseCreate.formData[type.key][field.name] = {
           name: defaultEncoderName,
-          element: defaultEncoderName
+          element: defaultEncoderElement
         };
       }
     }
@@ -148,6 +164,14 @@ export const useCreateOutput = () => {
     }
   }, { immediate: true });
 
+  watch(() => baseCreate.isOpen.value, (newIsOpen) => {
+    if (!newIsOpen) {
+      resetVisibleEncoderFields();
+    }
+  });
+  onMounted(() => {
+    initializeForm();
+  });
   return {
     ...baseCreate,
     addOutput,
@@ -159,5 +183,7 @@ export const useCreateOutput = () => {
     getEncoderValue,
     setEncoderValue,
     initializeForm,
+    toggleEncoderFields,
+    isEncoderFieldsVisible,
   };
 };
