@@ -59,7 +59,6 @@ export const useCreateOutput = () => {
         const defaultEncoderName = availableOptions[0].name;
         const defaultEncoderElement = availableOptions[0].element;
 
-
         if (!baseCreate.formData[type.key]) {
           baseCreate.formData[type.key] = {};
         }
@@ -70,7 +69,6 @@ export const useCreateOutput = () => {
       }
     }
   };
-
   const initializeEncoderFields = () => {
     baseCreate.types.value.forEach((type) => {
       if (type.fields) {
@@ -90,21 +88,14 @@ export const useCreateOutput = () => {
     const selectedEncoder = getEncoderOptions({ name: fieldName, options: [value] })[0];
     if (selectedEncoder) {
       if (!baseCreate.formData[itemKey]) {
-        baseCreate.formData[itemKey] = {};
+        baseCreate.formData[item.key] = {};
       }
       baseCreate.formData[itemKey][fieldName] = {
         name: value,
-        element: value,
-        ...Object.fromEntries(
-          Object.entries(selectedEncoder.fields || {})
-            .filter(([key, field]) => !field.hidden)
-            .map(([key, field]) => [key, field.default])
-        )
-
+        element: selectedEncoder.element
       };
     }
   };
-
 
   const getSelectedEncoder = (itemKey, fieldName) => {
     const selectedEncoderName = baseCreate.formData[itemKey]?.[fieldName]?.name;
