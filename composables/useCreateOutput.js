@@ -26,6 +26,7 @@ export const useCreateOutput = () => {
     return encoderOptions[field.name] || [];
   };
 
+
   const initializeEncoderField = (type, field) => {
     if (isEncoderField(field.name) && Array.isArray(field.options) && field.options.length > 0) {
       const defaultEncoderName = field.options[0];
@@ -47,6 +48,7 @@ export const useCreateOutput = () => {
       }
     }
   };
+
 
   const initializeEncoderFields = () => {
     baseCreate.types.value.forEach((type) => {
@@ -81,8 +83,23 @@ export const useCreateOutput = () => {
 
   const getSelectedEncoder = (itemKey, fieldName) => {
     const selectedEncoderName = baseCreate.formData[itemKey]?.[fieldName]?.name;
+    if (!selectedEncoderName) {
+      // If the encoder hasn't been initialized yet, return the first option
+      const type = baseCreate.types.value.find(type => type.key === itemKey);
+      if (type && type.fields) {
+        const field = Array.isArray(type.fields)
+          ? type.fields.find(f => f.name === fieldName)
+          : type.fields[fieldName];
+
+        if (field && Array.isArray(field.options) && field.options.length > 0) {
+          return encoderOptions[fieldName].find(encoder => encoder.name === field.options[0]);
+        }
+      }
+      return null;
+    }
     return encoderOptions[fieldName].find(encoder => encoder.name === selectedEncoderName);
   };
+
 
   const getEncoderValue = (itemKey, fieldName, subFieldName) => {
     if (!baseCreate.formData[itemKey] || !baseCreate.formData[itemKey][fieldName]) {
