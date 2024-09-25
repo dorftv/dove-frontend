@@ -23,32 +23,34 @@ export const useCreateOutput = () => {
   const isEncoderField = (fieldName) => ['audio_encoder', 'video_encoder', 'mux'].includes(fieldName);
 
   const getEncoderOptions = (field) => {
-    return encoderOptions[field.name] || [];
+    if (!encoderOptions[field.name]) {
+      return [];
+    }
+
+    if (Array.isArray(field.options) && field.options.length > 0) {
+      return encoderOptions[field.name].filter(encoder => field.options.includes(encoder.name));
+    }
+
+    return encoderOptions[field.name];
   };
 
 
   const initializeEncoderField = (type, field) => {
-    if (isEncoderField(field.name) && Array.isArray(field.options) && field.options.length > 0) {
-      const defaultEncoderName = field.options[0];
-      const defaultEncoder = encoderOptions[field.name].find(encoder => encoder.name === defaultEncoderName);
+    if (isEncoderField(field.name)) {
+      const availableOptions = getEncoderOptions(field);
+      if (availableOptions.length > 0) {
+        const defaultEncoderName = availableOptions[0].name;
 
-      if (defaultEncoder) {
         if (!baseCreate.formData[type.key]) {
           baseCreate.formData[type.key] = {};
         }
         baseCreate.formData[type.key][field.name] = {
           name: defaultEncoderName,
-          element: defaultEncoderName,
-          ...Object.fromEntries(
-            Object.entries(defaultEncoder.fields || {})
-              .filter(([key, subField]) => !subField.hidden)
-              .map(([key, subField]) => [key, subField.default])
-          )
+          element: defaultEncoderName
         };
       }
     }
   };
-
 
   const initializeEncoderFields = () => {
     baseCreate.types.value.forEach((type) => {
