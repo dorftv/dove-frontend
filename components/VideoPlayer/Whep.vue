@@ -1,5 +1,4 @@
 <template>
-{{ mutedState[uid] }}
   <div :id="`videocontainer-${props.uid}`" class="video-container aspect-video">
     <video
       ref="videoPlayer"
@@ -18,7 +17,6 @@ const props = defineProps({
   uid: String,
   muted: String,
 });
-
 const { mutedState, setMutedState } = useMutedState();
 
 const videoPlayer = ref(null);
@@ -44,6 +42,8 @@ const initializePlayer = async () => {
     player.on('initial-connection-failed', handleConnectionFailed);
     player.on('player-muted', () => setMutedState(props.uid, true));
     player.on('player-unmuted', () => setMutedState(props.uid, false));
+
+
   } catch (error) {
     console.error('Error loading player:', error);
   }
@@ -63,6 +63,8 @@ onUnmounted(() => {
     player.destroy();
   }
 });
+
+watch(() => props.uid, initializePlayer);
 
 
 </script>
