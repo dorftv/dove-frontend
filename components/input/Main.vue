@@ -23,7 +23,7 @@
             :inputEnabled="isInputEnabled(input.uid)"
             @enablePreview="toggleInputEnabled(input.uid)"
           />
-          <VideoPlayer
+          <VideoPlayerMain
             muted="true"
             v-if="shouldShowPreview(input.uid) && input.preview"
             :uid="input.uid"

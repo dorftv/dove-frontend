@@ -1,5 +1,5 @@
 <template>
-  <div :class="output.state.toLowerCase()" v-if="!output.type.startsWith('hlssink2')" class="flex flex-col">
+  <div :class="output.state.toLowerCase()" v-if="!output.is_preview">
     <div class="flex items-center justify-end mb-2">
       <Popover ref="op" appendTo="body">
         <pre>{{ outputDetails }}</pre>

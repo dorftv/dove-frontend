@@ -1,6 +1,6 @@
 <template>
   <div v-if="programMixer" class="w-full">
-    <VideoPlayer :uid="programMixer.uid" class="max-w-full" />
+    <VideoPlayerMain :uid="programMixer.uid" class="max-w-full" />
   </div>
 </template>
 

@@ -12,6 +12,7 @@ export default defineNuxtConfig({
       '/docs': process.env.DOVE_API ? process.env.DOVE_API + '/docs' : 'http://localhost:5000/docs',
       '/proxy': process.env.DOVE_API ? process.env.DOVE_API + '/proxy' : 'http://localhost:5000/proxy',
       '/preview': process.env.DOVE_API ? process.env.DOVE_API + '/preview' : 'http://localhost:5000/preview',
+      '/whep': process.env.WHEP_URL ? process.env.WHEP_URL + '/' : 'http://localhost:8889/',
     },
 
   },

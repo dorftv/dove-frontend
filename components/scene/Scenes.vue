@@ -2,7 +2,7 @@
   <div class="flex flex-col" v-if="scene">
     <SceneHeader :scene="scene" />
     <div v-if="mixerPreview || mixerEnabled" class="w-full aspect-video">
-      <VideoPlayer :uid="scene.uid" class="w-full h-full" />
+      <VideoPlayerMain :uid="scene.uid" class="w-full h-full" />
     </div>
     <div class="flex justify-start mt-2">
       <Button

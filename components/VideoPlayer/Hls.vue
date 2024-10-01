@@ -22,9 +22,11 @@ import { MediaRemoteControl } from 'vidstack';
 const mediaPlayer = ref(null);
 const { mutedState, setMutedState } = useMutedState();
 const remote = new MediaRemoteControl();
+
 const props = defineProps({
   uid: String,
-  muted: String
+  muted: String,
+  entity: Object,
 })
 
 onMounted(() => {

@@ -18,23 +18,25 @@ export function useMutedState() {
   });
 
   const initializeMutedState = () => {
-
     allEntities.value.forEach(entity => {
       if (!initializedEntities.has(entity.uid)) {
         initializedEntities.add(entity.uid);
         globalMutedState[entity.uid] = true;
       }
-      globalMutedState[programMixer.value.uid] = false;
-
     });
-
+    if (programMixer.value) {
+      globalMutedState[programMixer.value.uid] = false;
+    }
   };
 
   const setMutedState = (uid, isMuted) => {
-    Object.keys(globalMutedState).forEach(key => {
-      globalMutedState[key] = key === uid ? isMuted : true;
-    });
-
+    if (isMuted) {
+      globalMutedState[uid] = true;
+    } else {
+      Object.keys(globalMutedState).forEach(key => {
+        globalMutedState[key] = key === uid ? false : true;
+      });
+    }
   };
 
   initializeMutedState();
@@ -43,10 +45,9 @@ export function useMutedState() {
     newEntities.forEach(entity => {
       if (!initializedEntities.has(entity.uid)) {
         initializedEntities.add(entity.uid);
-        globalMutedState[entity.uid] = false;
+        globalMutedState[entity.uid] = true;
       }
     });
-
   }, { deep: true });
 
   return {
