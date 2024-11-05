@@ -13,7 +13,11 @@
     <Tabs :value="activeTabIndex" @tab-change="onTabChange" class="input-tabs">
       <TabList>
         <Tab v-for="(item, index) in types" :key="item.label" :value="index">
-          {{ item.label }}
+          <div v-for="field in item.fields" :key="field.name">
+            <div v-if="field.name == 'type'">
+              {{ field.label}}
+            </div>
+          </div>
         </Tab>
       </TabList>
       <TabPanels>
@@ -66,7 +70,7 @@
                         />
                       </div>
                       <Button icon="pi pi-refresh" @click="fetchItems(proxyType)" class="p-button-outlined p-button-sm" />
-                      <span class="text-xs text-gray-600">{{ proxyType }}</span>
+                      <span class="text-xs text-gray-600">load from {{ proxyType }}</span>
                     </div>
                   </div>
                 </div>
