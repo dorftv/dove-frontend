@@ -13,8 +13,8 @@
         @click="addSlot"
       />
     </div>
-    <div v-for="source in scene.sources" :key="source.sink">
-      <SceneInputs :source="source" :scene="scene" />
+    <div v-for="source in [...scene.sources].reverse()" :key="source.sink">
+        <SceneInputs :source="source" :scene="scene" />
     </div>
   </div>
 </template>

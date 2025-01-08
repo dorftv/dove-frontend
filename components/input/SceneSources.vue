@@ -1,12 +1,16 @@
 <template>
   <div class="flex justify-between items-center">
-  <div>{{ scene.name }} </div>
-  <div>{{ source.sink }}</div>
+  <div>{{ source.name }}</div>
   <div>{{inputName }}</div>
 
-  <div class="flex space-x-4">
-    <Icon  v-if="!isInSceneSources" name="heroicons:scissors" color="red" size="24px" @click="submitAddInputToScene" class="w-6"/>
-    <Icon v-if="isInSceneSources" name="lets-icons:remove-fill" color="red" size="24px" @click="submitRemoveInputFromScene"/>
+  <div class="flex space-x-4" v-if="source.src_locked">
+    <i class="pi pi-lock" color="green" ></i>
+  </div>
+  <div class="flex space-x-4" v-if="!source.src_locked">
+       <i v-if="!isInSceneSources" class="pi pi-plus-circle" @click="submitAddInputToScene"></i>
+       <i v-if="isInSceneSources" class="pi pi-minus-circle" @click="submitRemoveInputFromScene"></i>
+
+
   </div>
 </div>
 </template>

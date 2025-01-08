@@ -13,7 +13,7 @@
           {{ scene.name }}
         </button>
       </div>
-      <div class="flex-grow p-4">
+      <div class="flex-grow">
         <SceneScenes
           v-if="sceneMixers[activeIndex]"
           :scene="sceneMixers[activeIndex]"
