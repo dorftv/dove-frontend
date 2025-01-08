@@ -148,7 +148,8 @@ export function useEntities() {
 
     return Object.values(mixer.sources || {}).map(source => ({
       name: source.name,
-      index: source.index
+      index: source.index,
+      src_locked: source.src_locked
     }))
   }
 

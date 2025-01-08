@@ -76,6 +76,10 @@ export const useCreateInput = () => {
     if (!selectedScene.uid) return [];
     return sceneMixerSource(selectedScene.uid);
   });
+  
+  const filteredSources = computed(() => {
+    return currentSources.value.filter(source => !source.src_locked);
+  });
 
   watch(() => selectedScene.uid, (newUid) => {
     if (newUid) {
@@ -126,7 +130,7 @@ export const useCreateInput = () => {
     selectedSceneProgram,
     proxyItems,
     selectedScene,
-    currentSources,
+    currentSources: filteredSources,
     submitCreateInput,
     handleProxyNameChange,
     fetchItems,
