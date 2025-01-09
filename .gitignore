@@ -4,5 +4,6 @@ __pycache__/
 .output/
 node_modules/
 .vscode
+static
 
 
