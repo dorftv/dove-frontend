@@ -77,6 +77,12 @@ export const useCreateEntity = (entityType) => {
         formData[type.key].src = availSrc.value[0].value;
       });
     }
+
+    if (entityType === "inputs") {
+      types.forEach((type) => {
+        formData[type.key].volume = 0.8;
+      });
+    }
   };
 
   const submitCreate = async (itemType) => {
