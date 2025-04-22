@@ -3,7 +3,7 @@
     label="Add Input"
     class="p-button-rounded p-button-text text-xs"
     icon="pi pi-plus-circle"
-    v-if="addInput"
+    v-if="addInput || isUnlocked"
     @click="isOpen = true"
   />
   <Dialog v-model:visible="isOpen" :modal="true" class="input-pane-dialog">

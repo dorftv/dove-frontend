@@ -3,10 +3,10 @@
   <div>{{ source.name }}</div>
   <div>{{inputName }}</div>
 
-  <div class="flex space-x-4" v-if="source.src_locked">
+  <div class="flex space-x-4" v-if="source.src_locked && !isUnlocked">
     <i class="pi pi-lock" color="green" ></i>
   </div>
-  <div class="flex space-x-4" v-if="!source.src_locked">
+  <div class="flex space-x-4" v-if="!source.src_locked || isUnlocked">
        <i v-if="!isInSceneSources" class="pi pi-plus-circle" @click="submitAddInputToScene"></i>
        <i v-if="isInSceneSources" class="pi pi-minus-circle" @click="submitRemoveInputFromScene"></i>
 
@@ -15,6 +15,8 @@
 </div>
 </template>
 <script setup>
+
+const { isUnlocked } = useLocked()
 
 const props = defineProps({
   input: Object,

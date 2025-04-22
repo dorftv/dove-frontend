@@ -4,10 +4,10 @@
       <div class="w-1/3 truncate">{{ source.name }}</div>
       <div class="w-1/3 truncate">{{(inputs.find(input => input.uid === src) || {}).name }}</div>
       <div class="w-1/3 flex justify-end space-x-1">
-        <Button v-if="!mute && !scene.src_locked" icon="pi pi-volume-up" @click="handleChange('mute', true)" class="p-button-text p-button-sm p-0" />
-        <Button v-if="mute && !scene.src_locked" icon="pi pi-volume-off" @click="handleChange('mute', false)" class="p-button-text p-button-sm p-0" />
-        <Button v-if="!source.locked && !scene.src_locked" icon="pi pi-cog" @click="open = !open" class="p-button-text p-button-sm p-0" />
-        <Button v-if="source.locked || scene.src_locked" icon="pi pi-lock" class="p-button-text p-button-sm p-button-disabled p-0" disabled />
+        <Button v-if="!mute && (!scene.src_locked || isUnlocked)" icon="pi pi-volume-up" @click="handleChange('mute', true)" class="p-button-text p-button-sm p-0" />
+        <Button v-if="mute && (!scene.src_locked || isUnlocked)" icon="pi pi-volume-off" @click="handleChange('mute', false)" class="p-button-text p-button-sm p-0" />
+        <Button v-if="(!source.locked && !scene.src_locked) || isUnlocked" icon="pi pi-cog" @click="open = !open" class="p-button-text p-button-sm p-0" />
+        <Button v-if="(source.locked || scene.src_locked) && !isUnlocked" icon="pi pi-lock" class="p-button-text p-button-sm p-button-disabled p-0" disabled />
       </div>
     </div>
     <div v-if="open" class="mt-1">
@@ -38,6 +38,8 @@
 
 
 <script setup>
+
+const { isUnlocked } = useLocked()
 
 const props = defineProps({
   source: Object,

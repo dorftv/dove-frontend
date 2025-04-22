@@ -6,7 +6,7 @@
     </div>
     <div class="flex justify-start mt-2">
       <Button
-        v-if="!scene.src_locked"
+        v-if="!scene.src_locked || isUnlocked"
         label="Add Slot"
         icon="pi pi-plus"
         class="p-button-text p-button-sm text-xs py-1 px-2"
@@ -21,6 +21,8 @@
 
 
 <script setup>
+
+const { isUnlocked } = useLocked()
 
 const props = defineProps({
   scene: Object,

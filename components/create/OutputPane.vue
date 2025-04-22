@@ -3,7 +3,7 @@
     label="Add Output"
     class="p-button-rounded p-button-text text-xs"
     icon="pi pi-plus-circle"
-    v-if="addOutput"
+    v-if="addOutput || isUnlocked"
     @click="isOpen = true"
   />
   <Dialog v-model:visible="isOpen" :modal="true" class="output-pane-dialog">

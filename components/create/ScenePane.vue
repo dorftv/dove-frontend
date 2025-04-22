@@ -3,7 +3,7 @@
     label="Add Scene"
     class="p-button-rounded p-button-text text-xs"
     icon="pi pi-plus-circle"
-    v-if="addScene"
+    v-if="addScene || isUnlocked"
     @click="isOpen = true"
   />
   <Dialog v-model:visible="isOpen" :modal="true" class="scene-pane-dialog">

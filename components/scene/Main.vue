@@ -26,7 +26,6 @@
 
 <script setup>
 
-
 const { sceneMixers } = useEntities();
 const { activeIndex, handleSceneClick, selectedScene  } = useActiveScene();
 </script>

@@ -11,9 +11,9 @@
         <i class="pi pi-info-circle text-sm"></i>
       </button>
       <button
-        v-if="!output.locked"
+        v-if="!output.locked || isUnlocked"
         @click="submitRemoveOutput"
-        class="flex items-center justify-center w-7 h-7 rounded-full text-black-500 hover:bg-red-100 transition-colors duration-200"
+        class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 transition-colors duration-200"
       >
         <i class="pi pi-trash text-sm"></i>
       </button>
@@ -31,6 +31,8 @@
 </template>
 
 <script setup>
+
+const { isUnlocked } = useLocked()
 
 const props = defineProps({
   output: Object,

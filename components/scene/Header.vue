@@ -20,7 +20,7 @@
         <i class="pi pi-info-circle text-sm"></i>
       </button>
       <button
-        v-if="!scene.locked"
+        v-if="!scene.locked || isUnlocked"
         @click="submitRemove"
         class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 transition-colors duration-200"
       >
@@ -31,6 +31,8 @@
 </template>
 
 <script setup>
+
+const { isUnlocked } = useLocked()
 
 const props = defineProps({
   scene: Object,
