@@ -5,17 +5,7 @@ export default defineNuxtConfig({
     appManifest: false,
   },
   ssr: false,
-  target: 'static',
-  nitro: {
-    devProxy: {
-      '/api': process.env.DOVE_API ? process.env.DOVE_API + '/api' : 'http://localhost:5000/api',
-      '/docs': process.env.DOVE_API ? process.env.DOVE_API + '/docs' : 'http://localhost:5000/docs',
-      '/proxy': process.env.DOVE_API ? process.env.DOVE_API + '/proxy' : 'http://localhost:5000/proxy',
-      '/preview': process.env.DOVE_API ? process.env.DOVE_API + '/preview' : 'http://localhost:5000/preview',
-      '/whep': process.env.WHEP_URL ? process.env.WHEP_URL + '/' : 'http://localhost:5000/',
-    },
-
-  },
+  
   devtools: { enabled: true },
   css: ["@/assets/css/tailwind.css", "primeicons/primeicons.css"],
   postcss: {
@@ -26,6 +16,7 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  
   vite: {
     vue: {
       template: {
@@ -33,7 +24,32 @@ export default defineNuxtConfig({
           isCustomElement: (tag) => tag.startsWith('media-'),
         },
       },
-    }
+    },
+    server: {
+      proxy: {
+        '/api': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/docs': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/proxy': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/preview': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/whep': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+
+      },
+    },
   },
 
   modulesDir: ['./node_modules'],
@@ -41,11 +57,9 @@ export default defineNuxtConfig({
 
   primevue: {
     options: {
-        theme: {
-            preset: Aura
-        }
+      theme: {
+        preset: Aura
+      }
     }
   }
-
-
 })

@@ -6,7 +6,7 @@ services:
     environment:
      - DOVE_API=http://dove:5000
     working_dir: /var/www/html/app/
-    entrypoint: npm run dev -- -o --host
+    entrypoint: npm run dev -- --host 0.0.0.0
     ports:
       - 3000:3000
     volumes:
