@@ -38,9 +38,20 @@ export default function useActiveScene() {
     }
   };
 
+  // When a scene is added, select it automatically
+  watch(sceneMixers, (newSceneMixers, oldSceneMixers) => {
+    if (newSceneMixers && oldSceneMixers && newSceneMixers.length > oldSceneMixers.length) {
+      activeIndex.value = newSceneMixers.length - 1;
+    }
+  });
+
+  // Keep selectedScene in sync with activeIndex
   watch([activeIndex, sceneMixers], ([newIndex, newSceneMixers]) => {
     if (newSceneMixers && newSceneMixers.length > newIndex) {
       selectedScene.value = newSceneMixers[newIndex];
+    } else if (newSceneMixers && newSceneMixers.length > 0) {
+      activeIndex.value = newSceneMixers.length - 1;
+      selectedScene.value = newSceneMixers[activeIndex.value];
     } else {
       selectedScene.value = null;
     }
