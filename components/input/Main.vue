@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-        <div v-for="input in inputsPreview" :key="input.uid">
+        <div v-for="input in inputsPreview" :key="input.uid" class="rounded-lg overflow-hidden">
           <InputHeader
             :input="input"
             :inputEnabled="isInputEnabled(input.uid)"
@@ -49,7 +49,7 @@
          class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-4">
       <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Inputs without preview</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3">
-        <div v-for="input in inputsNoPreview" :key="input.uid">
+        <div v-for="input in inputsNoPreview" :key="input.uid" class="rounded-lg overflow-hidden">
           <InputHeader :input="input" />
           <InputControls :state="input.state" :uid="input.uid" :input="input" />
           <InputScenes :input="input" />
