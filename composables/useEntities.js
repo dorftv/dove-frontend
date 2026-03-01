@@ -7,6 +7,9 @@ export function useEntities() {
   const mixers = useState('entities-mixers', () => []);
   const outputs = useState('entities-outputs', () => []);
   const error = useState('entities-error', () => null);
+  const wsStatus = useState('ws-status', () => 'disconnected');
+  const isLoading = useState('entities-loading', () => true);
+  const notify = useNotify();
 
   const getEntities = (type) => {
     if (type === 'input') return inputs.value;
@@ -60,7 +63,9 @@ export function useEntities() {
       outputs.value = outputsData;
     } catch (e) {
       error.value = 'Failed to load entities: ' + e.message;
-      console.error(error.value);
+      notify.error('Failed to load entities');
+    } finally {
+      isLoading.value = false;
     }
   };
 
@@ -81,6 +86,7 @@ export function useEntities() {
 
     ws.onopen = () => {
       console.log('WebSocket connected');
+      wsStatus.value = 'connected';
       error.value = null;
       if (reconnectTimer) {
         clearTimeout(reconnectTimer);
@@ -103,16 +109,18 @@ export function useEntities() {
       }
     };
 
-    ws.onerror = (wsError) => {
+    ws.onerror = () => {
       error.value = 'WebSocket error';
-      console.error('WebSocket error:', wsError);
+      notify.error('WebSocket connection error');
     };
 
     ws.onclose = () => {
       console.log('WebSocket disconnected');
+      wsStatus.value = 'disconnected';
       ws = null;
       // Auto-reconnect after 3 seconds
       if (!reconnectTimer) {
+        wsStatus.value = 'reconnecting';
         reconnectTimer = setTimeout(async () => {
           reconnectTimer = null;
           console.log('Attempting WebSocket reconnect...');
@@ -226,6 +234,8 @@ export function useEntities() {
     sendWebSocketMessage,
     connectWebSocket,
     disconnectWebSocket,
-    error
+    error,
+    wsStatus,
+    isLoading
   };
 }
