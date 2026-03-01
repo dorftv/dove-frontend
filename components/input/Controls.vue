@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-900 text-gray-300 rounded-b-lg px-2 py-1.5 text-xs">
+  <div class="bg-gray-900 text-gray-300 rounded-b-lg px-2 py-1.5 text-xs" role="toolbar" :aria-label="`Controls for ${input.name}`">
     <!-- Progress bar -->
     <Slider
       v-if="input.duration && input.show_controls"
@@ -9,19 +9,20 @@
       :min="0"
       :max="input.duration"
       class="w-full transport-slider"
+      aria-label="Playback position"
     />
 
     <!-- Transport controls row -->
     <div class="flex items-center gap-1 mt-1">
       <!-- Playback buttons -->
       <div v-if="input.show_controls" class="flex items-center">
-        <button @click="submitStop" class="transport-btn" title="Stop">
+        <button @click="submitStop" class="transport-btn" title="Stop" aria-label="Stop">
           <Icon name="ph:stop-fill" size="14px" />
         </button>
-        <button @click="submitPlay" class="transport-btn" :class="{ 'text-green-400': input.state === 'PLAYING' }" title="Play">
+        <button @click="submitPlay" class="transport-btn" :class="{ 'text-green-400': input.state === 'PLAYING' }" title="Play" aria-label="Play">
           <Icon name="ph:play-fill" size="14px" />
         </button>
-        <button @click="submitPause" class="transport-btn" :class="{ 'text-orange-400': input.state === 'PAUSED' }" title="Pause">
+        <button @click="submitPause" class="transport-btn" :class="{ 'text-orange-400': input.state === 'PAUSED' }" title="Pause" aria-label="Pause">
           <Icon name="ph:pause-fill" size="14px" />
         </button>
       </div>
@@ -33,12 +34,14 @@
         class="transport-btn"
         :class="input.loop ? 'text-emerald-400' : 'text-gray-500'"
         title="Loop"
+        :aria-label="input.loop ? 'Disable loop' : 'Enable loop'"
+        :aria-pressed="input.loop"
       >
         <Icon name="ph:repeat" size="14px" />
       </button>
 
       <!-- State badge -->
-      <span :class="stateBadgeClass(input.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none">
+      <span :class="stateBadgeClass(input.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none" role="status">
         <Icon :name="stateIcon(input.state)" size="10px" />
         {{ input.state }}
       </span>
@@ -53,7 +56,7 @@
 
       <!-- Volume -->
       <div class="flex items-center gap-1 ml-1">
-        <button @click="toggleMute" class="transport-btn" :title="volume === 0 ? 'Unmute' : 'Mute'">
+        <button @click="toggleMute" class="transport-btn" :title="volume === 0 ? 'Unmute' : 'Mute'" :aria-label="volume === 0 ? 'Unmute' : 'Mute'">
           <Icon :name="volumeIcon" size="14px" />
         </button>
         <Slider
@@ -62,6 +65,7 @@
           :min="0"
           :max="100"
           class="w-16 volume-slider"
+          aria-label="Volume"
         />
       </div>
     </div>

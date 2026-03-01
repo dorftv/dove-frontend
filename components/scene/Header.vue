@@ -15,7 +15,7 @@
     <Popover ref="op" appendTo="body">
       <pre class="text-xs text-gray-700 dark:text-gray-300">{{ mixerDetails }}</pre>
     </Popover>
-    <button @click="op.toggle($event)" class="scene-btn" title="Details">
+    <button @click="op.toggle($event)" class="scene-btn" title="Details" aria-label="Show details">
       <i class="pi pi-info-circle text-[11px]"></i>
     </button>
     <button
@@ -24,6 +24,7 @@
       :disabled="deleting"
       class="scene-btn text-red-400 hover:text-red-300 disabled:opacity-50"
       title="Delete"
+      aria-label="Delete scene"
     >
       <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
     </button>

@@ -16,7 +16,7 @@
     <Popover ref="inputInfoPopover" appendTo="body">
       <pre class="text-xs text-gray-700 dark:text-gray-300">{{ inputDetails }}</pre>
     </Popover>
-    <button @click="inputInfoPopover.toggle($event)" class="header-btn" title="Details">
+    <button @click="inputInfoPopover.toggle($event)" class="header-btn" title="Details" aria-label="Show details">
       <i class="pi pi-info-circle text-[11px]"></i>
     </button>
     <button
@@ -25,6 +25,7 @@
       :disabled="deleting"
       class="header-btn text-red-400 hover:text-red-300 disabled:opacity-50"
       title="Delete"
+      aria-label="Delete input"
     >
       <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
     </button>
@@ -33,6 +34,7 @@
       @click="$emit('enablePreview', toggleInputPreview())"
       class="header-btn"
       title="Disable preview"
+      aria-label="Disable preview"
     >
       <Icon name="uil:video-slash" size="14px" />
     </button>
@@ -41,6 +43,7 @@
       @click="$emit('enablePreview', toggleInputPreview())"
       class="header-btn"
       title="Enable preview"
+      aria-label="Enable preview"
     >
       <Icon name="uil:video" size="14px" />
     </button>

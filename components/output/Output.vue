@@ -2,7 +2,7 @@
   <div v-if="!output.is_preview" class="bg-gray-900 text-gray-300 rounded-lg px-2 py-1.5 mb-2 text-xs">
     <div class="flex items-center gap-1.5">
       <!-- State badge -->
-      <span :class="stateBadgeClass(output.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none shrink-0">
+      <span :class="stateBadgeClass(output.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none shrink-0" role="status">
         <Icon :name="stateIcon(output.state)" size="10px" />
         {{ output.state }}
       </span>
@@ -25,7 +25,7 @@
       <Popover ref="op" appendTo="body">
         <pre class="text-xs text-gray-700 dark:text-gray-300">{{ outputDetails }}</pre>
       </Popover>
-      <button @click="op.toggle($event)" class="output-btn" title="Details">
+      <button @click="op.toggle($event)" class="output-btn" title="Details" aria-label="Show details">
         <i class="pi pi-info-circle text-[11px]"></i>
       </button>
       <button
@@ -34,6 +34,7 @@
         :disabled="deleting"
         class="output-btn text-red-400 hover:text-red-300 disabled:opacity-50"
         title="Delete"
+        aria-label="Delete output"
       >
         <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
       </button>

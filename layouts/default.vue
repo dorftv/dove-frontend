@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <header class="sticky top-0 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur border-b border-gray-200 dark:border-gray-700">
-      <nav class="px-3 h-10 flex items-center text-sm">
+      <nav class="px-3 h-10 flex items-center text-sm" aria-label="Main navigation">
 
         <!-- Logo -->
         <NuxtLink to="/" class="font-bold text-emerald-600 dark:text-emerald-400 shrink-0">DOVE <span class="hidden md:inline font-normal text-gray-400 dark:text-gray-500">Online Video Editor</span></NuxtLink>
@@ -20,9 +20,9 @@
         <!-- Right icon buttons -->
         <div class="flex items-center gap-0.5">
           <!-- WS indicator — always visible -->
-          <NuxtLink to="/websockets" class="flex icon-btn" :title="`WebSocket: ${wsStatus}`">
+          <NuxtLink to="/websockets" class="flex icon-btn" :title="`WebSocket: ${wsStatus}`" :aria-label="`WebSocket: ${wsStatus}`">
             <span
-              class="w-2.5 h-2.5 rounded-full"
+              class="w-2.5 h-2.5 rounded-full" role="status"
               :class="{
                 'bg-green-500': wsStatus === 'connected',
                 'bg-red-500': wsStatus === 'disconnected',
@@ -32,27 +32,27 @@
           </NuxtLink>
 
           <!-- Desktop-only icons -->
-          <NuxtLink to="/api/debug" external target="_blank" class="hidden md:flex icon-btn" title="Pipelines">
+          <NuxtLink to="/api/debug" external target="_blank" class="hidden md:flex icon-btn" title="Pipelines" aria-label="Pipelines">
             <Icon name="ph:graph" size="16px" />
           </NuxtLink>
-          <NuxtLink to="/docs" external target="_blank" class="hidden md:flex icon-btn" title="API Docs">
+          <NuxtLink to="/docs" external target="_blank" class="hidden md:flex icon-btn" title="API Docs" aria-label="API Docs">
             <Icon name="ph:code" size="16px" />
           </NuxtLink>
-          <NuxtLink to="/help" class="hidden md:flex icon-btn" title="Help">
+          <NuxtLink to="/help" class="hidden md:flex icon-btn" title="Help" aria-label="Help">
             <Icon name="ph:question" size="16px" />
           </NuxtLink>
-          <NuxtLink to="/about" class="hidden md:flex icon-btn" title="About">
+          <NuxtLink to="/about" class="hidden md:flex icon-btn" title="About" aria-label="About">
             <Icon name="ph:info" size="16px" />
           </NuxtLink>
 
-          <button @click="cycleColorMode" class="hidden md:flex icon-btn" :title="`Color mode: ${colorMode.preference}`">
+          <button @click="cycleColorMode" class="hidden md:flex icon-btn" :title="`Color mode: ${colorMode.preference}`" :aria-label="`Color mode: ${colorMode.preference}`">
             <Icon v-if="colorMode.value === 'dark'" name="ph:moon" size="16px" />
             <Icon v-else-if="colorMode.value === 'light'" name="ph:sun" size="16px" />
             <Icon v-else name="ph:monitor" size="16px" />
           </button>
 
           <!-- Mobile hamburger -->
-          <button @click="mobileMenuOpen = !mobileMenuOpen" class="flex md:hidden icon-btn">
+          <button @click="mobileMenuOpen = !mobileMenuOpen" class="flex md:hidden icon-btn" :aria-label="mobileMenuOpen ? 'Close menu' : 'Open menu'" :aria-expanded="mobileMenuOpen">
             <Icon :name="mobileMenuOpen ? 'ph:x' : 'ph:list'" size="18px" />
           </button>
         </div>
@@ -91,7 +91,7 @@
       </div>
     </header>
 
-    <main class="flex-grow">
+    <main class="flex-grow" role="main">
       <slot />
     </main>
   </div>
