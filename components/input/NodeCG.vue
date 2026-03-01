@@ -25,15 +25,13 @@
 </template>
 
 <script setup>
-const {     inputsNodeCG,    container,    iframeHeight,    activeTab,    adjustHeight, } = useNodeCG();
-
-
+const { inputsNodeCG, container, iframeHeight, activeTab } = useNodeCG();
 </script>
 
-<style>
+<style scoped>
 .iframe-container {
   position: relative;
   width: 100%;
-  height: '600px';
+  height: 600px;
 }
 </style>

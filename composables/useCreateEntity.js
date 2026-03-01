@@ -6,23 +6,28 @@ export const useCreateEntity = (entityType) => {
   const availSrc = ref([]);
   const types = ref([]);
   const activeTabIndex = ref(0);
+  const selectedResolution = ref(null);
 
   const { mixers } = useEntities();
-  const { resolutionOptions, defaultResolution, getResolutionDimensions } = useDoveConfig();
+  const doveConfig = useDoveConfig();
 
-  const selectedResolution = ref(defaultResolution);
   const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
 
+  const resolutionOptions = computed(() => doveConfig.resolutionOptions.value);
+  const defaultResolution = computed(() => doveConfig.defaultResolution.value);
+
   const updateResolutionDimensions = () => {
-    const dimensions = getResolutionDimensions(selectedResolution.value);
-    if (dimensions) {
-      types.value.forEach((type) => {
-        if (formData[type.key]) {
-          formData[type.key].width = dimensions.width;
-          formData[type.key].height = dimensions.height;
-        }
-      });
-    }
+    if (!selectedResolution.value) return;
+
+    const dimensions = doveConfig.getResolutionDimensions(selectedResolution.value);
+    if (!dimensions) return;
+
+    types.value.forEach((type) => {
+      if (formData[type.key]) {
+        formData[type.key].width = dimensions.width;
+        formData[type.key].height = dimensions.height;
+      }
+    });
   };
 
   const fetchTypes = async () => {
@@ -38,8 +43,7 @@ export const useCreateEntity = (entityType) => {
           ]
         }];
       } else {
-        const response = await fetch(`${path}/types`);
-        const data = await response.json();
+        const data = await $fetch(`${path}/types`);
         if (typeof data === 'object' && !Array.isArray(data)) {
           types.value = Object.entries(data).map(([key, value]) => ({ key, ...value }));
         } else {
@@ -54,8 +58,8 @@ export const useCreateEntity = (entityType) => {
     }
   };
 
-  const initializeFormData = (types) => {
-    types.forEach((type) => {
+  const initializeFormData = (typesArray) => {
+    typesArray.forEach((type) => {
       if (!(type.key in formData)) {
         formData[type.key] = {};
         if (Array.isArray(type.fields)) {
@@ -64,22 +68,25 @@ export const useCreateEntity = (entityType) => {
           });
         }
 
-        const dimensions = getResolutionDimensions(defaultResolution.value);
-        if (dimensions) {
-          formData[type.key].width = dimensions.width;
-          formData[type.key].height = dimensions.height;
+        const resolution = selectedResolution.value || defaultResolution.value;
+        if (resolution) {
+          const dimensions = doveConfig.getResolutionDimensions(resolution);
+          if (dimensions) {
+            formData[type.key].width = dimensions.width;
+            formData[type.key].height = dimensions.height;
+          }
         }
       }
     });
 
     if (entityType === "outputs" && availSrc.value.length > 0) {
-      types.forEach((type) => {
+      typesArray.forEach((type) => {
         formData[type.key].src = availSrc.value[0].value;
       });
     }
 
     if (entityType === "inputs") {
-      types.forEach((type) => {
+      typesArray.forEach((type) => {
         formData[type.key].volume = 0.8;
       });
     }
@@ -92,18 +99,13 @@ export const useCreateEntity = (entityType) => {
         body.type = 'scene';
       }
       const submitPath = entityType === 'mixers' ? '/api/mixers' : `${path}/${itemType}`;
-      const response = await fetch(submitPath, {
+      const responseJson = await $fetch(submitPath, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
+        body,
       });
-      const responseJson = await response.json();
       isOpen.value = false;
       return responseJson;
     } catch (error) {
-      // @TODO Add Toast
       isOpen.value = false;
     }
   };
@@ -131,9 +133,18 @@ export const useCreateEntity = (entityType) => {
 
   watch(selectedResolution, updateResolutionDimensions);
 
-  onMounted(() => {
-    fetchTypes();
-    selectedResolution.value = defaultResolution.value;
+  watch(defaultResolution, (newDefault) => {
+    if (newDefault && !selectedResolution.value) {
+      selectedResolution.value = newDefault;
+    }
+  }, { immediate: true });
+
+  onMounted(async () => {
+    await doveConfig.fetchConfig();
+    if (defaultResolution.value) {
+      selectedResolution.value = defaultResolution.value;
+    }
+    await fetchTypes();
   });
 
   return {

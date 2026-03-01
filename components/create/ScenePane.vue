@@ -8,12 +8,12 @@
   />
   <Dialog v-model:visible="isOpen" :modal="true" class="scene-pane-dialog">
     <template #header>
-      <h3 class="text-lg font-semibold">Add Scene</h3>
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Add Scene</h3>
     </template>
-    <div class="p-2 bg-gray-100 rounded-lg">
+    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
       <form @submit.prevent="submitCreate('scene')" class="space-y-2">
         <div class="mb-2">
-          <label for="name" class="block font-bold text-sm mb-1">Name</label>
+          <label for="name" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
           <InputText
             v-model="formData.scene.name"
             id="name"
@@ -23,7 +23,7 @@
         </div>
 
         <div>
-          <label class="block font-bold text-sm mb-1">Resolution</label>
+          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Resolution</label>
           <Select
             v-model="selectedResolution"
             :options="resolutionOptions"
@@ -44,6 +44,7 @@
 </template>
 
 <script setup>
+const { isUnlocked } = useLocked()
 
 const {
   isOpen,
@@ -53,9 +54,4 @@ const {
   resolutionOptions,
   addScene,
 } = useCreateScene();
-
 </script>
-
-<style scoped>
-
-</style>

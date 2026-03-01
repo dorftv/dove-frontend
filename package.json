@@ -3,21 +3,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build ",
+    "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare && cd node_modules/@eyevinn/webrtc-player && npm install && npm run build"
   },
   "devDependencies": {
-    "@nuxt/devtools": "latest",
+    "@nuxt/devtools": "^2.4.0",
     "@nuxt/icon": "^1.15.0",
+    "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@primevue/nuxt-module": "^4.4.1",
-    "nuxt": "^4.2.1",
-    "nuxt-icon-tw": "^1.0.0",
-    "vue": "^3.3.10",
-    "vue-router": "^4.2.5"
+    "nuxt": "^4.2.1"
   },
   "dependencies": {
     "@eyevinn/webrtc-player": "git+https://github.com/Eyevinn/webrtc-player.git#main",

@@ -1,180 +1,159 @@
 export default function useInputControls(props) {
-    const volume = ref(props.input.volume * 100);
-    const { inputs } = useEntities();
+  const volume = ref(props.input.volume * 100);
+  const { inputs, updateEntity } = useEntities();
 
-    watch(
-      () => props.input.volume,
-      (newValue) => {
-        volume.value = props.input.volume * 100;
-      }
-    );
+  watch(
+    () => props.input.volume,
+    () => {
+      volume.value = props.input.volume * 100;
+    }
+  );
 
-    const { updateEntity } = useEntities();
+  const duration = ref(props.input.duration);
+  const position = ref(props.input.position);
 
-    const duration = ref(props.input.duration);
-    const position = ref(props.input.position);
+  const durationFormatted = computed(() => {
+    return !props.input.duration || props.input.duration == '00'
+      ? ''
+      : `/${useTimeFormatter(duration).value}`;
+  });
 
-    const durationFormatted = computed(() => {
-      return !props.input.duration || props.input.duration == '00'
-        ? ''
-        : `/${useTimeFormatter(duration).value}`;
+  const positionFormatted = useTimeFormatter(position);
+
+  watchEffect(() => {
+    duration.value = props.input.duration;
+    position.value = props.input.position;
+  });
+
+  const handleVolumeChange = (newVolume) => {
+    volume.value = newVolume;
+    updateEntity('input', {
+      uid: props.input.uid,
+      volume: newVolume / 100,
     });
+  };
 
-    const positionFormatted = useTimeFormatter(position);
-
-    watchEffect(() => {
-      duration.value = props.input.duration;
-      position.value = props.input.position;
+  const handlePositionChange = (newPosition) => {
+    position.value = newPosition;
+    updateEntity('input', {
+      uid: props.input.uid,
+      position: newPosition,
     });
+  };
 
-    const handleVolumeChange = (newVolume) => {
-      volume.value = newVolume;
-      const vol = newVolume / 100;
-
-      updateEntity('input', {
+  const submitPlay = async () => {
+    await $fetch('/api/inputs', {
+      method: 'PUT',
+      body: {
         uid: props.input.uid,
-        volume: vol,
-      });
-    };
+        type: 'update',
+        state: 'PLAYING',
+      },
+    });
+  };
 
-    const handlePositionChange = (newPosition) => {
-      position.value = newPosition;
-
-      updateEntity('input', {
+  const submitPause = async () => {
+    await $fetch('/api/inputs', {
+      method: 'PUT',
+      body: {
         uid: props.input.uid,
-        position: newPosition,
-      });
-    };
-
-    const submitPlay = async () => {
-      const { data: responseData } = await useFetch('/api/inputs', {
-        method: 'put',
-        body: {
-          uid: props.input.uid,
-          type: 'update',
-          state: 'PLAYING',
-        },
-      });
-    };
-
-    const submitPause = async () => {
-      const { data: responseData } = await useFetch('/api/inputs', {
-        method: 'put',
-        body: {
-          uid: props.input.uid,
-          type: 'update',
-          state: 'PAUSED',
-        },
-      });
-    };
-
-    const submitStop = async () => {
-      const { data: responseData } = await useFetch('/api/inputs', {
-        method: 'put',
-        body: {
-          uid: props.input.uid,
-          type: 'update',
-          state: 'NULL',
-        },
-      });
-    };
-
-    const submitLoop = async (loopState) => {
-      const response = await useFetch('/api/inputs', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: {
-          uid: props.input.uid,
-          type: 'update',
-          loop: loopState,
-        },
-      });
-    };
-
-
-    const inputName = computed(() => {
-      const input = inputs.value.find(input => input.uid === props.source?.src);
-      return input ? input.name : '';
+        type: 'update',
+        state: 'PAUSED',
+      },
     });
+  };
 
-    const isInSceneSources = computed(() => {
-      return props.scene?.sources.some(source => source.src === props.input?.uid && source.sink === props.source?.sink);
+  const submitStop = async () => {
+    await $fetch('/api/inputs', {
+      method: 'PUT',
+      body: {
+        uid: props.input.uid,
+        type: 'update',
+        state: 'NULL',
+      },
     });
+  };
 
-    const submitAddInputToScene = async () => {
-      const { data: responseData } = await useFetch('/api/mixer/add_source', {
-        method: 'post',
-        body: {
-          src: props.input.uid,
-          target: props.scene.uid,
-          index: props.source.index
-        }
-      });
-    };
+  const submitLoop = async (loopState) => {
+    await $fetch('/api/inputs', {
+      method: 'PUT',
+      body: {
+        uid: props.input.uid,
+        type: 'update',
+        loop: loopState,
+      },
+    });
+  };
 
-    const submitRemoveInputFromScene = async () => {
-      const { data: responseData } = await useFetch('/api/mixer/remove_source', {
-        method: 'post',
-        body: {
-          src: "None",
-          target: props.scene.uid,
-          index: props.source.index
-        }
-      });
-    };
-    const inputInfoPopover = ref();
+  const inputName = computed(() => {
+    const input = inputs.value.find(input => input.uid === props.source?.src);
+    return input ? input.name : '';
+  });
 
-    const inputDetails = computed(() => JSON.stringify(props.input, null, 2));
+  const isInSceneSources = computed(() => {
+    return props.scene?.sources.some(source => source.src === props.input?.uid && source.sink === props.source?.sink);
+  });
 
-    const { inputPreview } = useUserState();
-
-    const submitRemoveInput = async () => {
-      try {
-        const response = await fetch('/api/inputs', {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            uid: props.input.uid,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to remove input');
-        }
-        // @TODO: add Toast Later
-      } catch (error) {
-        // @TODO: add Toast Later
+  const submitAddInputToScene = async () => {
+    await $fetch('/api/mixer/add_source', {
+      method: 'POST',
+      body: {
+        src: props.input.uid,
+        target: props.scene.uid,
+        index: props.source.index
       }
-    };
+    });
+  };
 
-    const toggleInputPreview = () => {
-      return !props.inputEnabled;
-    };
+  const submitRemoveInputFromScene = async () => {
+    await $fetch('/api/mixer/remove_source', {
+      method: 'POST',
+      body: {
+        src: "None",
+        target: props.scene.uid,
+        index: props.source.index
+      }
+    });
+  };
 
-    return {
-      volume,
-      position,
-      durationFormatted,
-      positionFormatted,
-      handleVolumeChange,
-      handlePositionChange,
-      submitPlay,
-      submitPause,
-      submitStop,
-      submitLoop,
-      inputName,
-      isInSceneSources,
-      submitAddInputToScene,
-      submitRemoveInputFromScene,
-      inputInfoPopover,
-      inputDetails,
-      inputPreview,
-      submitRemoveInput,
-      toggleInputPreview,
+  const inputInfoPopover = ref();
+  const inputDetails = computed(() => JSON.stringify(props.input, null, 2));
+  const { inputPreview } = useUserState();
 
-    };
-  }
+  const submitRemoveInput = async () => {
+    try {
+      await $fetch('/api/inputs', {
+        method: 'DELETE',
+        body: { uid: props.input.uid },
+      });
+    } catch (error) {
+      console.error('Failed to remove input:', error);
+    }
+  };
+
+  const toggleInputPreview = () => {
+    return !props.inputEnabled;
+  };
+
+  return {
+    volume,
+    position,
+    durationFormatted,
+    positionFormatted,
+    handleVolumeChange,
+    handlePositionChange,
+    submitPlay,
+    submitPause,
+    submitStop,
+    submitLoop,
+    inputName,
+    isInSceneSources,
+    submitAddInputToScene,
+    submitRemoveInputFromScene,
+    inputInfoPopover,
+    inputDetails,
+    inputPreview,
+    submitRemoveInput,
+    toggleInputPreview,
+  };
+}

@@ -1,25 +1,12 @@
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-
-let entitiesInstance = null;
+let ws = null;
+let reconnectTimer = null;
+let initialized = false;
 
 export function useEntities() {
-  if (entitiesInstance) {
-    return entitiesInstance;
-  }
-
-  const inputs = ref([]);
-  const mixers = ref([]);
-  const outputs = ref([]);
-  const webSocket = ref(null);
-  const error = ref(null);
-
-  let wsUrl;
-  if (process.dev) {
-    wsUrl = process.env.DOVE_API ? process.env.DOVE_API + '/ws' : 'ws://localhost:5000/ws';
-  } else {
-    const url = useRequestURL();
-    wsUrl = `${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}/ws`;
-  }
+  const inputs = useState('entities-inputs', () => []);
+  const mixers = useState('entities-mixers', () => []);
+  const outputs = useState('entities-outputs', () => []);
+  const error = useState('entities-error', () => null);
 
   const getEntities = (type) => {
     if (type === 'input') return inputs.value;
@@ -28,7 +15,11 @@ export function useEntities() {
   };
 
   const addEntityFromWebsocket = (type, entity) => {
-    getEntities(type).push(entity);
+    const entities = getEntities(type);
+    const exists = entities.some(e => e.uid === entity.uid);
+    if (!exists) {
+      entities.push(entity);
+    }
   };
 
   const updateEntityFromWebSocket = (type, updatedEntity) => {
@@ -58,17 +49,15 @@ export function useEntities() {
 
   const fetchEntities = async () => {
     try {
-      const { data: inputsData, error: inputsError } = await useFetch('/api/inputs');
-      const { data: mixersData, error: mixersError } = await useFetch('/api/mixers');
-      const { data: outputsData, error: outputsError } = await useFetch('/api/outputs');
+      const [inputsData, mixersData, outputsData] = await Promise.all([
+        $fetch('/api/inputs'),
+        $fetch('/api/mixers'),
+        $fetch('/api/outputs'),
+      ]);
 
-      if (inputsError.value || mixersError.value || outputsError.value) {
-        throw new Error('Failed to fetch entities');
-      }
-
-      inputs.value = inputsData.value;
-      mixers.value = mixersData.value;
-      outputs.value = outputsData.value;
+      inputs.value = inputsData;
+      mixers.value = mixersData;
+      outputs.value = outputsData;
     } catch (e) {
       error.value = 'Failed to load entities: ' + e.message;
       console.error(error.value);
@@ -76,10 +65,30 @@ export function useEntities() {
   };
 
   const connectWebSocket = () => {
-    if (webSocket.value) return; // Don't establish a new connection if one already exists
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      return;
+    }
 
-    webSocket.value = new WebSocket(wsUrl);
-    webSocket.value.onmessage = (event) => {
+    let wsUrl;
+    if (process.dev) {
+      wsUrl = process.env.DOVE_API ? process.env.DOVE_API + '/ws' : 'ws://localhost:5000/ws';
+    } else {
+      const url = useRequestURL();
+      wsUrl = `${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}/ws`;
+    }
+
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+      error.value = null;
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+    };
+
+    ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
       const action = {
         CREATE: addEntityFromWebsocket,
@@ -94,64 +103,79 @@ export function useEntities() {
       }
     };
 
-    webSocket.value.onerror = (wsError) => {
-      error.value = 'WebSocket error: ' + wsError.message;
-      console.error(error.value);
+    ws.onerror = (wsError) => {
+      error.value = 'WebSocket error';
+      console.error('WebSocket error:', wsError);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket disconnected');
+      ws = null;
+      // Auto-reconnect after 3 seconds
+      if (!reconnectTimer) {
+        reconnectTimer = setTimeout(async () => {
+          reconnectTimer = null;
+          console.log('Attempting WebSocket reconnect...');
+          await fetchEntities();
+          connectWebSocket();
+        }, 3000);
+      }
     };
   };
 
   const disconnectWebSocket = () => {
-    if (webSocket.value) {
-      webSocket.value.close();
-      webSocket.value = null;
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
+    if (ws) {
+      ws.close();
+      ws = null;
     }
   };
 
-  onMounted(async () => {
-    await fetchEntities();
-    connectWebSocket();
-  });
-
-  onUnmounted(() => {
-    disconnectWebSocket();
-  });
-
   const sendWebSocketMessage = (message) => {
-    if (webSocket.value && webSocket.value.readyState === WebSocket.OPEN) {
-      webSocket.value.send(JSON.stringify(message));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(message));
     } else {
       error.value = 'WebSocket is not open. Cannot send message.';
     }
   };
 
+  // Initialize once on client
+  if (import.meta.client && !initialized) {
+    initialized = true;
+    fetchEntities().then(() => connectWebSocket());
+  }
+
   const sceneInputs = computed(() => {
     return (inputUid) => {
-      const sceneInputs = [];
+      const result = [];
       sceneMixers.value.forEach(mixer => {
         mixer.sources.forEach(source => {
           const input = inputs.value.find(input => input.uid === source.src);
           if (input && input.uid === inputUid) {
-            sceneInputs.push({
+            result.push({
               ...input,
               mixer
             });
           }
         });
       });
-      return sceneInputs;
+      return result;
     };
   });
 
   const sceneMixerSource = (uid) => {
-    const mixer = sceneMixers.value.find(mixer => mixer.uid === uid)
-    if (!mixer) return []
+    const mixer = sceneMixers.value.find(mixer => mixer.uid === uid);
+    if (!mixer) return [];
 
     return Object.values(mixer.sources || {}).map(source => ({
       name: source.name,
       index: source.index,
       src_locked: source.src_locked
-    }))
-  }
+    }));
+  };
 
   const sceneMixers = computed(() => {
     return mixers.value.filter(mixer => mixer.type === 'scene');
@@ -163,15 +187,15 @@ export function useEntities() {
 
   const inputsPreview = computed(() => {
     return inputs.value.filter(input => input.preview === true && input.type !== 'nodecg');
-  })
+  });
 
   const inputsNoPreview = computed(() => {
     return inputs.value.filter(input => input.preview === false && input.type !== 'nodecg');
-  })
+  });
 
   const previewOutputs = computed(() => {
     return outputs.value.filter(output => output.is_preview === true);
-  })
+  });
 
   const inputsNodeCG = computed(() => {
     return inputs.value
@@ -180,17 +204,13 @@ export function useEntities() {
         if (a.index !== undefined && b.index !== undefined) {
           return a.index - b.index;
         }
-        if (a.index !== undefined) {
-          return -1;
-        }
-        if (b.index !== undefined) {
-          return 1;
-        }
+        if (a.index !== undefined) return -1;
+        if (b.index !== undefined) return 1;
         return 0;
       });
   });
 
-  entitiesInstance = {
+  return {
     inputs,
     inputsPreview,
     inputsNoPreview,
@@ -204,8 +224,8 @@ export function useEntities() {
     programMixer,
     updateEntity,
     sendWebSocketMessage,
+    connectWebSocket,
+    disconnectWebSocket,
     error
   };
-
-  return entitiesInstance;
 }

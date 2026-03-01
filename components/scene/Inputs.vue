@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full flex flex-col text-sm">
+  <div class="w-full flex flex-col text-sm text-gray-700 dark:text-gray-300">
     <div class="flex items-center space-x-4 py-0.5">
       <div class="w-1/3 truncate">{{ source.name }}</div>
-      <div class="w-1/3 truncate">{{(inputs.find(input => input.uid === src) || {}).name }}</div>
+      <div class="w-1/3 truncate">{{ (inputs.find(input => input.uid === src) || {}).name }}</div>
       <div class="w-1/3 flex justify-end space-x-1">
         <Button v-if="!mute && (!scene.src_locked || isUnlocked)" icon="pi pi-volume-up" @click="handleChange('mute', true)" class="p-button-text p-button-sm p-0" />
         <Button v-if="mute && (!scene.src_locked || isUnlocked)" icon="pi pi-volume-off" @click="handleChange('mute', false)" class="p-button-text p-button-sm p-0" />
@@ -18,7 +18,7 @@
       />
       <div v-for="(value, key) in { src, alpha, width, height, xpos, ypos, volume }" :key="key" class="flex items-center mb-1">
         <div v-if="getMax(key)" class="flex w-full">
-          <span class="w-16 text-xs">{{ key }}</span>
+          <span class="w-16 text-xs text-gray-600 dark:text-gray-400">{{ key }}</span>
           <Slider
             class="flex-grow mx-2"
             :modelValue="value"
@@ -27,18 +27,14 @@
             :min="0"
             :max="getMax(key)"
           />
-          <span class="w-16 text-right text-xs">{{ value }}/{{ getMax(key) }}</span>
+          <span class="w-16 text-right text-xs text-gray-600 dark:text-gray-400">{{ value }}/{{ getMax(key) }}</span>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-
-
-
 <script setup>
-
 const { isUnlocked } = useLocked()
 
 const props = defineProps({
@@ -56,7 +52,6 @@ watch(() => props.source.src, (newSrc) => {
   }
 });
 </script>
-
 
 <style scoped>
 .p-button.p-button-sm {

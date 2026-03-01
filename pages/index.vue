@@ -1,14 +1,18 @@
 <template>
-  <div class="grid grid-cols-12 gap-4 px-4 py-8">
-    <div class="col-span-12 lg:col-span-5">
+  <div class="grid grid-cols-12 gap-4 px-4 py-4">
+    <div class="col-span-12 md:col-span-6 lg:col-span-4">
       <SceneMain />
     </div>
 
-    <div class="col-span-12 lg:col-span-6">
+    <div class="col-span-12 md:col-span-6 lg:col-span-2">
+      <ProgramSwitch />
+    </div>
+
+    <div class="col-span-12 md:col-span-6 lg:col-span-4">
       <ProgramMain />
     </div>
 
-    <div class="col-span-12 lg:col-span-1">
+    <div class="col-span-12 md:col-span-6 lg:col-span-2">
       <OutputMain />
     </div>
 
@@ -20,6 +24,3 @@
 
 <script setup>
 </script>
-
-<style scoped>
-</style>

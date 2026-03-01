@@ -5,10 +5,5 @@
 </template>
 
 <script setup>
-
 const { programMixer } = useEntities();
 </script>
-
-<style scoped>
-
-</style>

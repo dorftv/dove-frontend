@@ -1,23 +1,33 @@
 <template>
-  <div class="grid grid-cols-12 gap-2">
-    <div class="col-span-8">
-      <CreateInputPane />
-    </div>
-    <div class="col-span-4 flex items-center justify-end">
-      <Button
-        v-if="inputsNodeCG.length > 0 && inputsNoPreview.length > 0"
-        class="p-1 text-xs"
-        @click="toggleNodeCG"
-      >
-        {{ showNodeCG ? 'show Inputs with no preview' : 'show NodeCG Panels' }}
-      </Button>
-    </div>
-
-    <div :class="[
-      inputsNodeCG.length > 0 || inputsNoPreview.length > 0 ? 'col-span-8' : 'col-span-12',
-    ]">
-      <div class="grid grid-cols-4 gap-2">
-        <div v-for="input in inputsPreview" :key="input.uid" class="px-2">
+  <div class="space-y-4">
+    <!-- Inputs with preview -->
+    <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Inputs</h3>
+          <CreateInputPane />
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            v-if="inputsNoPreview.length > 0"
+            @click="showNoPreview = !showNoPreview"
+            class="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <Icon :name="showNoPreview ? 'ph:caret-up' : 'ph:caret-down'" size="12px" />
+            {{ inputsNoPreview.length }} without preview
+          </button>
+          <button
+            v-if="inputsNodeCG.length > 0"
+            @click="showNodeCG = !showNodeCG"
+            class="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <Icon :name="showNodeCG ? 'ph:caret-up' : 'ph:caret-down'" size="12px" />
+            {{ inputsNodeCG.length }} NodeCG
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+        <div v-for="input in inputsPreview" :key="input.uid">
           <InputHeader
             :input="input"
             :inputEnabled="isInputEnabled(input.uid)"
@@ -33,55 +43,37 @@
         </div>
       </div>
     </div>
-    <div v-if="inputsNodeCG.length > 0 || inputsNoPreview.length > 0"
-         class="col-span-4">
-      <div v-if="inputsNodeCG.length > 0 && showNodeCG">
-        <InputNodeCG />
-      </div>
-      <div v-else class="grid grid-cols-2 gap-2">
-        <div v-for="input in inputsNoPreview" :key="input.id">
 
-          <InputHeader :input="input" />
-          <InputControls :state="input.state" :uid="input.uid" :input="input" />
-          <InputScenes :input="input" />
-        </div>
-        <div v-for="input in inputsNodeCG" :key="input.id">
-
+    <!-- Inputs without preview (collapsible) -->
+    <div v-if="inputsNoPreview.length > 0 && showNoPreview"
+         class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-4">
+      <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Inputs without preview</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3">
+        <div v-for="input in inputsNoPreview" :key="input.uid">
           <InputHeader :input="input" />
           <InputControls :state="input.state" :uid="input.uid" :input="input" />
           <InputScenes :input="input" />
         </div>
       </div>
     </div>
+
+    <!-- NodeCG panels (collapsible, full width) -->
+    <div v-if="inputsNodeCG.length > 0 && showNodeCG"
+         class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-4">
+      <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">NodeCG Panels</h3>
+      <InputNodeCG />
+    </div>
   </div>
 </template>
 
 <script setup>
-
-
-const { inputs, inputsPreview, inputsNoPreview, inputsNodeCG } = useEntities();
+const { inputsPreview, inputsNoPreview, inputsNodeCG } = useEntities();
 const {
-  inputPreview,
   isInputEnabled,
   toggleInputEnabled,
   shouldShowPreview
 } = usePreviewEnabled();
 
 const showNodeCG = ref(true);
-
-const toggleNodeCG = () => {
-  showNodeCG.value = !showNodeCG.value;
-};
-// Watcher for inputsNoPreview
-watch(inputsNoPreview, (newVal) => {
-  if (newVal.length === 0) {
-    showNodeCG.value = true;
-  }
-  console.log('Watch triggered for inputsNoPreview:', newVal.length, 'showNodeCG:', showNodeCG.value);
-});
-
+const showNoPreview = ref(true);
 </script>
-
-<style scoped>
-/* Add any scoped styles here if needed */
-</style>

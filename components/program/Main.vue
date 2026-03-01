@@ -1,19 +1,10 @@
 <template>
-  <div class="grid grid-cols-6 gap-4">
-    <div class="col-span-2 px-4">
-      <ProgramSwitch />
-    </div>
-    <div class="col-span-4  px-4 flex flex-col">
-      <ProgramHeader class="" />
-      <ProgramPlayer class="w-full" />
-      <ProgramOverlays />
-    </div>
+  <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-4 h-full">
+    <ProgramHeader />
+    <ProgramPlayer class="w-full" />
+    <ProgramOverlays />
   </div>
 </template>
+
 <script setup>
-
 </script>
-
-<style>
-
-</style>

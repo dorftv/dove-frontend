@@ -1,11 +1,6 @@
-let globalMutedState = null;
-let initializedEntities = null;
-
 export function useMutedState() {
-  if (!globalMutedState) {
-    globalMutedState = reactive({});
-    initializedEntities = new Set();
-  }
+  const mutedState = useState('muted-state', () => ({}));
+  const initializedEntities = useState('muted-initialized', () => new Set());
 
   const { sceneMixers, inputs, programMixer } = useEntities();
 
@@ -19,22 +14,22 @@ export function useMutedState() {
 
   const initializeMutedState = () => {
     allEntities.value.forEach(entity => {
-      if (!initializedEntities.has(entity.uid)) {
-        initializedEntities.add(entity.uid);
-        globalMutedState[entity.uid] = true;
+      if (!initializedEntities.value.has(entity.uid)) {
+        initializedEntities.value.add(entity.uid);
+        mutedState.value[entity.uid] = true;
       }
     });
     if (programMixer.value) {
-      globalMutedState[programMixer.value.uid] = false;
+      mutedState.value[programMixer.value.uid] = false;
     }
   };
 
   const setMutedState = (uid, isMuted) => {
     if (isMuted) {
-      globalMutedState[uid] = true;
+      mutedState.value[uid] = true;
     } else {
-      Object.keys(globalMutedState).forEach(key => {
-        globalMutedState[key] = key === uid ? false : true;
+      Object.keys(mutedState.value).forEach(key => {
+        mutedState.value[key] = key === uid ? false : true;
       });
     }
   };
@@ -43,15 +38,15 @@ export function useMutedState() {
 
   watch(allEntities, (newEntities) => {
     newEntities.forEach(entity => {
-      if (!initializedEntities.has(entity.uid)) {
-        initializedEntities.add(entity.uid);
-        globalMutedState[entity.uid] = true;
+      if (!initializedEntities.value.has(entity.uid)) {
+        initializedEntities.value.add(entity.uid);
+        mutedState.value[entity.uid] = true;
       }
     });
   }, { deep: true });
 
   return {
-    mutedState: globalMutedState,
+    mutedState,
     setMutedState
   };
 }

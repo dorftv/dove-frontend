@@ -21,11 +21,9 @@ export const useCreateOutput = () => {
     visibleEncoderFields.value = {};
   };
 
-
   const fetchEncoderOptions = async () => {
     try {
-      const response = await fetch('/api/config/encoder');
-      const data = await response.json();
+      const data = await $fetch('/api/config/encoder');
       encoderOptions.audio_encoder = data.audio || [];
       encoderOptions.video_encoder = data.video || [];
       encoderOptions.mux = data.mux || [];
@@ -37,20 +35,16 @@ export const useCreateOutput = () => {
   const isEncoderField = (fieldName) => ['audio_encoder', 'video_encoder', 'mux'].includes(fieldName);
 
   const getEncoderOptions = (field) => {
-    if (!encoderOptions[field.name]) {
-      return [];
-    }
+    if (!encoderOptions[field.name]) return [];
 
     if (Array.isArray(field.options) && field.options.length > 0) {
-      // Filter and sort encoder options based on field.options
       return field.options
         .map(optionName => encoderOptions[field.name].find(encoder => encoder.name === optionName))
-        .filter(Boolean); // Remove any undefined entries
+        .filter(Boolean);
     }
 
     return encoderOptions[field.name];
   };
-
 
   const initializeEncoderField = (type, field) => {
     if (isEncoderField(field.name)) {
@@ -69,6 +63,7 @@ export const useCreateOutput = () => {
       }
     }
   };
+
   const initializeEncoderFields = () => {
     baseCreate.types.value.forEach((type) => {
       if (type.fields) {
@@ -88,7 +83,7 @@ export const useCreateOutput = () => {
     const selectedEncoder = getEncoderOptions({ name: fieldName, options: [value] })[0];
     if (selectedEncoder) {
       if (!baseCreate.formData[itemKey]) {
-        baseCreate.formData[item.key] = {};
+        baseCreate.formData[itemKey] = {};
       }
       baseCreate.formData[itemKey][fieldName] = {
         name: value,
@@ -100,7 +95,6 @@ export const useCreateOutput = () => {
   const getSelectedEncoder = (itemKey, fieldName) => {
     const selectedEncoderName = baseCreate.formData[itemKey]?.[fieldName]?.name;
     if (!selectedEncoderName) {
-      // If the encoder hasn't been initialized yet, return the first option
       const type = baseCreate.types.value.find(type => type.key === itemKey);
       if (type && type.fields) {
         const field = Array.isArray(type.fields)
@@ -116,10 +110,8 @@ export const useCreateOutput = () => {
     return encoderOptions[fieldName].find(encoder => encoder.name === selectedEncoderName);
   };
 
-
   const getEncoderValue = (itemKey, fieldName, subFieldName) => {
     if (!baseCreate.formData[itemKey] || !baseCreate.formData[itemKey][fieldName]) {
-      // If the encoder hasn't been initialized yet, return the first option
       const type = baseCreate.types.value.find(type => type.key === itemKey);
       if (type && type.fields) {
         const field = Array.isArray(type.fields)
@@ -143,9 +135,7 @@ export const useCreateOutput = () => {
 
   const hasEncoderFields = (type) => {
     if (!type.fields) return false;
-
     const fields = Array.isArray(type.fields) ? type.fields : Object.values(type.fields);
-
     return fields.some(field =>
       field.name === 'video_encoder' ||
       field.name === 'audio_encoder' ||
@@ -179,9 +169,11 @@ export const useCreateOutput = () => {
       resetVisibleEncoderFields();
     }
   });
+
   onMounted(() => {
     initializeForm();
   });
+
   return {
     ...baseCreate,
     addOutput,

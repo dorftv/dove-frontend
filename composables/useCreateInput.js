@@ -14,19 +14,12 @@ export const useCreateInput = () => {
   const submitCutProgram = async () => {
     if (selectedSceneProgram.value) {
       try {
-        const cutProgramResponse = await fetch(`/api/mixer/cut_program`, {
+        await $fetch('/api/mixer/cut_program', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            src: selectedScene.uid
-          }),
+          body: { src: selectedScene.uid },
         });
-        const cutProgramResponseJson = await cutProgramResponse.json();
-        // @TODO Add Toast
       } catch (error) {
-        // @TODO Add Toast
+        console.error('Failed to cut program:', error);
       }
     }
   };
@@ -34,22 +27,17 @@ export const useCreateInput = () => {
   const submitAddToScene = async (responseJson) => {
     if (selectedScene.uid && selectedScene.slot !== null) {
       try {
-        const cutSceneResponse = await fetch(`/api/mixer/add_source`, {
+        await $fetch('/api/mixer/add_source', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+          body: {
             src: responseJson.uid,
             target: selectedScene.uid,
             index: selectedScene.slot
-          }),
+          },
         });
-        const cutSceneResponseJson = await cutSceneResponse.json();
         await submitCutProgram();
-        // @TODO Add Toast
       } catch (error) {
-        // @TODO Add Toast
+        console.error('Failed to add to scene:', error);
       }
     }
   };
@@ -63,12 +51,12 @@ export const useCreateInput = () => {
   };
 
   const fetchItems = async (proxyType) => {
-    const { data, error } = await useFetch(() => `/proxy/${proxyType}`);
-    if (error.value) {
+    try {
+      const data = await $fetch(`/proxy/${proxyType}`);
+      proxyItems.value[proxyType] = data;
+    } catch (err) {
       proxyItems.value[proxyType] = [];
-      console.error('Failed to fetch items from proxy:', error.value);
-    } else {
-      proxyItems.value[proxyType] = data.value;
+      console.error('Failed to fetch items from proxy:', err);
     }
   };
 
@@ -76,7 +64,7 @@ export const useCreateInput = () => {
     if (!selectedScene.uid) return [];
     return sceneMixerSource(selectedScene.uid);
   });
-  
+
   const filteredSources = computed(() => {
     return currentSources.value.filter(source => !source.src_locked);
   });

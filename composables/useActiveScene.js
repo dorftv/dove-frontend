@@ -1,8 +1,7 @@
-
-const activeIndex = ref(0);
-const selectedScene = ref(null);
-
 export default function useActiveScene() {
+  const activeIndex = useState('active-scene-index', () => 0);
+  const selectedScene = useState('active-scene-selected', () => null);
+
   const { sceneMixers, programMixer } = useEntities();
 
   const activeScene = computed(() => {
@@ -13,13 +12,11 @@ export default function useActiveScene() {
       const activeSourceIndex = programMixer.value.active;
       const activeSource = programMixer.value.sources[activeSourceIndex];
       if (activeSource && activeSource.src) {
-        const scene = sceneMixers.value.find(sceneMixer => sceneMixer.uid === activeSource.src);
-        return scene;
+        return sceneMixers.value.find(sceneMixer => sceneMixer.uid === activeSource.src);
       }
     }
     return null;
   });
-
 
   const handleSceneClick = (index) => {
     if (index >= 0 && index < sceneMixers.value.length) {
@@ -29,36 +26,18 @@ export default function useActiveScene() {
   };
 
   const cutSceneToProgram = async () => {
-    if (!selectedScene.value) {
-      return;
-    }
+    if (!selectedScene.value) return;
 
     try {
-      const response = await fetch('/api/mixer/cut_program', {
+      const data = await $fetch('/api/mixer/cut_program', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ src: selectedScene.value.uid })
+        body: { src: selectedScene.value.uid }
       });
-
-      if (!response.ok) {
-        throw new Error('Server responded with an error');
-      }
-
-      const data = await response.json();
-      if (data && data.src) {
-        // @TODO: Add Toast later for success
-      } else {
-        // @TODO: Add Toast later for failure
-      }
-    } catch (error) {
-      console.error('Failed to switch scene:', error);
-      // @TODO: Add Toast later for error
+    } catch (err) {
+      console.error('Failed to switch scene:', err);
     }
   };
 
-  // Watch for changes to activeIndex and sceneMixers and update selectedScene
   watch([activeIndex, sceneMixers], ([newIndex, newSceneMixers]) => {
     if (newSceneMixers && newSceneMixers.length > newIndex) {
       selectedScene.value = newSceneMixers[newIndex];

@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     appManifest: false,
   },
   ssr: false,
-  
+
   devtools: { enabled: true },
   css: ["@/assets/css/tailwind.css", "primeicons/primeicons.css"],
   postcss: {
@@ -16,7 +16,7 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  
+
   vite: {
     vue: {
       template: {
@@ -47,19 +47,27 @@ export default defineNuxtConfig({
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,
         },
-
       },
     },
   },
 
   modulesDir: ['./node_modules'],
-  modules: ["@primevue/nuxt-module", "@nuxt/icon"],
+  modules: ["@primevue/nuxt-module", "@nuxt/icon", "@nuxtjs/color-mode"],
+
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+  },
 
   primevue: {
     options: {
       theme: {
-        preset: Aura
-      }
-    }
-  }
+        preset: Aura,
+        options: {
+          darkModeSelector: '.dark',
+        },
+      },
+    },
+  },
 })

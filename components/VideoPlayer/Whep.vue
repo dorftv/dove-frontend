@@ -35,15 +35,12 @@ const initializePlayer = async () => {
     statsTypeFilter: '^candidate-*|^inbound-rtp',
   });
 
-
   try {
     const url = new URL(`/whep/${props.uid}/whep`, window.location.origin);
     await player.load(url);
     player.on('initial-connection-failed', handleConnectionFailed);
     player.on('player-muted', () => setMutedState(props.uid, true));
     player.on('player-unmuted', () => setMutedState(props.uid, false));
-
-
   } catch (error) {
     console.error('Error loading player:', error);
   }
@@ -65,15 +62,11 @@ onUnmounted(() => {
 });
 
 watch(() => props.uid, initializePlayer);
-
-
 </script>
 
 <style scoped>
 .video-container {
   width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
 }
 
 video {

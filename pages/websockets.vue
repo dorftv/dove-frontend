@@ -1,17 +1,9 @@
 <template>
-  <h1>Debug websockets Messages</h1>
-  <div class="grid col-span-12">
-  <DebugWebsockets />
-</div>
-
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Debug WebSocket Messages</h1>
+    <DebugWebsockets />
+  </div>
 </template>
 
-<script>
-export default {
-
-}
+<script setup>
 </script>
-
-<style>
-
-</style>

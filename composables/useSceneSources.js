@@ -1,7 +1,3 @@
-// useSceneSources.js
-import { useEntities } from '@/composables/useEntities';
-import { ref, watch } from 'vue';
-
 export function useSceneSources(scene, source) {
   const { inputs, updateEntity: updateEntityInEntities } = useEntities();
 
@@ -14,55 +10,20 @@ export function useSceneSources(scene, source) {
   const volume = ref(source.volume * 100);
   const mute = ref(source.mute);
 
-  watch(
-    () => source.alpha,
-    (newValue) => {
-      alpha.value = newValue * 100;
-    }
-  );
-
-  watch(
-    () => source.volume,
-    (newValue) => {
-      volume.value = newValue * 100;
-    }
-  );
-
-  watch(
-    () => source.mute, // Watch for changes in source.mute
-    (newValue) => {
-      mute.value = newValue;
-    }
-  );
+  watch(() => source.alpha, (newValue) => { alpha.value = newValue * 100; });
+  watch(() => source.volume, (newValue) => { volume.value = newValue * 100; });
+  watch(() => source.mute, (newValue) => { mute.value = newValue; });
 
   const handleChange = (prop, newValue) => {
     switch (prop) {
-      case 'src':
-        src.value = newValue;
-        break;
-      case 'alpha':
-        alpha.value = newValue;
-        newValue = newValue / 100;
-        break;
-      case 'width':
-        width.value = newValue;
-        break;
-      case 'height':
-        height.value = newValue;
-        break;
-      case 'xpos':
-        xpos.value = newValue;
-        break;
-      case 'ypos':
-        ypos.value = newValue;
-        break;
-      case 'volume':
-        volume.value = newValue;
-        newValue = newValue / 100;
-        break;
-      case 'mute': // Handle mute value change
-        mute.value = newValue;
-        break;
+      case 'src': src.value = newValue; break;
+      case 'alpha': alpha.value = newValue; newValue = newValue / 100; break;
+      case 'width': width.value = newValue; break;
+      case 'height': height.value = newValue; break;
+      case 'xpos': xpos.value = newValue; break;
+      case 'ypos': ypos.value = newValue; break;
+      case 'volume': volume.value = newValue; newValue = newValue / 100; break;
+      case 'mute': mute.value = newValue; break;
     }
 
     updateEntityInEntities('mixer', {
@@ -82,13 +43,12 @@ export function useSceneSources(scene, source) {
       'ypos': scene.height,
       'volume': 150,
     };
-
     return typeMaxMap[type];
   };
 
   const removeSlot = async () => {
-    const { data: responseData } = await useFetch('/api/mixer/remove_slot', {
-      method: 'post',
+    await $fetch('/api/mixer/remove_slot', {
+      method: 'POST',
       body: {
         uid: scene.uid,
         index: source.index
