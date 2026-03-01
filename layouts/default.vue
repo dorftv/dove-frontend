@@ -114,9 +114,18 @@ const cycleColorMode = () => {
   colorMode.preference = modes[(currentIndex + 1) % modes.length]
 }
 
+const faviconSvg = (color) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='8' fill='${encodeURIComponent(color)}'/></svg>`
+
+const faviconHref = computed(() => {
+  if (wsStatus.value === 'connected') return faviconSvg('#22c55e')
+  if (wsStatus.value === 'reconnecting') return faviconSvg('#f97316')
+  return faviconSvg('#ef4444')
+})
+
 useHead({
   titleTemplate: () => `DOVE - Online Video Editor`,
-  link: [{ rel: 'icon', type: 'image/png', href: '/favicon.png' }],
+  link: [{ rel: 'icon', type: 'image/svg+xml', href: faviconHref }],
 })
 </script>
 

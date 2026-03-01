@@ -1,6 +1,13 @@
 <template>
   <div class="w-full flex flex-col text-sm text-gray-700 dark:text-gray-300">
-    <div class="flex items-center gap-3 px-3 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+    <div
+      class="flex items-center gap-3 px-3 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+      :class="{ 'ring-2 ring-inset ring-blue-400': dragOver }"
+      @dragover.prevent
+      @dragenter.prevent="dragOver = true"
+      @dragleave="dragOver = false"
+      @drop="onDrop"
+    >
       <span class="text-xs text-gray-400 dark:text-gray-500 w-8 shrink-0">{{ source.name }}</span>
       <span class="truncate flex-grow" :class="inputMatch ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic'">
         {{ inputMatch ? inputMatch.name : 'Empty' }}
@@ -21,11 +28,24 @@
       </div>
     </div>
     <div v-if="open" class="px-3 pb-2 bg-blue-50/50 dark:bg-blue-900/10">
+      <div class="flex items-center mb-1 mt-1">
+        <span class="w-16 text-xs text-gray-600 dark:text-gray-400">src</span>
+        <Select
+          class="flex-grow"
+          :options="inputs"
+          optionLabel="name"
+          optionValue="uid"
+          :modelValue="src"
+          @update:modelValue="(val) => handleChange('src', val)"
+          placeholder="Select input"
+          size="small"
+        />
+      </div>
       <button @click="removeSlot" class="flex items-center gap-1 text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 py-1 cursor-pointer">
         <i class="pi pi-minus-circle text-[11px]"></i>
         Remove Slot
       </button>
-      <div v-for="(value, key) in { src, alpha, width, height, xpos, ypos, volume }" :key="key" class="flex items-center mb-1">
+      <div v-for="(value, key) in { alpha, width, height, xpos, ypos, volume }" :key="key" class="flex items-center mb-1">
         <div v-if="getMax(key)" class="flex w-full">
           <span class="w-16 text-xs text-gray-600 dark:text-gray-400">{{ key }}</span>
           <Slider
@@ -55,6 +75,13 @@ const { inputs, removeSlot, handleChange, getMax, src, alpha, width, height, xpo
 
 const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
 const open = ref(false);
+const dragOver = ref(false);
+
+const onDrop = (event) => {
+  dragOver.value = false;
+  const uid = event.dataTransfer.getData('text/plain');
+  if (uid) handleChange('src', uid);
+};
 
 watch(() => props.source.src, (newSrc) => {
   if (newSrc !== src.value) {

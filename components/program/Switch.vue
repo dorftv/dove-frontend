@@ -16,6 +16,7 @@
         <Button @click="cutSceneToProgram" class="w-full" severity="success">
           <Icon name="ph:arrow-right" size="14px" class="mr-1" />
           {{ selectedScene.name }}
+          <kbd class="ml-2 text-[10px] bg-white/20 px-1 rounded font-mono leading-relaxed">Enter</kbd>
         </Button>
       </div>
     </template>

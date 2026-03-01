@@ -1,5 +1,9 @@
 <template>
-  <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-t-lg px-2 py-1.5 flex items-center gap-1.5 text-xs">
+  <div
+    class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-t-lg px-2 py-1.5 flex items-center gap-1.5 text-xs"
+    draggable="true"
+    @dragstart="onDragStart"
+  >
     <!-- Name -->
     <span
       v-tooltip="input.name + ' (' + input.type + ')'"
@@ -66,6 +70,11 @@ const {
   deleting,
   toggleInputPreview
 } = useInputControls(props);
+
+const onDragStart = (event) => {
+  event.dataTransfer.setData('text/plain', props.input.uid);
+  event.dataTransfer.effectAllowed = 'link';
+};
 </script>
 
 <style scoped>
