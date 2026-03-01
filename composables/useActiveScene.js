@@ -26,9 +26,12 @@ export default function useActiveScene() {
     }
   };
 
-  const cutSceneToProgram = async () => {
-    if (!selectedScene.value) return;
+  const cutting = ref(false);
 
+  const cutSceneToProgram = async () => {
+    if (!selectedScene.value || cutting.value) return;
+
+    cutting.value = true;
     try {
       await $fetch('/api/mixer/cut_program', {
         method: 'POST',
@@ -36,6 +39,8 @@ export default function useActiveScene() {
       });
     } catch (err) {
       notify.error('Failed to switch scene');
+    } finally {
+      cutting.value = false;
     }
   };
 
@@ -62,6 +67,7 @@ export default function useActiveScene() {
     selectedScene,
     activeScene,
     activeIndex,
+    cutting,
     handleSceneClick,
     cutSceneToProgram,
   };

@@ -13,8 +13,9 @@
       </div>
 
       <div class="mt-auto">
-        <Button @click="cutSceneToProgram" class="w-full" severity="success">
-          <Icon name="ph:arrow-right" size="14px" class="mr-1" />
+        <Button @click="cutSceneToProgram" :disabled="cutting" class="w-full !py-3 md:!py-2" severity="success">
+          <i v-if="cutting" class="pi pi-spinner pi-spin mr-1 text-sm" />
+          <Icon v-else name="ph:arrow-right" size="14px" class="mr-1" />
           {{ selectedScene.name }}
           <kbd class="ml-2 text-[10px] bg-white/20 px-1 rounded font-mono leading-relaxed">Enter</kbd>
         </Button>
@@ -34,5 +35,5 @@ const switchemodes = [
 ];
 const switchmode = ref(switchemodes[0]);
 
-const { activeScene, selectedScene, cutSceneToProgram } = useActiveScene()
+const { activeScene, selectedScene, cutting, cutSceneToProgram } = useActiveScene()
 </script>

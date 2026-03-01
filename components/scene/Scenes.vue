@@ -20,8 +20,8 @@
           <SceneInputs :source="source" :scene="scene" />
         </div>
         <div v-if="!scene.src_locked || isUnlocked" class="px-3 py-1.5">
-          <button @click="addSlot" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
-            <i class="pi pi-plus text-[10px]"></i>
+          <button @click="addSlot" :disabled="addingSlot" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer disabled:opacity-50">
+            <i :class="addingSlot ? 'pi pi-spinner pi-spin' : 'pi pi-plus'" class="text-[10px]"></i>
             Add Slot
           </button>
         </div>
@@ -39,18 +39,23 @@ const props = defineProps({
   active: Boolean
 });
 
+const notify = useNotify();
 const { mixerPreview } = useUserState();
 const mixerEnabled = ref(false);
 const slotsOpen = ref(true);
+const addingSlot = ref(false);
 
 const addSlot = async () => {
+  addingSlot.value = true;
   try {
     await $fetch('/api/mixer/add_slot', {
       method: 'POST',
       body: { uid: props.scene.uid },
     });
   } catch (error) {
-    console.error('Failed to add slot:', error);
+    notify.error('Failed to add slot');
+  } finally {
+    addingSlot.value = false;
   }
 };
 </script>

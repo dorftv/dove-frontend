@@ -1,5 +1,6 @@
 export function useSceneSources(scene, source) {
   const { inputs, updateEntity: updateEntityInEntities } = useEntities();
+  const notify = useNotify();
 
   const src = ref(source.src);
   const alpha = ref(source.alpha * 100);
@@ -47,13 +48,17 @@ export function useSceneSources(scene, source) {
   };
 
   const removeSlot = async () => {
-    await $fetch('/api/mixer/remove_slot', {
-      method: 'POST',
-      body: {
-        uid: scene.uid,
-        index: source.index
-      }
-    });
+    try {
+      await $fetch('/api/mixer/remove_slot', {
+        method: 'POST',
+        body: {
+          uid: scene.uid,
+          index: source.index
+        }
+      });
+    } catch (error) {
+      notify.error('Failed to remove slot');
+    }
   };
 
   return {
