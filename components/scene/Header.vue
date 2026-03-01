@@ -1,33 +1,32 @@
 <template>
-  <div class="flex items-center w-full">
-    <div class="flex-grow mr-2 overflow-hidden">
-      <span
-        v-tooltip="scene.uid"
-        :id="'sceneName_' + scene.uid"
-        class="truncate inline-block max-w-full cursor-help text-gray-800 dark:text-gray-200"
-      >
-        {{ scene.name }}
-      </span>
-    </div>
-    <div class="flex-shrink-0 flex items-center">
-      <Popover ref="op" appendTo="body">
-        <pre class="text-xs text-gray-700 dark:text-gray-300">{{ mixerDetails }}</pre>
-      </Popover>
-      <button
-        @click="op.toggle($event)"
-        class="flex items-center justify-center w-7 h-7 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 mr-2"
-      >
-        <i class="pi pi-info-circle text-sm"></i>
-      </button>
-      <button
-        v-if="!scene.locked || isUnlocked"
-        @click="submitRemove"
-        :disabled="deleting"
-        class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 disabled:opacity-50"
-      >
-        <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-sm"></i>
-      </button>
-    </div>
+  <div class="bg-gray-900 text-gray-300 px-2 py-1.5 flex items-center gap-1.5 text-xs">
+    <!-- Name -->
+    <span
+      v-tooltip="scene.uid"
+      class="truncate cursor-help text-sm text-gray-200 font-medium"
+    >
+      {{ scene.name }}
+    </span>
+
+    <!-- Spacer -->
+    <div class="flex-grow" />
+
+    <!-- Actions -->
+    <Popover ref="op" appendTo="body">
+      <pre class="text-xs text-gray-700 dark:text-gray-300">{{ mixerDetails }}</pre>
+    </Popover>
+    <button @click="op.toggle($event)" class="scene-btn" title="Details">
+      <i class="pi pi-info-circle text-[11px]"></i>
+    </button>
+    <button
+      v-if="!scene.locked || isUnlocked"
+      @click="submitRemove"
+      :disabled="deleting"
+      class="scene-btn text-red-400 hover:text-red-300 disabled:opacity-50"
+      title="Delete"
+    >
+      <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
+    </button>
   </div>
 </template>
 
@@ -67,3 +66,11 @@ const submitRemove = () => {
   });
 };
 </script>
+
+<style scoped>
+.scene-btn {
+  @apply flex items-center justify-center w-5 h-5 rounded
+         text-gray-400 hover:bg-gray-700 hover:text-white
+         transition-colors duration-100 cursor-pointer;
+}
+</style>
