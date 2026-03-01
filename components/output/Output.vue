@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!output.is_preview" class="bg-gray-900 text-gray-300 rounded-lg px-2 py-1.5 mb-2 text-xs">
+  <div v-if="!output.is_preview" class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1.5 mb-2 text-xs">
     <div class="flex items-center gap-1.5">
       <!-- State badge -->
       <span :class="stateBadgeClass(output.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none shrink-0" role="status">
@@ -10,7 +10,7 @@
       <!-- Name -->
       <span
         v-tooltip="output.name + ' (' + output.type + ')'"
-        class="truncate cursor-help text-sm text-gray-300"
+        class="truncate cursor-help text-sm text-gray-800 dark:text-gray-300"
       >
         {{ output.name }}
       </span>
@@ -60,15 +60,15 @@ const stateIcon = (state) => {
 
 const stateBadgeClass = (state) => {
   const classes = {
-    PLAYING: 'bg-green-900/60 text-green-400',
-    PAUSED: 'bg-orange-900/60 text-orange-400',
-    NULL: 'bg-gray-700 text-gray-400',
-    READY: 'bg-gray-700 text-gray-400',
-    EOS: 'bg-red-900/60 text-red-400',
-    ERROR: 'bg-red-900/60 text-red-400',
-    BUFFERING: 'bg-orange-900/60 text-orange-400',
+    PLAYING: 'bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-400',
+    PAUSED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
+    NULL: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+    READY: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+    EOS: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
+    ERROR: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
+    BUFFERING: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
   };
-  return classes[state] || 'bg-gray-700 text-gray-400';
+  return classes[state] || 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
 };
 
 const props = defineProps({
@@ -114,7 +114,9 @@ const submitRemoveOutput = () => {
 <style scoped>
 .output-btn {
   @apply flex items-center justify-center w-5 h-5 rounded
-         text-gray-400 hover:bg-gray-700 hover:text-white
+         text-gray-500 dark:text-gray-400
+         hover:bg-gray-300 dark:hover:bg-gray-700
+         hover:text-gray-900 dark:hover:text-white
          transition-colors duration-100 cursor-pointer;
 }
 </style>

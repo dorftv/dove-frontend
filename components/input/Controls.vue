@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-900 text-gray-300 rounded-b-lg px-2 py-1.5 text-xs" role="toolbar" :aria-label="`Controls for ${input.name}`">
+  <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-b-lg px-2 py-1.5 text-xs" role="toolbar" :aria-label="`Controls for ${input.name}`">
     <!-- Progress bar -->
     <Slider
       v-if="input.duration && input.show_controls"
@@ -50,8 +50,8 @@
       <div class="flex-grow" />
 
       <!-- Timecode -->
-      <span v-if="input.duration && input.show_controls" class="font-mono text-[11px] text-gray-400 tabular-nums">
-        {{ positionFormatted }}<span class="text-gray-600">{{ durationFormatted }}</span>
+      <span v-if="input.duration && input.show_controls" class="font-mono text-[11px] text-gray-500 dark:text-gray-400 tabular-nums">
+        {{ positionFormatted }}<span class="text-gray-400 dark:text-gray-600">{{ durationFormatted }}</span>
       </span>
 
       <!-- Volume -->
@@ -94,15 +94,15 @@ const stateIcon = (state) => {
 
 const stateBadgeClass = (state) => {
   const classes = {
-    PLAYING: 'bg-green-900/60 text-green-400',
-    PAUSED: 'bg-orange-900/60 text-orange-400',
-    NULL: 'bg-gray-700 text-gray-400',
-    READY: 'bg-gray-700 text-gray-400',
-    EOS: 'bg-red-900/60 text-red-400',
-    ERROR: 'bg-red-900/60 text-red-400',
-    BUFFERING: 'bg-orange-900/60 text-orange-400',
+    PLAYING: 'bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-400',
+    PAUSED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
+    NULL: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+    READY: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+    EOS: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
+    ERROR: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
+    BUFFERING: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
   };
-  return classes[state] || 'bg-gray-700 text-gray-400';
+  return classes[state] || 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
 };
 
 const {
@@ -139,12 +139,13 @@ const volumeIcon = computed(() => {
 <style scoped>
 .transport-btn {
   @apply flex items-center justify-center w-6 h-6 rounded
-         hover:bg-gray-700 hover:text-white
+         hover:bg-gray-300 dark:hover:bg-gray-700
+         hover:text-gray-900 dark:hover:text-white
          transition-colors duration-100 cursor-pointer;
 }
 
 :deep(.transport-slider .p-slider) {
-  @apply bg-gray-700;
+  @apply bg-gray-300 dark:bg-gray-700;
   height: 4px;
 }
 
@@ -153,23 +154,23 @@ const volumeIcon = computed(() => {
 }
 
 :deep(.transport-slider .p-slider-handle) {
-  @apply bg-emerald-400 border-none;
+  @apply bg-emerald-500 dark:bg-emerald-400 border-none;
   width: 10px;
   height: 10px;
   margin-top: -3px;
 }
 
 :deep(.volume-slider .p-slider) {
-  @apply bg-gray-700;
+  @apply bg-gray-300 dark:bg-gray-700;
   height: 3px;
 }
 
 :deep(.volume-slider .p-slider-range) {
-  @apply bg-gray-400;
+  @apply bg-gray-500 dark:bg-gray-400;
 }
 
 :deep(.volume-slider .p-slider-handle) {
-  @apply bg-gray-300 border-none;
+  @apply bg-gray-600 dark:bg-gray-300 border-none;
   width: 8px;
   height: 8px;
   margin-top: -2.5px;

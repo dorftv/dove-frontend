@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-gray-900 text-gray-300 rounded-t-lg px-2 py-1.5 flex items-center gap-1.5 text-xs">
+  <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-t-lg px-2 py-1.5 flex items-center gap-1.5 text-xs">
     <!-- Name -->
     <span
       v-tooltip="input.name + ' (' + input.type + ')'"
-      class="truncate cursor-help text-sm text-gray-200 font-medium"
+      class="truncate cursor-help text-sm text-gray-800 dark:text-gray-200 font-medium"
     >
       {{ input.name }}
     </span>
@@ -71,7 +71,9 @@ const {
 <style scoped>
 .header-btn {
   @apply flex items-center justify-center w-5 h-5 rounded
-         text-gray-400 hover:bg-gray-700 hover:text-white
+         text-gray-500 dark:text-gray-400
+         hover:bg-gray-300 dark:hover:bg-gray-700
+         hover:text-gray-900 dark:hover:text-white
          transition-colors duration-100 cursor-pointer;
 }
 </style>
