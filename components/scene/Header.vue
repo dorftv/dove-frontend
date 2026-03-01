@@ -22,9 +22,10 @@
       <button
         v-if="!scene.locked || isUnlocked"
         @click="submitRemove"
-        class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200"
+        :disabled="deleting"
+        class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 disabled:opacity-50"
       >
-        <i class="pi pi-trash text-sm"></i>
+        <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-sm"></i>
       </button>
     </div>
   </div>
@@ -39,15 +40,30 @@ const props = defineProps({
 
 const op = ref();
 const mixerDetails = computed(() => JSON.stringify(props.scene, null, 2));
+const confirm = useConfirm();
+const notify = useNotify();
+const deleting = ref(false);
 
-const submitRemove = async () => {
+const doRemove = async () => {
+  deleting.value = true;
   try {
     await $fetch('/api/mixers', {
       method: 'DELETE',
       body: { uid: props.scene.uid },
     });
   } catch (error) {
-    console.error('Failed to remove scene:', error);
+    notify.error('Failed to remove scene');
+  } finally {
+    deleting.value = false;
   }
+};
+
+const submitRemove = () => {
+  confirm.require({
+    message: `Delete scene "${props.scene.name}"?`,
+    header: 'Confirm',
+    acceptClass: 'p-button-danger',
+    accept: doRemove,
+  });
 };
 </script>

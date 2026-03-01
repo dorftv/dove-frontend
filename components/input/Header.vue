@@ -22,9 +22,10 @@
       <button
         v-if="!input.locked || isUnlocked"
         @click="submitRemoveInput"
-        class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200"
+        :disabled="deleting"
+        class="flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 disabled:opacity-50"
       >
-        <i class="pi pi-trash text-sm"></i>
+        <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-sm"></i>
       </button>
       <Icon name="uil:video-slash" class="text-gray-700 dark:text-gray-300 cursor-pointer" size="24px" v-if="!inputPreview && inputEnabled" @click="$emit('enablePreview', toggleInputPreview())"/>
       <Icon name="uil:video" class="text-gray-700 dark:text-gray-300 cursor-pointer" size="24px" v-if="!inputPreview && !inputEnabled" @click="$emit('enablePreview', toggleInputPreview())"/>
@@ -45,6 +46,7 @@ const {
   inputDetails,
   inputPreview,
   submitRemoveInput,
+  deleting,
   toggleInputPreview
 } = useInputControls(props);
 </script>

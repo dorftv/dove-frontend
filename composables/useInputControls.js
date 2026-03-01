@@ -120,14 +120,35 @@ export default function useInputControls(props) {
   const inputDetails = computed(() => JSON.stringify(props.input, null, 2));
   const { inputPreview } = useUserState();
 
-  const submitRemoveInput = async () => {
+  const confirm = useConfirm();
+  const notify = useNotify();
+  const deleting = ref(false);
+
+  const doRemoveInput = async () => {
+    deleting.value = true;
     try {
       await $fetch('/api/inputs', {
         method: 'DELETE',
         body: { uid: props.input.uid },
       });
     } catch (error) {
-      console.error('Failed to remove input:', error);
+      notify.error('Failed to remove input');
+    } finally {
+      deleting.value = false;
+    }
+  };
+
+  const submitRemoveInput = () => {
+    const state = props.input.state;
+    if (state === 'EOS' || state === 'ERROR' || state === 'NULL') {
+      doRemoveInput();
+    } else {
+      confirm.require({
+        message: `Delete input "${props.input.name}"?`,
+        header: 'Confirm',
+        acceptClass: 'p-button-danger',
+        accept: doRemoveInput,
+      });
     }
   };
 
@@ -154,6 +175,7 @@ export default function useInputControls(props) {
     inputDetails,
     inputPreview,
     submitRemoveInput,
+    deleting,
     toggleInputPreview,
   };
 }
