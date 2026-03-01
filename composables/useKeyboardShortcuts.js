@@ -3,7 +3,7 @@ export default function useKeyboardShortcuts() {
 
   const onKeyDown = (event) => {
     const tag = event.target.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || event.target.isContentEditable) return;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON' || event.target.isContentEditable) return;
 
     if (event.key >= '1' && event.key <= '9') {
       handleSceneClick(Number(event.key) - 1);

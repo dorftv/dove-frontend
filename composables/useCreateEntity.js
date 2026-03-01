@@ -116,6 +116,8 @@ export const useCreateEntity = (entityType) => {
       Object.keys(formData).forEach(key => delete formData[key]);
       initializeFormData(types.value);
       selectedResolution.value = defaultResolution.value;
+      // Blur focus so Enter key doesn't re-trigger dialog
+      document.activeElement?.blur();
     }
   });
 
