@@ -1,7 +1,5 @@
 <template>
   <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-4 h-full flex flex-col">
-    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Mixer</h3>
-
     <template v-if="selectedScene">
       <div class="mb-3 text-sm text-gray-600 dark:text-gray-400">
         Active: <span v-if="activeScene" class="text-red-500 dark:text-red-400 font-semibold">{{ activeScene.name }}</span>

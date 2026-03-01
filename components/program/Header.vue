@@ -1,5 +1,5 @@
 <template>
-  <div v-if="programMixer" class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded px-2 py-1.5 mb-2 flex items-center gap-1.5 text-xs">
+  <div v-if="programMixer" class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-3 py-1.5 flex items-center gap-1.5 text-xs">
     <span class="text-sm text-gray-800 dark:text-gray-200 font-medium truncate cursor-help" v-tooltip="programMixer.uid">
       {{ programMixer.name || 'Program' }}
     </span>

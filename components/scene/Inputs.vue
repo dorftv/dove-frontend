@@ -1,21 +1,30 @@
 <template>
   <div class="w-full flex flex-col text-sm text-gray-700 dark:text-gray-300">
-    <div class="flex items-center space-x-4 py-0.5">
-      <div class="w-1/3 truncate">{{ source.name }}</div>
-      <div class="w-1/3 truncate">{{ (inputs.find(input => input.uid === src) || {}).name }}</div>
-      <div class="w-1/3 flex justify-end space-x-1">
-        <Button v-if="!mute && (!scene.src_locked || isUnlocked)" icon="pi pi-volume-up" @click="handleChange('mute', true)" class="p-button-text p-button-sm p-0" />
-        <Button v-if="mute && (!scene.src_locked || isUnlocked)" icon="pi pi-volume-off" @click="handleChange('mute', false)" class="p-button-text p-button-sm p-0" />
-        <Button v-if="(!source.locked && !scene.src_locked) || isUnlocked" icon="pi pi-cog" @click="open = !open" class="p-button-text p-button-sm p-0" />
-        <Button v-if="(source.locked || scene.src_locked) && !isUnlocked" icon="pi pi-lock" class="p-button-text p-button-sm p-button-disabled p-0" disabled />
+    <div class="flex items-center gap-3 px-3 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+      <span class="text-xs text-gray-400 dark:text-gray-500 w-8 shrink-0">{{ source.name }}</span>
+      <span class="truncate flex-grow" :class="inputMatch ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic'">
+        {{ inputMatch ? inputMatch.name : 'Empty' }}
+      </span>
+      <div class="flex items-center gap-0.5 shrink-0">
+        <button v-if="!mute && (!scene.src_locked || isUnlocked)" @click="handleChange('mute', true)" class="slot-btn" title="Mute" aria-label="Mute">
+          <i class="pi pi-volume-up text-[11px]"></i>
+        </button>
+        <button v-if="mute && (!scene.src_locked || isUnlocked)" @click="handleChange('mute', false)" class="slot-btn text-orange-500 dark:text-orange-400" title="Unmute" aria-label="Unmute">
+          <i class="pi pi-volume-off text-[11px]"></i>
+        </button>
+        <button v-if="(!source.locked && !scene.src_locked) || isUnlocked" @click="open = !open" class="slot-btn" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
+          <i class="pi pi-cog text-[11px]"></i>
+        </button>
+        <span v-if="(source.locked || scene.src_locked) && !isUnlocked" class="slot-btn opacity-40" title="Locked">
+          <i class="pi pi-lock text-[11px]"></i>
+        </span>
       </div>
     </div>
-    <div v-if="open" class="mt-1">
-      <Button label="remove Slot"
-              icon="pi pi-minus-circle"
-              @click="removeSlot"
-              class="p-button-text p-button-sm text-xs py-0 px-2 mb-1 w-full justify-start"
-      />
+    <div v-if="open" class="px-3 pb-2 bg-blue-50/50 dark:bg-blue-900/10">
+      <button @click="removeSlot" class="flex items-center gap-1 text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 py-1 cursor-pointer">
+        <i class="pi pi-minus-circle text-[11px]"></i>
+        Remove Slot
+      </button>
       <div v-for="(value, key) in { src, alpha, width, height, xpos, ypos, volume }" :key="key" class="flex items-center mb-1">
         <div v-if="getMax(key)" class="flex w-full">
           <span class="w-16 text-xs text-gray-600 dark:text-gray-400">{{ key }}</span>
@@ -44,6 +53,7 @@ const props = defineProps({
 
 const { inputs, removeSlot, handleChange, getMax, src, alpha, width, height, xpos, ypos, volume, mute } = useSceneSources(props.scene, props.source);
 
+const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
 const open = ref(false);
 
 watch(() => props.source.src, (newSrc) => {
@@ -54,12 +64,11 @@ watch(() => props.source.src, (newSrc) => {
 </script>
 
 <style scoped>
-.p-button.p-button-sm {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-.p-button.p-button-sm.w-full {
-  width: 100%;
-  height: auto;
+.slot-btn {
+  @apply flex items-center justify-center w-5 h-5 rounded
+         text-gray-500 dark:text-gray-400
+         hover:bg-gray-200 dark:hover:bg-gray-700
+         hover:text-gray-900 dark:hover:text-white
+         transition-colors duration-100 cursor-pointer;
 }
 </style>

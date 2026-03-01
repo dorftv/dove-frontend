@@ -6,6 +6,11 @@
         <!-- Logo -->
         <NuxtLink to="/" class="font-bold text-emerald-600 dark:text-emerald-400 shrink-0">DOVE <span class="hidden md:inline font-normal text-gray-400 dark:text-gray-500">Online Video Editor</span></NuxtLink>
 
+        <!-- Server load -->
+        <span v-if="load" class="text-[11px] font-mono tabular-nums ml-3" :class="load.load_percent > 80 ? 'text-red-500' : load.load_percent > 50 ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'" :title="`Load: ${load.load1} / ${load.load5} / ${load.load15} (${load.cpu_count} cores)`">
+          {{ load.load_percent }}%
+        </span>
+
         <!-- Spacer -->
         <div class="flex-grow" />
 
@@ -101,6 +106,7 @@
 const colorMode = useColorMode()
 const mobileMenuOpen = ref(false)
 const { wsStatus } = useEntities()
+const { load } = useServerLoad()
 
 const cycleColorMode = () => {
   const modes = ['system', 'light', 'dark']

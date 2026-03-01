@@ -1,10 +1,9 @@
 <template>
   <div class="space-y-4">
     <!-- Inputs with preview -->
-    <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-4">
-      <div class="flex items-center justify-between mb-3">
+    <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-2">
+      <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
-          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Inputs</h3>
           <CreateInputPane />
         </div>
         <div class="flex items-center gap-2">
