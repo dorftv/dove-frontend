@@ -10,6 +10,7 @@ export const useCreateEntity = (entityType) => {
 
   const { mixers } = useEntities();
   const doveConfig = useDoveConfig();
+  const notify = useNotify();
 
   const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
 
@@ -93,20 +94,16 @@ export const useCreateEntity = (entityType) => {
   };
 
   const submitCreate = async (itemType) => {
+    const body = { ...formData[itemType] };
+    if (entityType === 'mixers') {
+      body.type = 'scene';
+    }
+    const submitPath = entityType === 'mixers' ? '/api/mixers' : `${path}/${itemType}`;
+    isOpen.value = false;
     try {
-      const body = { ...formData[itemType] };
-      if (entityType === 'mixers') {
-        body.type = 'scene';
-      }
-      const submitPath = entityType === 'mixers' ? '/api/mixers' : `${path}/${itemType}`;
-      const responseJson = await $fetch(submitPath, {
-        method: 'PUT',
-        body,
-      });
-      isOpen.value = false;
-      return responseJson;
+      return await $fetch(submitPath, { method: 'PUT', body });
     } catch (error) {
-      isOpen.value = false;
+      notify.error(`Failed to create ${entityType === 'mixers' ? 'scene' : entityType.slice(0, -1)}`);
     }
   };
 

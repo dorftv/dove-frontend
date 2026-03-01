@@ -1,6 +1,7 @@
 export default function useActiveScene() {
   const activeIndex = useState('active-scene-index', () => 0);
   const selectedScene = useState('active-scene-selected', () => null);
+  const notify = useNotify();
 
   const { sceneMixers, programMixer } = useEntities();
 
@@ -29,12 +30,12 @@ export default function useActiveScene() {
     if (!selectedScene.value) return;
 
     try {
-      const data = await $fetch('/api/mixer/cut_program', {
+      await $fetch('/api/mixer/cut_program', {
         method: 'POST',
         body: { src: selectedScene.value.uid }
       });
     } catch (err) {
-      console.error('Failed to switch scene:', err);
+      notify.error('Failed to switch scene');
     }
   };
 

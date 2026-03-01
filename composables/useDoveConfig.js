@@ -25,7 +25,8 @@ export default function useDoveConfig() {
         return config.value;
       } catch (err) {
         error.value = err.message;
-        console.error('Error fetching config:', err);
+        const notify = useNotify();
+        notify.error('Failed to load configuration');
         throw err;
       } finally {
         isLoading.value = false;
