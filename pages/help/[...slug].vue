@@ -1,0 +1,95 @@
+<template>
+  <div class="min-h-[calc(100vh-2.5rem)]">
+    <!-- Mobile nav -->
+    <div class="md:hidden border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2">
+      <div class="flex items-center gap-2 overflow-x-auto text-sm">
+        <NuxtLink
+          v-for="item in navItems" :key="item.slug"
+          :to="item.slug === 'index' ? '/help' : `/help/${item.slug}`"
+          class="shrink-0 px-3 py-1 rounded-full transition-colors"
+          :class="currentSlug === item.slug
+            ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+        >
+          {{ item.title }}
+        </NuxtLink>
+      </div>
+    </div>
+
+    <div class="flex max-w-6xl mx-auto">
+      <!-- Desktop sidebar -->
+      <nav class="hidden md:block w-52 shrink-0 border-r border-gray-200 dark:border-gray-700 p-4">
+        <ul class="space-y-0.5 text-sm sticky top-14">
+          <li v-for="item in navItems" :key="item.slug">
+            <NuxtLink
+              :to="item.slug === 'index' ? '/help' : `/help/${item.slug}`"
+              class="block px-3 py-1.5 rounded transition-colors"
+              :class="currentSlug === item.slug
+                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+            >
+              {{ item.title }}
+            </NuxtLink>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Content -->
+      <div class="flex-1 min-w-0 px-4 sm:px-8 py-6 sm:py-8">
+        <article
+          v-if="html"
+          class="prose dark:prose-invert prose-emerald max-w-3xl
+                 prose-headings:font-semibold
+                 prose-a:text-emerald-600 dark:prose-a:text-emerald-400
+                 prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+                 prose-table:text-sm
+                 prose-th:text-left prose-th:font-medium prose-th:text-gray-500 dark:prose-th:text-gray-400
+                 prose-td:py-2"
+          v-html="html"
+        />
+        <div v-else-if="error" class="text-gray-500 dark:text-gray-400 py-12 text-center">
+          <p class="text-lg mb-2">Page not found</p>
+          <NuxtLink to="/help" class="text-emerald-600 dark:text-emerald-400 hover:underline text-sm">Back to Help</NuxtLink>
+        </div>
+        <div v-else class="text-gray-400 py-12 text-center">Loading...</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import MarkdownIt from 'markdown-it'
+
+const route = useRoute()
+
+const navItems = [
+  { slug: 'index', title: 'Overview' },
+  { slug: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
+  { slug: 'interface', title: 'Interface' },
+  { slug: 'connection-status', title: 'Connection Status' },
+]
+
+const md = new MarkdownIt({ html: true })
+
+const currentSlug = computed(() => {
+  const parts = route.params.slug
+  if (!parts || parts.length === 0) return 'index'
+  return parts.join('/')
+})
+
+const html = ref('')
+const error = ref('')
+
+async function fetchDoc(slug) {
+  html.value = ''
+  error.value = ''
+  try {
+    const raw = await $fetch(`/api/docs/${slug}.md`, { responseType: 'text' })
+    html.value = md.render(raw)
+  } catch (e) {
+    error.value = `not found`
+  }
+}
+
+watch(currentSlug, (slug) => fetchDoc(slug), { immediate: true })
+</script>

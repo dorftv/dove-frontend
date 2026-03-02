@@ -37,10 +37,10 @@
           </NuxtLink>
 
           <!-- Desktop-only icons -->
-          <NuxtLink to="/api/debug" external target="_blank" class="hidden md:flex icon-btn" title="Pipelines" aria-label="Pipelines">
+          <NuxtLink to="/api/debug/graphviz" external target="_blank" class="hidden md:flex icon-btn" title="Pipelines" aria-label="Pipelines">
             <Icon name="ph:graph" size="16px" />
           </NuxtLink>
-          <NuxtLink to="/docs" external target="_blank" class="hidden md:flex icon-btn" title="API Docs" aria-label="API Docs">
+          <NuxtLink to="/api/debug/docs" external target="_blank" class="hidden md:flex icon-btn" title="API Docs" aria-label="API Docs">
             <Icon name="ph:code" size="16px" />
           </NuxtLink>
           <NuxtLink to="/help" class="hidden md:flex icon-btn" title="Help" aria-label="Help">
@@ -78,10 +78,10 @@
         <NuxtLink to="/websockets" @click="mobileMenuOpen = false" class="mobile-link">
           <Icon name="ph:plugs-connected" size="16px" /> WebSocket
         </NuxtLink>
-        <NuxtLink to="/api/debug" external target="_blank" class="mobile-link">
+        <NuxtLink to="/api/debug/graphviz" external target="_blank" class="mobile-link">
           <Icon name="ph:graph" size="16px" /> Pipelines
         </NuxtLink>
-        <NuxtLink to="/docs" external target="_blank" class="mobile-link">
+        <NuxtLink to="/api/debug/docs" external target="_blank" class="mobile-link">
           <Icon name="ph:code" size="16px" /> API Docs
         </NuxtLink>
         <button @click="cycleColorMode()" class="mobile-link w-full">
