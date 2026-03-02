@@ -18,9 +18,30 @@ const props = defineProps({
   muted: String,
 });
 const { mutedState, setMutedState } = useMutedState();
+const toast = useToast();
 
 const videoPlayer = ref(null);
 let player = null;
+
+let autoplayToastShown = false;
+
+const handleAutoplayBlocked = (uid) => {
+  setMutedState(uid, true);
+  videoPlayer.value.muted = true;
+  videoPlayer.value.play();
+  if (!autoplayToastShown) {
+    autoplayToastShown = true;
+    toast.add({
+      severity: 'warn',
+      summary: 'Audio blocked by browser',
+      detail: 'Click anywhere to enable audio',
+    });
+  }
+  document.addEventListener('click', () => {
+    setMutedState(uid, false);
+    toast.removeAllGroups();
+  }, { once: true });
+};
 
 const initializePlayer = async () => {
   if (!videoPlayer.value) return;
@@ -36,11 +57,17 @@ const initializePlayer = async () => {
   });
 
   try {
-    const url = new URL(`/whep/${props.uid}/whep`, window.location.origin);
+    const url = new URL(`/whep/${props.uid}`, window.location.origin);
     await player.load(url);
     player.on('initial-connection-failed', handleConnectionFailed);
     player.on('player-muted', () => setMutedState(props.uid, true));
     player.on('player-unmuted', () => setMutedState(props.uid, false));
+
+    try {
+      await videoPlayer.value.play();
+    } catch {
+      handleAutoplayBlocked(props.uid);
+    }
   } catch (error) {
     console.error('Error loading player:', error);
   }

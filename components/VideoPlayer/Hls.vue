@@ -19,8 +19,10 @@ import HLS from 'hls.js';
 
 import { MediaPlayerElement } from 'vidstack/elements';
 import { MediaRemoteControl } from 'vidstack';
+
 const mediaPlayer = ref(null);
 const { mutedState, setMutedState } = useMutedState();
+const toast = useToast();
 const remote = new MediaRemoteControl();
 
 const props = defineProps({
@@ -38,6 +40,25 @@ onMounted(() => {
 
   player.addEventListener('media-unmute-request', () => {
     setMutedState(props.uid, false);
+  });
+
+  let autoplayToastShown = false;
+
+  player.addEventListener('auto-play-fail', () => {
+    setMutedState(props.uid, true);
+    nextTick(() => player.play());
+    if (!autoplayToastShown) {
+      autoplayToastShown = true;
+      toast.add({
+        severity: 'warn',
+        summary: 'Audio blocked by browser',
+        detail: 'Click anywhere to enable audio',
+      });
+    }
+    document.addEventListener('click', () => {
+      setMutedState(props.uid, false);
+      toast.removeAllGroups();
+    }, { once: true });
   });
 
   player.addEventListener('provider-change', (event) => {
