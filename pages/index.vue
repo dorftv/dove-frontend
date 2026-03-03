@@ -13,11 +13,11 @@
       <ProgramSwitch />
     </div>
 
-    <div class="col-span-12 md:col-span-6 lg:col-span-4">
-      <ProgramMain ref="programRef" />
+    <div class="col-span-12 md:col-span-6 lg:col-span-4" ref="programRef">
+      <ProgramMain />
     </div>
 
-    <div class="col-span-12 md:col-span-6 lg:col-span-2" :style="programHeight ? { maxHeight: programHeight + 'px' } : {}">
+    <div class="col-span-12 md:col-span-6 lg:col-span-2 self-start" :style="rowHeight ? { height: rowHeight + 'px' } : {}">
       <OutputMain />
     </div>
 
@@ -32,14 +32,17 @@ const { isLoading } = useEntities();
 useKeyboardShortcuts();
 
 const programRef = ref(null);
-const programHeight = ref(0);
+const rowHeight = ref(0);
 
 let ro;
-onMounted(() => {
-  ro = new ResizeObserver(() => {
-    programHeight.value = programRef.value?.$el?.offsetHeight || 0;
-  });
-  if (programRef.value?.$el) ro.observe(programRef.value.$el);
+watch(programRef, (el) => {
+  ro?.disconnect();
+  if (el) {
+    ro = new ResizeObserver(() => {
+      rowHeight.value = el.offsetHeight || 0;
+    });
+    ro.observe(el);
+  }
 });
 onUnmounted(() => ro?.disconnect());
 </script>
