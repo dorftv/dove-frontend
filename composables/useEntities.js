@@ -209,6 +209,39 @@ export function useEntities() {
     return outputs.value.filter(output => output.is_preview === true);
   });
 
+  const entityMap = computed(() => {
+    const map = new Map();
+    for (const list of [inputs.value, mixers.value, outputs.value, encoders.value]) {
+      for (const e of list) map.set(e.uid, e);
+    }
+    return map;
+  });
+
+  const resolveEntity = (uid) => entityMap.value.get(uid) || null;
+
+  const resolveField = (uid, keys) => {
+    const resolved = resolveEntity(uid);
+    if (!resolved) return uid;
+    const obj = { uid };
+    for (const k of keys) obj[k] = resolved[k];
+    return obj;
+  };
+
+  const enrichEntity = (entity) => {
+    const data = { ...entity };
+    const linkFields = { src: ['name', 'type'], video_encoder: ['element', 'type'], audio_encoder: ['element', 'type'] };
+    for (const [field, keys] of Object.entries(linkFields)) {
+      if (data[field]) data[field] = resolveField(data[field], keys);
+    }
+    if (data.sources) {
+      data.sources = data.sources.map(s => ({
+        ...s,
+        src: s.src ? resolveField(s.src, ['name', 'type']) : s.src,
+      }));
+    }
+    return data;
+  };
+
   const inputsNodeCG = computed(() => {
     return inputs.value
       .filter(input => input.type === 'nodecg')
@@ -231,6 +264,9 @@ export function useEntities() {
     mixers,
     outputs,
     encoders,
+    entityMap,
+    resolveEntity,
+    enrichEntity,
     sceneInputs,
     sceneMixerSource,
     sceneMixers,

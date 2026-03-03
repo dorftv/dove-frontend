@@ -17,10 +17,10 @@
 </template>
 
 <script setup>
-const { programMixer } = useEntities();
+const { programMixer, enrichEntity } = useEntities();
 
 const op = ref();
-const programDetails = computed(() => JSON.stringify(programMixer.value, null, 2));
+const programDetails = computed(() => programMixer.value ? JSON.stringify(enrichEntity(programMixer.value), null, 2) : '');
 </script>
 
 <style scoped>

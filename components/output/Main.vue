@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-const { outputs, encoders, mixers, inputs } = useEntities();
+const { outputs, encoders, resolveEntity } = useEntities();
 const activeTab = ref('outputs');
 const showPreview = ref(false);
 
@@ -52,17 +52,12 @@ const filteredEncoders = computed(() =>
   showPreview.value ? encoders.value : encoders.value.filter(e => !e.is_preview)
 );
 
-const resolveName = (uid) => {
-  const all = [...mixers.value, ...outputs.value, ...inputs.value];
-  return all.find(e => e.uid === uid)?.name || uid;
-};
-
 const encoderGroups = computed(() => {
   const groups = {};
   for (const encoder of filteredEncoders.value) {
     const src = encoder.src || 'unknown';
     if (!groups[src]) {
-      groups[src] = { src, name: resolveName(src), encoders: [] };
+      groups[src] = { src, name: resolveEntity(src)?.name || src, encoders: [] };
     }
     groups[src].encoders.push(encoder);
   }

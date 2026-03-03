@@ -33,13 +33,14 @@
 
 <script setup>
 const { isUnlocked } = useLocked()
+const { enrichEntity } = useEntities()
 
 const props = defineProps({
   scene: Object,
 });
 
 const op = ref();
-const mixerDetails = computed(() => JSON.stringify(props.scene, null, 2));
+const mixerDetails = computed(() => JSON.stringify(enrichEntity(props.scene), null, 2));
 const confirm = useConfirm();
 const notify = useNotify();
 const deleting = ref(false);

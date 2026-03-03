@@ -1,11 +1,13 @@
 <template>
   <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1.5 mb-2 text-xs">
     <div class="flex items-center gap-1.5">
-      <!-- State badge -->
-      <span :class="stateBadgeClass(output.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none shrink-0" role="status">
-        <Icon :name="stateIcon(output.state)" size="10px" />
-        {{ output.state }}
-      </span>
+      <!-- State dot -->
+      <span
+        :title="output.state"
+        class="w-2 h-2 rounded-full shrink-0"
+        :class="stateDotClass(output.state)"
+        role="status"
+      />
 
       <!-- Name -->
       <span
@@ -17,6 +19,9 @@
 
       <!-- Type -->
       <span class="text-[10px] text-gray-500 shrink-0">{{ output.type }}</span>
+
+      <!-- Resolved links -->
+      <span v-if="linkedInfo" class="text-[10px] text-gray-500 truncate">{{ linkedInfo }}</span>
 
       <!-- Spacer -->
       <div class="flex-grow" />
@@ -44,31 +49,30 @@
 
 <script setup>
 const { isUnlocked } = useLocked()
+const { resolveEntity, enrichEntity } = useEntities()
 
-const stateIcon = (state) => {
-  const icons = {
-    PLAYING: 'ph:play-circle',
-    PAUSED: 'ph:pause-circle',
-    NULL: 'ph:stop-circle',
-    READY: 'ph:circle-dashed',
-    EOS: 'ph:stop',
-    ERROR: 'ph:warning-circle',
-    BUFFERING: 'ph:spinner',
-  };
-  return icons[state] || 'ph:circle';
-};
+const linkedInfo = computed(() => {
+  const parts = [];
+  const src = resolveEntity(props.output.src);
+  if (src) parts.push(src.name);
+  const venc = resolveEntity(props.output.video_encoder);
+  if (venc) parts.push(venc.element);
+  const aenc = resolveEntity(props.output.audio_encoder);
+  if (aenc) parts.push(aenc.element);
+  return parts.join(' · ');
+});
 
-const stateBadgeClass = (state) => {
+const stateDotClass = (state) => {
   const classes = {
-    PLAYING: 'bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-400',
-    PAUSED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
-    NULL: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-    READY: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-    EOS: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
-    ERROR: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
-    BUFFERING: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
+    PLAYING: 'bg-green-500',
+    PAUSED: 'bg-orange-400',
+    NULL: 'bg-gray-400 dark:bg-gray-500',
+    READY: 'bg-gray-400 dark:bg-gray-500',
+    EOS: 'bg-red-500',
+    ERROR: 'bg-red-500',
+    BUFFERING: 'bg-orange-400',
   };
-  return classes[state] || 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
+  return classes[state] || 'bg-gray-400';
 };
 
 const props = defineProps({
@@ -77,7 +81,7 @@ const props = defineProps({
 });
 
 const op = ref();
-const outputDetails = computed(() => JSON.stringify(props.output, null, 2));
+const outputDetails = computed(() => JSON.stringify(enrichEntity(props.output), null, 2));
 const confirm = useConfirm();
 const notify = useNotify();
 const deleting = ref(false);

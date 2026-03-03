@@ -62,7 +62,8 @@ const props = defineProps({
 });
 
 const op = ref();
-const encoderDetails = computed(() => JSON.stringify(props.encoder, null, 2));
+const { enrichEntity } = useEntities();
+const encoderDetails = computed(() => JSON.stringify(enrichEntity(props.encoder), null, 2));
 const confirm = useConfirm();
 const notify = useNotify();
 const deleting = ref(false);
