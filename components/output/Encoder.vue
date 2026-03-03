@@ -1,22 +1,22 @@
 <template>
-  <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1.5 mb-2 text-xs">
+  <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1.5 mb-1 text-xs">
     <div class="flex items-center gap-1.5">
-      <!-- State badge -->
-      <span :class="stateBadgeClass(encoder.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none shrink-0" role="status">
-        <Icon :name="stateIcon(encoder.state)" size="10px" />
-        {{ encoder.state }}
-      </span>
-
-      <!-- Name -->
+      <!-- State dot -->
       <span
-        v-tooltip="encoder.name + ' (' + encoder.element + ')'"
-        class="truncate cursor-help text-sm text-gray-800 dark:text-gray-300"
-      >
-        {{ encoder.name }}
-      </span>
+        :title="encoder.state"
+        class="w-2 h-2 rounded-full shrink-0"
+        :class="stateDotClass(encoder.state)"
+        role="status"
+      />
 
-      <!-- Type + element -->
-      <span class="text-[10px] text-gray-500 shrink-0">{{ encoder.type }} · {{ encoder.element }}</span>
+      <!-- Type icon + element -->
+      <Icon :name="encoder.type === 'video' ? 'ph:video-camera' : 'ph:speaker-high'" size="12px" class="text-gray-400 shrink-0" :title="encoder.type" />
+      <span class="truncate text-gray-800 dark:text-gray-200">{{ encoder.element }}</span>
+
+      <!-- Options -->
+      <span v-if="encoder.options" class="truncate text-[10px] text-gray-500 dark:text-gray-400" :title="encoder.options">
+        {{ encoder.options }}
+      </span>
 
       <!-- Spacer -->
       <div class="flex-grow" />
@@ -25,10 +25,11 @@
       <Popover ref="op" appendTo="body">
         <pre class="text-xs text-gray-700 dark:text-gray-300">{{ encoderDetails }}</pre>
       </Popover>
-      <button @click="op.toggle($event)" class="encoder-btn" title="Details" aria-label="Show details">
+      <button @click="op.toggle($event)" class="encoder-btn ml-auto" title="Details" aria-label="Show details">
         <i class="pi pi-info-circle text-[11px]"></i>
       </button>
       <button
+        v-if="!encoder.locked || isUnlocked"
         @click="submitRemoveEncoder"
         :disabled="deleting"
         class="encoder-btn text-red-400 hover:text-red-300 disabled:opacity-50"
@@ -42,28 +43,18 @@
 </template>
 
 <script setup>
-const stateIcon = (state) => {
-  const icons = {
-    PLAYING: 'ph:play-circle',
-    PAUSED: 'ph:pause-circle',
-    NULL: 'ph:stop-circle',
-    READY: 'ph:circle-dashed',
-    EOS: 'ph:stop',
-    ERROR: 'ph:warning-circle',
-  };
-  return icons[state] || 'ph:circle';
-};
+const { isUnlocked } = useLocked()
 
-const stateBadgeClass = (state) => {
+const stateDotClass = (state) => {
   const classes = {
-    PLAYING: 'bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-400',
-    PAUSED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
-    NULL: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-    READY: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-    EOS: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
-    ERROR: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
+    PLAYING: 'bg-green-500',
+    PAUSED: 'bg-orange-400',
+    NULL: 'bg-gray-400 dark:bg-gray-500',
+    READY: 'bg-gray-400 dark:bg-gray-500',
+    EOS: 'bg-red-500',
+    ERROR: 'bg-red-500',
   };
-  return classes[state] || 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
+  return classes[state] || 'bg-gray-400';
 };
 
 const props = defineProps({

@@ -1,11 +1,9 @@
 <template>
-  <div v-if="entityPreview">
-    <div v-if="entityPreview.type == 'hlssink2'">
-      <VideoPlayerHls :uid="uid" :muted="muted" />
-    </div>
-    <div v-else>
-      <VideoPlayerWhep :uid="uid" :muted="muted" />
-    </div>
+  <div v-if="entityPreview && entityPreview.type === 'hlssink2'">
+    <VideoPlayerHls :uid="uid" :muted="muted" />
+  </div>
+  <div v-else>
+    <VideoPlayerWhep :uid="uid" :muted="muted" />
   </div>
 </template>
 
@@ -21,7 +19,6 @@ const { previewOutputs } = useEntities();
 const entityPreview = computed(() => {
   return previewOutputs.value.find(input => input.src === props.uid);
 });
-
 
 </script>
 

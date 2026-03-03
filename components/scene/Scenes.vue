@@ -19,10 +19,18 @@
         >
           <SceneInputs :source="source" :scene="scene" />
         </div>
-        <div v-if="!scene.src_locked || isUnlocked" class="px-3 py-1.5">
-          <button @click="addSlot" :disabled="addingSlot" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer disabled:opacity-50">
+        <div
+          v-if="!scene.src_locked || isUnlocked"
+          class="px-3 py-1.5 transition-colors duration-100"
+          :class="{ 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-inset ring-blue-400': dropOver }"
+          @dragover.prevent
+          @dragenter.prevent="dragCount++; dropOver = true"
+          @dragleave="dragCount--; if (dragCount <= 0) { dropOver = false; dragCount = 0 }"
+          @drop="onDropAdd"
+        >
+          <button @click="addSlot()" :disabled="addingSlot" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer disabled:opacity-50">
             <i :class="addingSlot ? 'pi pi-spinner pi-spin' : 'pi pi-plus'" class="text-[10px]"></i>
-            Add Slot
+            {{ dropOver ? 'Drop to add slot' : 'Add Slot' }}
           </button>
         </div>
       </div>
@@ -40,22 +48,39 @@ const props = defineProps({
 });
 
 const notify = useNotify();
+const { updateEntity } = useEntities();
 const { mixerPreview } = useUserState();
 const mixerEnabled = ref(false);
 const slotsOpen = ref(true);
 const addingSlot = ref(false);
+const dropOver = ref(false);
+const dragCount = ref(0);
 
-const addSlot = async () => {
+const addSlot = async (src) => {
   addingSlot.value = true;
   try {
-    await $fetch('/api/mixer/add_slot', {
+    const result = await $fetch('/api/mixer/add_slot', {
       method: 'POST',
       body: { uid: props.scene.uid },
     });
+    if (src && result?.index !== undefined) {
+      updateEntity('mixer', {
+        uid: props.scene.uid,
+        index: result.index,
+        src,
+      });
+    }
   } catch (error) {
     notify.error('Failed to add slot');
   } finally {
     addingSlot.value = false;
   }
+};
+
+const onDropAdd = (event) => {
+  dropOver.value = false;
+  dragCount.value = 0;
+  const uid = event.dataTransfer.getData('text/plain');
+  if (uid) addSlot(uid);
 };
 </script>
