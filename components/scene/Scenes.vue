@@ -13,7 +13,7 @@
       <div v-show="slotsOpen">
         <div
           v-for="(source, i) in [...scene.sources].reverse()"
-          :key="source.sink"
+          :key="source.index"
           :class="i % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/60' : 'bg-white dark:bg-gray-800/30'"
           class="border-b border-gray-100 dark:border-gray-700/50 last:border-b-0"
         >

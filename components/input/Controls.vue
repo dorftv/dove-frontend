@@ -59,14 +59,16 @@
         <button @click="toggleMute" class="transport-btn" :title="volume === 0 ? 'Unmute' : 'Mute'" :aria-label="volume === 0 ? 'Unmute' : 'Mute'">
           <Icon :name="volumeIcon" size="14px" />
         </button>
-        <Slider
-          :model-value="volume"
-          @update:model-value="handleVolumeChange"
-          :min="0"
-          :max="100"
-          class="w-16 volume-slider"
-          aria-label="Volume"
-        />
+        <span :title="volume + '%'">
+          <Slider
+            :model-value="volume"
+            @update:model-value="handleVolumeChange"
+            :min="0"
+            :max="100"
+            class="w-16 volume-slider"
+            aria-label="Volume"
+          />
+        </span>
       </div>
     </div>
   </div>
