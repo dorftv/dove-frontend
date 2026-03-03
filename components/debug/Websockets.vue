@@ -62,7 +62,7 @@ const MAX_MESSAGES = 500;
 let socket = null;
 
 const channelOptions = ['CREATE', 'UPDATE', 'DELETE'];
-const typeOptions = ['input', 'mixer', 'output'];
+const typeOptions = ['input', 'mixer', 'output', 'encoder'];
 
 const channelColor = (channel) => {
   const colors = {

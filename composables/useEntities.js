@@ -6,6 +6,7 @@ export function useEntities() {
   const inputs = useState('entities-inputs', () => []);
   const mixers = useState('entities-mixers', () => []);
   const outputs = useState('entities-outputs', () => []);
+  const encoders = useState('entities-encoders', () => []);
   const error = useState('entities-error', () => null);
   const wsStatus = useState('ws-status', () => 'disconnected');
   const isLoading = useState('entities-loading', () => true);
@@ -15,6 +16,7 @@ export function useEntities() {
     if (type === 'input') return inputs.value;
     else if (type === 'mixer') return mixers.value;
     else if (type === 'output') return outputs.value;
+    else if (type === 'encoder') return encoders.value;
   };
 
   const addEntityFromWebsocket = (type, entity) => {
@@ -52,15 +54,17 @@ export function useEntities() {
 
   const fetchEntities = async () => {
     try {
-      const [inputsData, mixersData, outputsData] = await Promise.all([
+      const [inputsData, mixersData, outputsData, encodersData] = await Promise.all([
         $fetch('/api/inputs'),
         $fetch('/api/mixers'),
         $fetch('/api/outputs'),
+        $fetch('/api/encoders'),
       ]);
 
       inputs.value = inputsData;
       mixers.value = mixersData;
       outputs.value = outputsData;
+      encoders.value = encodersData;
     } catch (e) {
       error.value = 'Failed to load entities: ' + e.message;
       notify.error('Failed to load entities');
@@ -226,6 +230,7 @@ export function useEntities() {
     previewOutputs,
     mixers,
     outputs,
+    encoders,
     sceneInputs,
     sceneMixerSource,
     sceneMixers,

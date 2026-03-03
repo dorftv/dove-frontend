@@ -14,10 +14,10 @@
     </div>
 
     <div class="col-span-12 md:col-span-6 lg:col-span-4">
-      <ProgramMain />
+      <ProgramMain ref="programRef" />
     </div>
 
-    <div class="col-span-12 md:col-span-6 lg:col-span-2">
+    <div class="col-span-12 md:col-span-6 lg:col-span-2" :style="programHeight ? { maxHeight: programHeight + 'px' } : {}">
       <OutputMain />
     </div>
 
@@ -30,4 +30,16 @@
 <script setup>
 const { isLoading } = useEntities();
 useKeyboardShortcuts();
+
+const programRef = ref(null);
+const programHeight = ref(0);
+
+let ro;
+onMounted(() => {
+  ro = new ResizeObserver(() => {
+    programHeight.value = programRef.value?.$el?.offsetHeight || 0;
+  });
+  if (programRef.value?.$el) ro.observe(programRef.value.$el);
+});
+onUnmounted(() => ro?.disconnect());
 </script>
