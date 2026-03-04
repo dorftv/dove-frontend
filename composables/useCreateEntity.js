@@ -1,5 +1,6 @@
 export const useCreateEntity = (entityType) => {
   const isOpen = ref(false);
+  const op = ref();
   const isLoading = ref(false);
   const fetchError = ref(null);
   const formData = reactive({});
@@ -107,12 +108,20 @@ export const useCreateEntity = (entityType) => {
     }
   };
 
+  const selectedType = computed(() => types.value[activeTabIndex.value] || null);
+
   const onTabChange = (event) => {
     activeTabIndex.value = event.index;
   };
 
+  const toggle = (event) => {
+    op.value.toggle(event);
+    isOpen.value = true;
+  };
+
   watch(isOpen, (newValue) => {
     if (newValue === false) {
+      op.value?.hide();
       Object.keys(formData).forEach(key => delete formData[key]);
       initializeFormData(types.value);
       selectedResolution.value = defaultResolution.value;
@@ -148,6 +157,8 @@ export const useCreateEntity = (entityType) => {
 
   return {
     isOpen,
+    op,
+    toggle,
     isLoading,
     fetchError,
     formData,
@@ -158,6 +169,7 @@ export const useCreateEntity = (entityType) => {
     fetchTypes,
     submitCreate,
     activeTabIndex,
+    selectedType,
     onTabChange,
     initializeFormData,
   };

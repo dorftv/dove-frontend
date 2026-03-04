@@ -1,16 +1,14 @@
 <template>
   <Button
     label="Add Scene"
-    class="p-button-rounded p-button-text text-xs"
+    class="p-button-text text-xs"
     icon="pi pi-plus-circle"
     v-if="addScene || isUnlocked"
-    @click="isOpen = true"
+    @click="toggle"
   />
-  <Dialog v-model:visible="isOpen" :modal="true" class="scene-pane-dialog">
-    <template #header>
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Add Scene</h3>
-    </template>
-    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+  <Popover ref="op" appendTo="body" @hide="isOpen = false">
+    <div class="p-3 w-80 max-w-[calc(100vw-1rem)]">
+      <div class="text-sm font-medium mb-2">Add Scene</div>
       <form @submit.prevent="submitCreate('scene')" class="space-y-2">
         <div class="mb-2">
           <label for="name" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
@@ -40,7 +38,7 @@
         </div>
       </form>
     </div>
-  </Dialog>
+  </Popover>
 </template>
 
 <script setup>
@@ -48,6 +46,8 @@ const { isUnlocked } = useLocked()
 
 const {
   isOpen,
+  op,
+  toggle,
   formData,
   submitCreate,
   selectedResolution,
