@@ -17,11 +17,11 @@
       <ProgramMain />
     </div>
 
-    <div class="col-span-12 md:col-span-6 lg:col-span-2 self-start" :style="rowHeight ? { height: rowHeight + 'px' } : {}">
+    <div class="col-span-12 md:col-span-6 lg:col-span-2 self-start order-last md:order-none" :style="rowHeight ? { height: rowHeight + 'px' } : {}">
       <OutputMain />
     </div>
 
-    <div class="col-span-12">
+    <div class="col-span-12 md:order-last">
       <InputMain />
     </div>
   </div>
