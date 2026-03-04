@@ -2,9 +2,10 @@ export const useCreateInput = () => {
   const baseCreate = useCreateEntity('inputs');
   const { sceneMixerSource, sceneMixers } = useEntities();
   const { addInput, proxyTypes } = useDoveConfig();
+  const { proxyItems, fetchItems, handleProxyName } = useProxyItems();
+  const notify = useNotify();
 
   const selectedSceneProgram = ref(false);
-  const proxyItems = ref({});
 
   const selectedScene = reactive({
     uid: null,
@@ -20,6 +21,7 @@ export const useCreateInput = () => {
         });
       } catch (error) {
         console.error('Failed to cut program:', error);
+        notify.error('Failed to cut program');
       }
     }
   };
@@ -38,26 +40,13 @@ export const useCreateInput = () => {
         await submitCutProgram();
       } catch (error) {
         console.error('Failed to add to scene:', error);
+        notify.error('Failed to add input to scene');
       }
     }
   };
 
   const handleProxyNameChange = (itemLabel, field, proxyType, value) => {
-    const selectedItem = proxyItems.value[proxyType]?.find(item => item.url === value);
-    if (selectedItem) {
-      baseCreate.formData[itemLabel][field] = value;
-      baseCreate.formData[itemLabel]['name'] = selectedItem.name;
-    }
-  };
-
-  const fetchItems = async (proxyType) => {
-    try {
-      const data = await $fetch(`/proxy/${proxyType}`);
-      proxyItems.value[proxyType] = data;
-    } catch (err) {
-      proxyItems.value[proxyType] = [];
-      console.error('Failed to fetch items from proxy:', err);
-    }
+    handleProxyName(itemLabel, field, proxyType, value, baseCreate.formData);
   };
 
   const currentSources = computed(() => {

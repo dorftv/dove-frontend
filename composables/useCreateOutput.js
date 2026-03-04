@@ -1,6 +1,7 @@
 export const useCreateOutput = () => {
   const baseCreate = useCreateEntity('outputs');
   const { addOutput } = useDoveConfig();
+  const notify = useNotify();
 
   const encoderOptions = reactive({
     audio_encoder: [],
@@ -29,6 +30,7 @@ export const useCreateOutput = () => {
       encoderOptions.mux = data.mux || [];
     } catch (error) {
       console.error('Error fetching encoder options:', error);
+      notify.error('Failed to load encoder options');
     }
   };
 

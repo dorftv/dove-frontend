@@ -17,17 +17,12 @@
     <div class="flex-grow" />
 
     <!-- Actions -->
-    <Popover ref="inputInfoPopover" appendTo="body">
-      <pre class="text-xs text-gray-700 dark:text-gray-300">{{ inputDetails }}</pre>
-    </Popover>
-    <button @click="inputInfoPopover.toggle($event)" class="header-btn" title="Details" aria-label="Show details">
-      <i class="pi pi-info-circle text-[11px]"></i>
-    </button>
+    <DetailPopover :entity="input" />
     <button
       v-if="!input.locked || isUnlocked"
-      @click="submitRemoveInput"
+      @click="submitRemove"
       :disabled="deleting"
-      class="header-btn text-red-400 hover:text-red-300 disabled:opacity-50"
+      class="icon-btn text-red-400 hover:text-red-300 disabled:opacity-50"
       title="Delete"
       aria-label="Delete input"
     >
@@ -36,7 +31,7 @@
     <button
       v-if="!inputPreview && inputEnabled"
       @click="$emit('enablePreview', toggleInputPreview())"
-      class="header-btn"
+      class="icon-btn"
       title="Disable preview"
       aria-label="Disable preview"
     >
@@ -45,7 +40,7 @@
     <button
       v-if="!inputPreview && !inputEnabled"
       @click="$emit('enablePreview', toggleInputPreview())"
-      class="header-btn"
+      class="icon-btn"
       title="Enable preview"
       aria-label="Enable preview"
     >
@@ -63,26 +58,14 @@ const props = defineProps({
 });
 
 const {
-  inputInfoPopover,
-  inputDetails,
   inputPreview,
-  submitRemoveInput,
-  deleting,
   toggleInputPreview
 } = useInputControls(props);
+
+const { deleting, submitRemove } = useDeleteEntity('input', () => props.input);
 
 const onDragStart = (event) => {
   event.dataTransfer.setData('text/plain', props.input.uid);
   event.dataTransfer.effectAllowed = 'link';
 };
 </script>
-
-<style scoped>
-.header-btn {
-  @apply flex items-center justify-center w-5 h-5 rounded
-         text-gray-500 dark:text-gray-400
-         hover:bg-gray-300 dark:hover:bg-gray-700
-         hover:text-gray-900 dark:hover:text-white
-         transition-colors duration-100 cursor-pointer;
-}
-</style>

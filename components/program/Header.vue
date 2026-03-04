@@ -7,28 +7,10 @@
       LIVE
     </span>
     <div class="flex-grow" />
-    <Popover ref="op" appendTo="body">
-      <pre class="text-xs text-gray-700 dark:text-gray-300">{{ programDetails }}</pre>
-    </Popover>
-    <button @click="op.toggle($event)" class="program-btn" title="Details" aria-label="Show details">
-      <i class="pi pi-info-circle text-[11px]"></i>
-    </button>
+    <DetailPopover :entity="programMixer" />
   </div>
 </template>
 
 <script setup>
-const { programMixer, enrichEntity } = useEntities();
-
-const op = ref();
-const programDetails = computed(() => programMixer.value ? JSON.stringify(enrichEntity(programMixer.value), null, 2) : '');
+const { programMixer } = useEntities();
 </script>
-
-<style scoped>
-.program-btn {
-  @apply flex items-center justify-center w-5 h-5 rounded
-         text-gray-500 dark:text-gray-400
-         hover:bg-gray-300 dark:hover:bg-gray-700
-         hover:text-gray-900 dark:hover:text-white
-         transition-colors duration-100 cursor-pointer;
-}
-</style>

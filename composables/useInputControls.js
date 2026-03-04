@@ -1,6 +1,7 @@
 export default function useInputControls(props) {
   const volume = ref(props.input.volume * 100);
   const { inputs, updateEntity } = useEntities();
+  const notify = useNotify();
 
   watch(
     () => props.input.volume,
@@ -42,47 +43,47 @@ export default function useInputControls(props) {
   };
 
   const submitPlay = async () => {
-    await $fetch('/api/inputs', {
-      method: 'PUT',
-      body: {
-        uid: props.input.uid,
-        type: 'update',
-        state: 'PLAYING',
-      },
-    });
+    try {
+      await $fetch('/api/inputs', {
+        method: 'PUT',
+        body: { uid: props.input.uid, type: 'update', state: 'PLAYING' },
+      });
+    } catch (error) {
+      notify.error('Failed to play input');
+    }
   };
 
   const submitPause = async () => {
-    await $fetch('/api/inputs', {
-      method: 'PUT',
-      body: {
-        uid: props.input.uid,
-        type: 'update',
-        state: 'PAUSED',
-      },
-    });
+    try {
+      await $fetch('/api/inputs', {
+        method: 'PUT',
+        body: { uid: props.input.uid, type: 'update', state: 'PAUSED' },
+      });
+    } catch (error) {
+      notify.error('Failed to pause input');
+    }
   };
 
   const submitStop = async () => {
-    await $fetch('/api/inputs', {
-      method: 'PUT',
-      body: {
-        uid: props.input.uid,
-        type: 'update',
-        state: 'NULL',
-      },
-    });
+    try {
+      await $fetch('/api/inputs', {
+        method: 'PUT',
+        body: { uid: props.input.uid, type: 'update', state: 'NULL' },
+      });
+    } catch (error) {
+      notify.error('Failed to stop input');
+    }
   };
 
   const submitLoop = async (loopState) => {
-    await $fetch('/api/inputs', {
-      method: 'PUT',
-      body: {
-        uid: props.input.uid,
-        type: 'update',
-        loop: loopState,
-      },
-    });
+    try {
+      await $fetch('/api/inputs', {
+        method: 'PUT',
+        body: { uid: props.input.uid, type: 'update', loop: loopState },
+      });
+    } catch (error) {
+      notify.error('Failed to toggle loop');
+    }
   };
 
   const inputName = computed(() => {
@@ -116,41 +117,7 @@ export default function useInputControls(props) {
     });
   };
 
-  const inputInfoPopover = ref();
-  const inputDetails = computed(() => JSON.stringify(props.input, null, 2));
   const { inputPreview } = useUserState();
-
-  const confirm = useConfirm();
-  const notify = useNotify();
-  const deleting = ref(false);
-
-  const doRemoveInput = async () => {
-    deleting.value = true;
-    try {
-      await $fetch('/api/inputs', {
-        method: 'DELETE',
-        body: { uid: props.input.uid },
-      });
-    } catch (error) {
-      notify.error('Failed to remove input');
-    } finally {
-      deleting.value = false;
-    }
-  };
-
-  const submitRemoveInput = () => {
-    const state = props.input.state;
-    if (state === 'EOS' || state === 'ERROR' || state === 'NULL') {
-      doRemoveInput();
-    } else {
-      confirm.require({
-        message: `Delete input "${props.input.name}"?`,
-        header: 'Confirm',
-        acceptClass: 'p-button-danger',
-        accept: doRemoveInput,
-      });
-    }
-  };
 
   const toggleInputPreview = () => {
     return !props.inputEnabled;
@@ -171,11 +138,7 @@ export default function useInputControls(props) {
     isInSceneSources,
     submitAddInputToScene,
     submitRemoveInputFromScene,
-    inputInfoPopover,
-    inputDetails,
     inputPreview,
-    submitRemoveInput,
-    deleting,
     toggleInputPreview,
   };
 }

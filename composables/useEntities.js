@@ -1,7 +1,3 @@
-let ws = null;
-let reconnectTimer = null;
-let initialized = false;
-
 export function useEntities() {
   const inputs = useState('entities-inputs', () => []);
   const mixers = useState('entities-mixers', () => []);
@@ -12,44 +8,13 @@ export function useEntities() {
   const isLoading = useState('entities-loading', () => true);
   const notify = useNotify();
 
-  const getEntities = (type) => {
-    if (type === 'input') return inputs.value;
-    else if (type === 'mixer') return mixers.value;
-    else if (type === 'output') return outputs.value;
-    else if (type === 'encoder') return encoders.value;
-  };
-
-  const addEntityFromWebsocket = (type, entity) => {
-    const entities = getEntities(type);
-    const exists = entities.some(e => e.uid === entity.uid);
-    if (!exists) {
-      entities.push(entity);
-    }
-  };
-
-  const updateEntityFromWebSocket = (type, updatedEntity) => {
-    const entities = getEntities(type);
-    const index = entities.findIndex((entity) => entity.uid === updatedEntity.uid);
-    if (index !== -1) {
-      entities.splice(index, 1, { ...entities[index], ...updatedEntity });
-    }
-  };
-
   const updateEntity = (type, updatedEntity) => {
-    const message = {
+    const { $ws } = useNuxtApp();
+    $ws.sendMessage({
       type: type,
       action: 'UPDATE',
       data: updatedEntity
-    };
-    sendWebSocketMessage(message);
-  };
-
-  const deleteEntityFromWebsocket = (type, deletedEntity) => {
-    const entities = getEntities(type);
-    const index = entities.findIndex((entity) => entity.uid === deletedEntity.uid);
-    if (index !== -1) {
-      entities.splice(index, 1);
-    }
+    });
   };
 
   const fetchEntities = async () => {
@@ -72,93 +37,6 @@ export function useEntities() {
       isLoading.value = false;
     }
   };
-
-  const connectWebSocket = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    let wsUrl;
-    if (process.dev) {
-      wsUrl = process.env.DOVE_API ? process.env.DOVE_API + '/ws' : 'ws://localhost:5000/ws';
-    } else {
-      const url = useRequestURL();
-      wsUrl = `${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}/ws`;
-    }
-
-    ws = new WebSocket(wsUrl);
-
-    ws.onopen = () => {
-      console.log('WebSocket connected');
-      wsStatus.value = 'connected';
-      error.value = null;
-      if (reconnectTimer) {
-        clearTimeout(reconnectTimer);
-        reconnectTimer = null;
-      }
-    };
-
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      const action = {
-        CREATE: addEntityFromWebsocket,
-        UPDATE: updateEntityFromWebSocket,
-        DELETE: deleteEntityFromWebsocket
-      }[message.channel];
-
-      if (action) {
-        action(message.type, message.data);
-      } else {
-        console.warn('Unknown Type or Channel:', message.type, message.channel);
-      }
-    };
-
-    ws.onerror = () => {
-      error.value = 'WebSocket error';
-      notify.error('WebSocket connection error');
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket disconnected');
-      wsStatus.value = 'disconnected';
-      ws = null;
-      // Auto-reconnect after 3 seconds
-      if (!reconnectTimer) {
-        wsStatus.value = 'reconnecting';
-        reconnectTimer = setTimeout(async () => {
-          reconnectTimer = null;
-          console.log('Attempting WebSocket reconnect...');
-          await fetchEntities();
-          connectWebSocket();
-        }, 3000);
-      }
-    };
-  };
-
-  const disconnectWebSocket = () => {
-    if (reconnectTimer) {
-      clearTimeout(reconnectTimer);
-      reconnectTimer = null;
-    }
-    if (ws) {
-      ws.close();
-      ws = null;
-    }
-  };
-
-  const sendWebSocketMessage = (message) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(message));
-    } else {
-      error.value = 'WebSocket is not open. Cannot send message.';
-    }
-  };
-
-  // Initialize once on client
-  if (import.meta.client && !initialized) {
-    initialized = true;
-    fetchEntities().then(() => connectWebSocket());
-  }
 
   const sceneInputs = computed(() => {
     return (inputUid) => {
@@ -272,9 +150,7 @@ export function useEntities() {
     sceneMixers,
     programMixer,
     updateEntity,
-    sendWebSocketMessage,
-    connectWebSocket,
-    disconnectWebSocket,
+    fetchEntities,
     error,
     wsStatus,
     isLoading

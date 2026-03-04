@@ -6,6 +6,12 @@ export default defineNuxtConfig({
   },
   ssr: false,
 
+  runtimeConfig: {
+    public: {
+      wsUrl: process.env.DOVE_WS_URL || '',
+    },
+  },
+
   devtools: { enabled: true },
   css: ["@/assets/css/tailwind.css", "primeicons/primeicons.css"],
   postcss: {

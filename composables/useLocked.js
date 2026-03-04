@@ -1,5 +1,3 @@
-// useUnlocked.js
-
 export const useLocked = () => {
   const route = useRoute()
 

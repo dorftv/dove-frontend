@@ -8,7 +8,7 @@
       :step="1"
       :min="0"
       :max="input.duration"
-      class="w-full transport-slider"
+      class="w-full slim-slider-accent"
       aria-label="Playback position"
     />
 
@@ -57,7 +57,7 @@
       <!-- Volume -->
       <div class="flex items-center gap-1 ml-1">
         <button @click="toggleMute" class="transport-btn" :title="volume === 0 ? 'Unmute' : 'Mute'" :aria-label="volume === 0 ? 'Unmute' : 'Mute'">
-          <Icon :name="volumeIcon" size="14px" />
+          <Icon :name="volumeIcon(volume)" size="14px" />
         </button>
         <span :title="volume + '%'">
           <Slider
@@ -65,7 +65,7 @@
             @update:model-value="handleVolumeChange"
             :min="0"
             :max="100"
-            class="w-16 volume-slider"
+            class="w-16 slim-slider"
             aria-label="Volume"
           />
         </span>
@@ -79,33 +79,7 @@ const props = defineProps({
   input: Object,
 });
 
-const { stateClass } = useStateClass();
-
-const stateIcon = (state) => {
-  const icons = {
-    PLAYING: 'ph:play-circle',
-    PAUSED: 'ph:pause-circle',
-    NULL: 'ph:stop-circle',
-    READY: 'ph:circle-dashed',
-    EOS: 'ph:stop',
-    ERROR: 'ph:warning-circle',
-    BUFFERING: 'ph:spinner',
-  };
-  return icons[state] || 'ph:circle';
-};
-
-const stateBadgeClass = (state) => {
-  const classes = {
-    PLAYING: 'bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-400',
-    PAUSED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
-    NULL: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-    READY: 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-    EOS: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
-    ERROR: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
-    BUFFERING: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
-  };
-  return classes[state] || 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
-};
+const { stateIcon, stateBadgeClass, volumeIcon } = useStateClass();
 
 const {
   volume,
@@ -130,12 +104,6 @@ const toggleMute = () => {
     handleVolumeChange(0);
   }
 };
-
-const volumeIcon = computed(() => {
-  if (volume.value === 0) return 'ph:speaker-x';
-  if (volume.value < 50) return 'ph:speaker-low';
-  return 'ph:speaker-high';
-});
 </script>
 
 <style scoped>
@@ -144,37 +112,5 @@ const volumeIcon = computed(() => {
          hover:bg-gray-300 dark:hover:bg-gray-700
          hover:text-gray-900 dark:hover:text-white
          transition-colors duration-100 cursor-pointer;
-}
-
-:deep(.transport-slider .p-slider) {
-  @apply bg-gray-300 dark:bg-gray-700;
-  height: 4px;
-}
-
-:deep(.transport-slider .p-slider-range) {
-  @apply bg-emerald-500;
-}
-
-:deep(.transport-slider .p-slider-handle) {
-  @apply bg-emerald-500 dark:bg-emerald-400 border-none;
-  width: 10px;
-  height: 10px;
-  margin-top: -3px;
-}
-
-:deep(.volume-slider .p-slider) {
-  @apply bg-gray-300 dark:bg-gray-700;
-  height: 3px;
-}
-
-:deep(.volume-slider .p-slider-range) {
-  @apply bg-gray-500 dark:bg-gray-400;
-}
-
-:deep(.volume-slider .p-slider-handle) {
-  @apply bg-gray-600 dark:bg-gray-300 border-none;
-  width: 8px;
-  height: 8px;
-  margin-top: -2.5px;
 }
 </style>

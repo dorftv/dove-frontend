@@ -38,4 +38,42 @@ body {
   .state-null {
     @apply bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400;
   }
+
+  .icon-btn {
+    @apply flex items-center justify-center w-5 h-5 rounded
+           text-gray-500 dark:text-gray-400
+           hover:bg-gray-300 dark:hover:bg-gray-700
+           hover:text-gray-900 dark:hover:text-white
+           transition-colors duration-100 cursor-pointer;
+  }
+}
+
+/* Slim slider — volume controls */
+.slim-slider .p-slider {
+  @apply bg-gray-300 dark:bg-gray-700;
+  height: 3px;
+}
+.slim-slider .p-slider-range {
+  @apply bg-gray-500 dark:bg-gray-400;
+}
+.slim-slider .p-slider-handle {
+  @apply bg-gray-600 dark:bg-gray-300 border-none;
+  width: 8px;
+  height: 8px;
+  margin-top: -2.5px;
+}
+
+/* Slim slider accent — transport/seek bar */
+.slim-slider-accent .p-slider {
+  @apply bg-gray-300 dark:bg-gray-700;
+  height: 4px;
+}
+.slim-slider-accent .p-slider-range {
+  @apply bg-emerald-500;
+}
+.slim-slider-accent .p-slider-handle {
+  @apply bg-emerald-500 dark:bg-emerald-400 border-none;
+  width: 10px;
+  height: 10px;
+  margin-top: -3px;
 }

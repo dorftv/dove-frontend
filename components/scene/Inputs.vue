@@ -15,7 +15,7 @@
       <div class="flex items-center gap-0.5 shrink-0">
         <!-- Volume: mute icon + slider -->
         <template v-if="!scene.src_locked || isUnlocked">
-          <button @click="toggleMute" class="slot-btn" :class="{ 'text-orange-500 dark:text-orange-400': mute }" :title="mute ? 'Unmute' : 'Mute'" :aria-label="mute ? 'Unmute' : 'Mute'">
+          <button @click="toggleMute" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-orange-500 dark:text-orange-400': mute }" :title="mute ? 'Unmute' : 'Mute'" :aria-label="mute ? 'Unmute' : 'Mute'">
             <Icon :name="volumeIcon" size="14px" />
           </button>
           <span :title="volume + '%'">
@@ -24,12 +24,12 @@
               @update:modelValue="handleChange('volume', $event)"
               :min="0"
               :max="150"
-              class="w-24 slot-volume-slider"
+              class="w-24 slim-slider"
               aria-label="Volume"
             />
           </span>
         </template>
-        <button v-if="(!source.locked && !scene.src_locked) || isUnlocked" @click="open = !open" class="slot-btn" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
+        <button v-if="(!source.locked && !scene.src_locked) || isUnlocked" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
           <i class="pi pi-cog text-[11px]"></i>
         </button>
         <span v-if="(source.locked || scene.src_locked) && !isUnlocked" class="slot-btn opacity-40" title="Locked">
@@ -83,6 +83,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
+const { volumeIcon: volumeIconFn } = useStateClass();
 const { inputs, removeSlot, handleChange, getMax, src, alpha, width, height, xpos, ypos, volume, mute } = useSceneSources(props.scene, props.source);
 
 const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
@@ -98,11 +99,7 @@ const toggleMute = () => {
   }
 };
 
-const volumeIcon = computed(() => {
-  if (mute.value || volume.value === 0) return 'ph:speaker-x';
-  if (volume.value < 75) return 'ph:speaker-low';
-  return 'ph:speaker-high';
-});
+const volumeIcon = computed(() => volumeIconFn(volume.value, mute.value));
 
 const doRemoveSlot = () => {
   open.value = false;
@@ -123,28 +120,3 @@ watch(() => props.source.src, (newSrc) => {
 });
 </script>
 
-<style scoped>
-.slot-btn {
-  @apply flex items-center justify-center w-7 h-7 md:w-5 md:h-5 rounded
-         text-gray-500 dark:text-gray-400
-         hover:bg-gray-200 dark:hover:bg-gray-700
-         hover:text-gray-900 dark:hover:text-white
-         transition-colors duration-100 cursor-pointer;
-}
-
-:deep(.slot-volume-slider .p-slider) {
-  @apply bg-gray-300 dark:bg-gray-700;
-  height: 3px;
-}
-
-:deep(.slot-volume-slider .p-slider-range) {
-  @apply bg-gray-500 dark:bg-gray-400;
-}
-
-:deep(.slot-volume-slider .p-slider-handle) {
-  @apply bg-gray-600 dark:bg-gray-300 border-none;
-  width: 8px;
-  height: 8px;
-  margin-top: -2.5px;
-}
-</style>
