@@ -1,32 +1,21 @@
 <template>
-  <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1.5 mb-2 text-xs">
+  <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1.5 mb-1 text-xs">
+    <!-- Top row: output name, type, resolution, actions -->
     <div class="flex items-center gap-1.5">
-      <!-- State dot -->
       <span
         :title="output.state"
         class="w-2 h-2 rounded-full shrink-0"
         :class="stateDotClass(output.state)"
         role="status"
       />
-
-      <!-- Name -->
       <span
         v-tooltip="output.name + ' (' + output.type + ')'"
         class="truncate cursor-help text-sm text-gray-800 dark:text-gray-300"
       >
         {{ output.name }}
       </span>
-
-      <!-- Type -->
       <span class="text-[10px] text-gray-500 shrink-0">{{ output.type }}</span>
-
-      <!-- Resolved links -->
-      <span v-if="linkedInfo" class="text-[10px] text-gray-500 truncate">{{ linkedInfo }}</span>
-
-      <!-- Spacer -->
       <div class="flex-grow" />
-
-      <!-- Action buttons -->
       <DetailPopover :entity="output" />
       <button
         v-if="!output.locked || isUnlocked"
@@ -39,6 +28,22 @@
         <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
       </button>
     </div>
+    <!-- Encoder rows below -->
+    <div v-if="videoEncoder || audioEncoder" class="flex flex-col gap-0.5 ml-3.5 mt-0.5">
+      <div v-if="videoEncoder" v-tooltip="videoEncoder.element + ' (' + videoEncoder.name + ')'" class="flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="stateDotClass(videoEncoder.state)" />
+        <Icon name="ph:video-camera" size="11px" class="text-gray-400" />
+        <span class="text-[10px] text-gray-500 dark:text-gray-400">{{ videoEncoder.element }}</span>
+        <span v-if="videoEncoder.width && videoEncoder.height" class="text-[10px] text-gray-400">{{ videoEncoder.width }}x{{ videoEncoder.height }}</span>
+        <span v-if="videoEncoder.details" class="text-[10px] text-red-400 truncate max-w-[8rem]">{{ videoEncoder.details }}</span>
+      </div>
+      <div v-if="audioEncoder" v-tooltip="audioEncoder.element + ' (' + audioEncoder.name + ')'" class="flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="stateDotClass(audioEncoder.state)" />
+        <Icon name="ph:speaker-high" size="11px" class="text-gray-400" />
+        <span class="text-[10px] text-gray-500 dark:text-gray-400">{{ audioEncoder.element }}</span>
+        <span v-if="audioEncoder.details" class="text-[10px] text-red-400 truncate max-w-[8rem]">{{ audioEncoder.details }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,19 +54,10 @@ const { stateDotClass } = useStateClass()
 
 const props = defineProps({
   output: Object,
-  mixers: Array,
 });
 
-const linkedInfo = computed(() => {
-  const parts = [];
-  const src = resolveEntity(props.output.src);
-  if (src) parts.push(src.name);
-  const venc = resolveEntity(props.output.video_encoder);
-  if (venc) parts.push(venc.element);
-  const aenc = resolveEntity(props.output.audio_encoder);
-  if (aenc) parts.push(aenc.element);
-  return parts.join(' · ');
-});
+const videoEncoder = computed(() => resolveEntity(props.output.video_encoder));
+const audioEncoder = computed(() => resolveEntity(props.output.audio_encoder));
 
 const { deleting, submitRemove } = useDeleteEntity('output', () => props.output);
 </script>

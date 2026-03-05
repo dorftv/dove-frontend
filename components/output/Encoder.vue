@@ -11,7 +11,12 @@
 
       <!-- Type icon + element -->
       <Icon :name="encoder.type === 'video' ? 'ph:video-camera' : 'ph:speaker-high'" size="12px" class="text-gray-400 shrink-0" :title="encoder.type" />
-      <span class="truncate text-gray-800 dark:text-gray-200">{{ encoder.element }}</span>
+      <span class="shrink-0 text-gray-800 dark:text-gray-200">{{ encoder.element }}</span>
+
+      <!-- Resolution (video only) -->
+      <span v-if="encoder.type === 'video' && encoder.width && encoder.height" class="text-[10px] text-gray-400 shrink-0">
+        {{ encoder.width }}x{{ encoder.height }}
+      </span>
 
       <!-- Options -->
       <span v-if="encoder.options" class="truncate text-[10px] text-gray-500 dark:text-gray-400" :title="encoder.options">

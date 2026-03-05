@@ -21,10 +21,19 @@
     <div class="overflow-y-auto min-h-0 flex-1">
       <template v-if="activeTab === 'outputs'">
         <CreateOutputPane />
-        <Output v-for="output in filteredOutputs" :key="output.uid" :output="output" />
+        <div v-for="group in outputGroups" :key="group.src" class="mb-3">
+          <div class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide px-1 mb-1">
+            {{ group.name }}
+          </div>
+          <Output v-for="output in group.outputs" :key="output.uid" :output="output" />
+        </div>
+        <div v-if="filteredOutputs.length === 0" class="text-xs text-gray-400 dark:text-gray-500 text-center py-4">
+          No outputs
+        </div>
       </template>
 
       <template v-else>
+        <CreateEncoderPane />
         <div v-for="group in encoderGroups" :key="group.src" class="mb-3">
           <div class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide px-1 mb-1">
             {{ group.name }}
@@ -40,35 +49,13 @@
 </template>
 
 <script setup>
-const { outputs, encoders, resolveEntity } = useEntities();
-const activeTab = ref('outputs');
-const showPreview = ref(false);
-
-const filteredOutputs = computed(() =>
-  showPreview.value ? outputs.value : outputs.value.filter(o => !o.is_preview)
-);
-
-const filteredEncoders = computed(() =>
-  showPreview.value ? encoders.value : encoders.value.filter(e => !e.is_preview)
-);
-
-const encoderGroups = computed(() => {
-  const groups = {};
-  for (const encoder of filteredEncoders.value) {
-    const src = encoder.src || 'unknown';
-    if (!groups[src]) {
-      groups[src] = { src, name: resolveEntity(src)?.name || src, encoders: [] };
-    }
-    groups[src].encoders.push(encoder);
-  }
-  for (const group of Object.values(groups)) {
-    group.encoders.sort((a, b) => (a.type === 'video' ? -1 : 1) - (b.type === 'video' ? -1 : 1));
-  }
-  return Object.values(groups);
-});
-
-const tabs = computed(() => [
-  { key: 'outputs', label: 'Outputs', count: filteredOutputs.value.length },
-  { key: 'encoders', label: 'Encoders', count: filteredEncoders.value.length },
-]);
+const {
+  activeTab,
+  showPreview,
+  filteredOutputs,
+  filteredEncoders,
+  outputGroups,
+  encoderGroups,
+  tabs,
+} = useOutputList();
 </script>
