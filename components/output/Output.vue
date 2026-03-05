@@ -28,6 +28,10 @@
         <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
       </button>
     </div>
+    <!-- Stats row -->
+    <div v-if="output.details" class="ml-3.5 mt-0.5 text-[10px] text-gray-500 dark:text-gray-400 truncate">
+      {{ output.details }}
+    </div>
     <!-- Encoder rows below -->
     <div v-if="videoEncoder || audioEncoder" class="flex flex-col gap-0.5 ml-3.5 mt-0.5">
       <div v-if="videoEncoder" v-tooltip="videoEncoder.element + ' (' + videoEncoder.name + ')'" class="flex items-center gap-1">

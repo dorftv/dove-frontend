@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-2 h-full flex flex-col">
+  <div class="flex flex-col gap-2">
     <div class="flex items-center gap-1 mb-2 text-xs">
       <button
         v-for="tab in tabs" :key="tab.key"
