@@ -16,7 +16,11 @@ const props = defineProps({
   muted: String,
 });
 
-const { videoPlayer, mutedState } = useWhepPlayer(props);
+const emit = defineEmits(['error']);
+
+const { videoPlayer, mutedState } = useWhepPlayer(props, {
+  onError: () => emit('error'),
+});
 </script>
 
 <style scoped>

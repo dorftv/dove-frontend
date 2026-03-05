@@ -1,12 +1,15 @@
 import { WebRTCPlayer } from '@eyevinn/webrtc-player';
 
-export function useWhepPlayer(props) {
+let autoplayToastShown = false;
+
+export function useWhepPlayer(props, { onError } = {}) {
   const videoPlayer = ref(null);
   const { mutedState, setMutedState } = useMutedState();
   const toast = useToast();
 
   let player = null;
-  let autoplayToastShown = false;
+  let failCount = 0;
+  const MAX_RETRIES = 3;
 
   const initializePlayer = async () => {
     if (!videoPlayer.value) return;
@@ -24,6 +27,7 @@ export function useWhepPlayer(props) {
     try {
       const url = new URL(`/whep/${props.uid}`, window.location.origin);
       await player.load(url);
+      failCount = 0;
       player.on('initial-connection-failed', handleConnectionFailed);
 
       try {
@@ -47,10 +51,19 @@ export function useWhepPlayer(props) {
       }
     } catch (error) {
       console.error('Error loading player:', error);
+      failCount++;
+      if (failCount >= MAX_RETRIES && onError) {
+        onError();
+      }
     }
   };
 
   const handleConnectionFailed = () => {
+    failCount++;
+    if (failCount >= MAX_RETRIES && onError) {
+      onError();
+      return;
+    }
     setTimeout(initializePlayer, 100);
   };
 

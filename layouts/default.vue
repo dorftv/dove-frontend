@@ -19,6 +19,15 @@
           <TogglePreview />
         </div>
 
+        <!-- Preview type toggle -->
+        <button
+          @click="cyclePreviewMode"
+          class="hidden md:flex icon-btn text-[10px] font-mono tabular-nums mx-2"
+          v-tooltip.bottom="'Preview Type'"
+        >
+          {{ previewModeLabel }}
+        </button>
+
         <!-- Divider -->
         <div class="hidden md:block w-px h-5 bg-gray-200 dark:bg-gray-600 mx-1" />
 
@@ -90,6 +99,10 @@
           <Icon v-else name="ph:monitor" size="16px" />
           Color mode: {{ colorMode.preference }}
         </button>
+        <button @click="cyclePreviewMode" class="mobile-link w-full">
+          <Icon name="ph:monitor-play" size="16px" />
+          Preview: {{ previewModeLabel }}
+        </button>
         <div class="pt-2 mt-1 border-t border-gray-200 dark:border-gray-700">
           <TogglePreview />
         </div>
@@ -107,6 +120,13 @@ const colorMode = useColorMode()
 const mobileMenuOpen = ref(false)
 const { wsStatus } = useEntities()
 const { load } = useServerLoad()
+const { previewMode, cycle: cyclePreviewMode } = usePreviewMode()
+
+const previewModeLabel = computed(() => {
+  if (previewMode.value === 'auto') return 'Auto';
+  if (previewMode.value === 'webrtc') return 'WebRTC';
+  return 'HLS';
+})
 
 const cycleColorMode = () => {
   const modes = ['system', 'light', 'dark']

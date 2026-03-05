@@ -64,9 +64,11 @@ const route = useRoute()
 
 const navItems = [
   { slug: 'index', title: 'Overview' },
+  { slug: 'previews', title: 'Previews' },
   { slug: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
   { slug: 'interface', title: 'Interface' },
   { slug: 'connection-status', title: 'Connection Status' },
+  { slug: 'debugging', title: 'Debugging' },
 ]
 
 const md = new MarkdownIt({ html: true })
