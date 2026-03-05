@@ -1,7 +1,7 @@
 <template>
   <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden h-full">
     <div class="flex flex-col md:flex-row">
-      <div class="md:w-48 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
+      <div class="order-2 md:order-first md:w-48 border-t md:border-t-0 md:border-r border-gray-200 dark:border-gray-700">
         <CreateScenePane />
         <div class="flex md:flex-col overflow-x-auto md:overflow-x-visible">
           <button
@@ -10,7 +10,7 @@
             @click="handleSceneClick(index)"
             class="whitespace-nowrap md:w-full text-left py-2 px-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none flex items-center gap-1.5"
             :class="[
-              index === activeIndex ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium' : '',
+              index === activeIndex ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 font-semibold' : '',
               scene.uid === activeScene?.uid ? 'border-l-2 border-red-500' : 'border-l-2 border-transparent'
             ]"
           >
@@ -20,7 +20,7 @@
           </button>
         </div>
       </div>
-      <div class="flex-grow min-w-0">
+      <div class="flex-grow min-w-0 order-1 md:order-last">
         <SceneScenes
           v-if="sceneMixers[activeIndex]"
           :scene="sceneMixers[activeIndex]"

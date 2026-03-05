@@ -26,8 +26,11 @@ export default function useActiveScene() {
     }
   };
 
-  const transition = useState('transition-mode', () => 'cut');
-  const transitionDuration = useState('transition-duration', () => 1000);
+  const transition = useState('transition-mode', () => localStorage.getItem('transition-mode') || 'cut');
+  const transitionDuration = useState('transition-duration', () => Number(localStorage.getItem('transition-duration')) || 1000);
+
+  watch(transition, (v) => localStorage.setItem('transition-mode', v));
+  watch(transitionDuration, (v) => localStorage.setItem('transition-duration', String(v)));
 
   const cutting = ref(false);
 
@@ -59,15 +62,42 @@ export default function useActiveScene() {
     }
   });
 
+  // Restore selected scene from localStorage, fall back to first
+  const restoreSelection = (scenes) => {
+    const savedUid = localStorage.getItem('selected-scene-uid');
+    if (savedUid) {
+      const idx = scenes.findIndex(s => s.uid === savedUid);
+      if (idx !== -1) {
+        activeIndex.value = idx;
+        selectedScene.value = scenes[idx];
+        return;
+      }
+    }
+    activeIndex.value = 0;
+    selectedScene.value = scenes[0] || null;
+  };
+
+  watch(selectedScene, (s) => {
+    if (s?.uid) localStorage.setItem('selected-scene-uid', s.uid);
+  });
+
   // Keep selectedScene in sync with activeIndex
+  let restored = false;
   watch([activeIndex, sceneMixers], ([newIndex, newSceneMixers]) => {
-    if (newSceneMixers && newSceneMixers.length > newIndex) {
+    if (!newSceneMixers || newSceneMixers.length === 0) {
+      selectedScene.value = null;
+      return;
+    }
+    if (!restored) {
+      restored = true;
+      restoreSelection(newSceneMixers);
+      return;
+    }
+    if (newSceneMixers.length > newIndex) {
       selectedScene.value = newSceneMixers[newIndex];
-    } else if (newSceneMixers && newSceneMixers.length > 0) {
+    } else {
       activeIndex.value = newSceneMixers.length - 1;
       selectedScene.value = newSceneMixers[activeIndex.value];
-    } else {
-      selectedScene.value = null;
     }
   }, { immediate: true });
 
