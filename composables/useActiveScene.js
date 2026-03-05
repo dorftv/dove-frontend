@@ -26,6 +26,9 @@ export default function useActiveScene() {
     }
   };
 
+  const transition = useState('transition-mode', () => 'cut');
+  const transitionDuration = useState('transition-duration', () => 1000);
+
   const cutting = ref(false);
 
   const cutSceneToProgram = async () => {
@@ -33,9 +36,14 @@ export default function useActiveScene() {
 
     cutting.value = true;
     try {
+      const body = { src: selectedScene.value.uid };
+      if (transition.value === 'fade') {
+        body.transition = 'fade';
+        body.duration = transitionDuration.value;
+      }
       await $fetch('/api/mixer/cut_program', {
         method: 'POST',
-        body: { src: selectedScene.value.uid }
+        body,
       });
     } catch (err) {
       notify.error('Failed to switch scene');
@@ -68,6 +76,8 @@ export default function useActiveScene() {
     activeScene,
     activeIndex,
     cutting,
+    transition,
+    transitionDuration,
     handleSceneClick,
     cutSceneToProgram,
   };

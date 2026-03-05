@@ -2,11 +2,12 @@ export default defineNuxtPlugin((nuxtApp) => {
   let ws = null;
   let reconnectTimer = null;
   let reconnectDelay = 1000;
+  let lastMessage = 0;
+  let healthInterval = null;
 
   const status = useState('ws-status', () => 'disconnected');
   const error = useState('entities-error', () => null);
 
-  // Access entity state directly to avoid useNotify/useToast during plugin init
   const inputs = useState('entities-inputs', () => []);
   const mixers = useState('entities-mixers', () => []);
   const outputs = useState('entities-outputs', () => []);
@@ -24,12 +25,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     const config = useRuntimeConfig();
     if (config.public.wsUrl) return config.public.wsUrl;
 
+    // In dev, connect directly to backend on port 5000 using same hostname
+    // (works for both localhost and LAN access from mobile)
     if (process.dev) {
-      return process.env.DOVE_API ? process.env.DOVE_API + '/ws' : 'ws://localhost:5000/ws';
+      return `ws://${window.location.hostname}:5000/ws`;
     }
 
-    const url = useRequestURL();
-    return `${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}/ws`;
+    // In production, WS goes through the same host (reverse proxy handles it)
+    return `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
   };
 
   const fetchEntities = async () => {
@@ -44,6 +47,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       mixers.value = mixersData;
       outputs.value = outputsData;
       encoders.value = encodersData;
+      error.value = null;
     } catch (e) {
       error.value = 'Failed to load entities: ' + e.message;
       console.error('Failed to load entities:', e);
@@ -52,24 +56,57 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   };
 
+  const cleanup = () => {
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
+    if (ws) {
+      ws.onopen = null;
+      ws.onmessage = null;
+      ws.onerror = null;
+      ws.onclose = null;
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+        ws.close();
+      }
+      ws = null;
+    }
+  };
+
+  const scheduleReconnect = () => {
+    if (reconnectTimer) return;
+    status.value = 'reconnecting';
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null;
+      reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+      connect();
+    }, reconnectDelay);
+  };
+
   const connect = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) return;
+    cleanup();
 
     const wsUrl = getWsUrl();
-    ws = new WebSocket(wsUrl);
+    status.value = 'reconnecting';
+
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch (e) {
+      console.error('WebSocket creation failed:', e);
+      scheduleReconnect();
+      return;
+    }
 
     ws.onopen = () => {
       console.log('WebSocket connected');
       status.value = 'connected';
       error.value = null;
       reconnectDelay = 1000;
-      if (reconnectTimer) {
-        clearTimeout(reconnectTimer);
-        reconnectTimer = null;
-      }
+      lastMessage = Date.now();
     };
 
     ws.onmessage = (event) => {
+      lastMessage = Date.now();
       const message = JSON.parse(event.data);
       const entities = getEntitiesArray(message.type);
       if (!entities) {
@@ -91,8 +128,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (index !== -1) {
           entities.value.splice(index, 1);
         }
-      } else {
-        console.warn('Unknown channel:', message.channel);
       }
     };
 
@@ -102,29 +137,14 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     ws.onclose = () => {
       console.log('WebSocket disconnected');
-      status.value = 'reconnecting';
       ws = null;
-      if (!reconnectTimer) {
-        reconnectTimer = setTimeout(async () => {
-          reconnectTimer = null;
-          console.log(`Reconnecting in ${reconnectDelay}ms...`);
-          await fetchEntities();
-          reconnectDelay = Math.min(reconnectDelay * 2, 30000);
-          connect();
-        }, reconnectDelay);
-      }
+      scheduleReconnect();
     };
   };
 
   const disconnect = () => {
-    if (reconnectTimer) {
-      clearTimeout(reconnectTimer);
-      reconnectTimer = null;
-    }
-    if (ws) {
-      ws.close();
-      ws = null;
-    }
+    cleanup();
+    status.value = 'disconnected';
   };
 
   const sendMessage = (message) => {
@@ -135,9 +155,36 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   };
 
-  // Wait for app mount so all PrimeVue services are ready, then fetch + connect
+  // Health check: poll entities and reconnect WS if stale.
+  // Works regardless of visibility API / timer throttling reliability.
+  const startHealthCheck = () => {
+    if (healthInterval) return;
+    healthInterval = setInterval(async () => {
+      const wsAlive = ws && ws.readyState === WebSocket.OPEN;
+      const stale = Date.now() - lastMessage > 10000;
+
+      if (!wsAlive || stale) {
+        // Always poll to keep data fresh regardless of WS state
+        await fetchEntities();
+        // Reconnect WS
+        if (!wsAlive) {
+          reconnectDelay = 1000;
+          connect();
+        } else if (stale) {
+          // Socket looks open but no messages — force reconnect
+          console.log('WebSocket stale, reconnecting');
+          reconnectDelay = 1000;
+          connect();
+        }
+      }
+    }, 5000);
+  };
+
   nuxtApp.hook('app:mounted', () => {
-    fetchEntities().then(() => connect());
+    fetchEntities().then(() => {
+      connect();
+      startHealthCheck();
+    });
   });
 
   return {
