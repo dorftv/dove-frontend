@@ -48,7 +48,7 @@
   </div>
 
   <!-- Large screens: output drawer -->
-  <Drawer v-model:visible="outputOpen" position="right" :modal="false" class="output-drawer">
+  <Drawer v-model:visible="outputOpen" position="right" :modal="false" :dismissable="false" class="output-drawer">
     <template #header>
       <span class="font-medium text-sm">Outputs & Encoders</span>
     </template>
@@ -57,35 +57,33 @@
 </template>
 
 <script setup>
-const { isLoading } = useEntities();
+const { isLoading, outputs } = useEntities();
+const { stateColor } = useStateClass();
 useKeyboardShortcuts();
 
 const outputOpen = ref(false);
 const programRef = ref(null);
 const tabTop = ref(null);
 
-const { outputs } = useEntities();
-
 const statusItems = computed(() =>
   outputs.value.filter(o => !o.is_preview).map(o => ({ uid: o.uid, name: o.name, state: o.state }))
 );
-
-function stateColor(state) {
-  switch (state) {
-    case 'PLAYING': return '#22c55e';
-    case 'PAUSED': return '#f59e0b';
-    case 'READY': return '#3b82f6';
-    case 'NULL': return '#6b7280';
-    case 'PENDING': return '#6b7280';
-    default: return '#6b7280';
-  }
-}
 
 function updateTabPosition() {
   const el = programRef.value;
   if (!el) return;
   tabTop.value = el.offsetTop + el.offsetHeight / 2;
 }
+
+// Close drawer on outside click, but ignore PrimeVue overlays (popovers, selects, etc.)
+let skipNextClick = false;
+watch(outputOpen, (val) => { if (val) skipNextClick = true; });
+const onDocumentClick = (e) => {
+  if (skipNextClick) { skipNextClick = false; return; }
+  if (!outputOpen.value) return;
+  const overlay = e.target.closest('.p-drawer, .p-popover, .p-select-overlay, .p-dialog, .p-confirmdialog, .p-tooltip');
+  if (!overlay) outputOpen.value = false;
+};
 
 let ro;
 watch(programRef, (el) => {
@@ -97,7 +95,11 @@ watch(programRef, (el) => {
   }
 });
 
-onUnmounted(() => ro?.disconnect());
+onMounted(() => document.addEventListener('click', onDocumentClick));
+onUnmounted(() => {
+  ro?.disconnect();
+  document.removeEventListener('click', onDocumentClick);
+});
 </script>
 
 <style scoped>

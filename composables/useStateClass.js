@@ -49,5 +49,16 @@ export function useStateClass() {
     return 'ph:speaker-high';
   };
 
-  return { stateClass, stateIcon, stateBadgeClass, stateDotClass, volumeIcon };
+  const stateColor = (state) => {
+    const colors = {
+      PLAYING: '#22c55e',
+      PAUSED: '#f59e0b',
+      READY: '#3b82f6',
+      NULL: '#6b7280',
+      PENDING: '#6b7280',
+    };
+    return colors[state] || '#6b7280';
+  };
+
+  return { stateClass, stateIcon, stateBadgeClass, stateDotClass, stateColor, volumeIcon };
 }

@@ -6,7 +6,7 @@
       @dragover.prevent
       @dragenter.prevent="dragOver = true"
       @dragleave="dragOver = false"
-      @drop="onDrop"
+      @drop="handleDrop"
     >
       <span class="text-xs text-gray-400 dark:text-gray-500 w-8 shrink-0">{{ source.name }}</span>
       <span class="truncate flex-grow" :class="inputMatch ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic'">
@@ -83,23 +83,11 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const { volumeIcon: volumeIconFn } = useStateClass();
-const { inputs, removeSlot, handleChange, getMax, src, alpha, width, height, xpos, ypos, volume, mute } = useSceneSources(props.scene, props.source);
+const { inputs, removeSlot, handleChange, getMax, toggleMute, volumeIcon, onDrop, src, alpha, width, height, xpos, ypos, volume, mute } = useSceneSources(() => props.scene, () => props.source);
 
 const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
 const open = ref(false);
 const dragOver = ref(false);
-const previousVolume = ref(volume.value || 100);
-
-const toggleMute = () => {
-  if (mute.value) {
-    handleChange('mute', false);
-  } else {
-    handleChange('mute', true);
-  }
-};
-
-const volumeIcon = computed(() => volumeIconFn(volume.value, mute.value));
 
 const doRemoveSlot = () => {
   open.value = false;
@@ -107,16 +95,9 @@ const doRemoveSlot = () => {
   removeSlot();
 };
 
-const onDrop = (event) => {
+const handleDrop = (event) => {
   dragOver.value = false;
-  const uid = event.dataTransfer.getData('text/plain');
-  if (uid) handleChange('src', uid);
+  onDrop(event);
 };
 
-watch(() => props.source.src, (newSrc) => {
-  if (newSrc !== src.value) {
-    src.value = newSrc;
-  }
-});
 </script>
-

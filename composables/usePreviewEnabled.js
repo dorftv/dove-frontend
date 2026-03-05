@@ -1,4 +1,4 @@
-export default function usePreviewEnabled() {
+export function usePreviewEnabled() {
   const { inputPreview } = useUserState();
   const enabledInputs = ref({});
 

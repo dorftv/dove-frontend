@@ -1,4 +1,6 @@
-export default function useActiveScene() {
+import { useStorage } from '@vueuse/core';
+
+export function useActiveScene() {
   const activeIndex = useState('active-scene-index', () => 0);
   const selectedScene = useState('active-scene-selected', () => null);
   const notify = useNotify();
@@ -26,11 +28,9 @@ export default function useActiveScene() {
     }
   };
 
-  const transition = useState('transition-mode', () => localStorage.getItem('transition-mode') || 'cut');
-  const transitionDuration = useState('transition-duration', () => Number(localStorage.getItem('transition-duration')) || 1000);
-
-  watch(transition, (v) => localStorage.setItem('transition-mode', v));
-  watch(transitionDuration, (v) => localStorage.setItem('transition-duration', String(v)));
+  const transition = useStorage('transition-mode', 'cut');
+  const transitionDuration = useStorage('transition-duration', 1000);
+  const savedSceneUid = useStorage('selected-scene-uid', null);
 
   const cutting = ref(false);
 
@@ -62,11 +62,10 @@ export default function useActiveScene() {
     }
   });
 
-  // Restore selected scene from localStorage, fall back to first
+  // Restore selected scene from storage, fall back to first
   const restoreSelection = (scenes) => {
-    const savedUid = localStorage.getItem('selected-scene-uid');
-    if (savedUid) {
-      const idx = scenes.findIndex(s => s.uid === savedUid);
+    if (savedSceneUid.value) {
+      const idx = scenes.findIndex(s => s.uid === savedSceneUid.value);
       if (idx !== -1) {
         activeIndex.value = idx;
         selectedScene.value = scenes[idx];
@@ -78,7 +77,7 @@ export default function useActiveScene() {
   };
 
   watch(selectedScene, (s) => {
-    if (s?.uid) localStorage.setItem('selected-scene-uid', s.uid);
+    if (s?.uid) savedSceneUid.value = s.uid;
   });
 
   // Keep selectedScene in sync with activeIndex

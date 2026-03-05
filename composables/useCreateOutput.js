@@ -181,11 +181,7 @@ export const useCreateOutput = () => {
     const newData = baseCreate.formData[typeKey]?.[`_new_${fieldName}`];
     if (!newData) return null;
 
-    let codec = '';
-    if (fieldName === 'video_encoder') {
-      if (newData.element.includes('264')) codec = 'h264';
-      else if (newData.element.includes('265')) codec = 'h265';
-    }
+    const codec = fieldName === 'video_encoder' ? codecFromElement(newData.element) : '';
 
     const body = {
       type: fieldName === 'video_encoder' ? 'video' : 'audio',

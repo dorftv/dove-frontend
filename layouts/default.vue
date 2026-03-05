@@ -120,7 +120,7 @@ const colorMode = useColorMode()
 const mobileMenuOpen = ref(false)
 const { wsStatus } = useEntities()
 const { load } = useServerLoad()
-const { previewMode, cycle: cyclePreviewMode } = usePreviewMode()
+const { previewMode, cycle: cyclePreviewMode } = usePlayerMode()
 
 const previewModeLabel = computed(() => {
   if (previewMode.value === 'auto') return 'Auto';

@@ -92,18 +92,8 @@ const {
   submitPause,
   submitStop,
   submitLoop,
+  toggleMute,
 } = useInputControls(props);
-
-const previousVolume = ref(80);
-
-const toggleMute = () => {
-  if (volume.value === 0) {
-    handleVolumeChange(previousVolume.value);
-  } else {
-    previousVolume.value = volume.value;
-    handleVolumeChange(0);
-  }
-};
 </script>
 
 <style scoped>

@@ -1,4 +1,4 @@
-export default function useKeyboardShortcuts() {
+export function useKeyboardShortcuts() {
   const { handleSceneClick, cutSceneToProgram } = useActiveScene();
 
   const onKeyDown = (event) => {

@@ -64,11 +64,7 @@ export const useCreateEncoder = () => {
   };
 
   const submitCreate = async () => {
-    let codec = '';
-    if (encoderType.value === 'video') {
-      if (formData.element.includes('264')) codec = 'h264';
-      else if (formData.element.includes('265')) codec = 'h265';
-    }
+    const codec = encoderType.value === 'video' ? codecFromElement(formData.element) : '';
 
     const dimensions = selectedResolution.value
       ? doveConfig.getResolutionDimensions(selectedResolution.value)

@@ -1,4 +1,4 @@
-export default function useNotify() {
+export function useNotify() {
   const toast = useToast();
 
   return {

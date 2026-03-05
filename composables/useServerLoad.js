@@ -1,4 +1,4 @@
-export default function useServerLoad() {
+export function useServerLoad() {
   const load = useState('server-load', () => null);
   let timer = null;
 

@@ -1,7 +1,8 @@
-export default function useInputControls(props) {
+export function useInputControls(props) {
   const volume = ref(props.input.volume * 100);
   const { inputs, updateEntity } = useEntities();
   const notify = useNotify();
+  const previousVolume = ref(80);
 
   watch(
     () => props.input.volume,
@@ -117,6 +118,15 @@ export default function useInputControls(props) {
     });
   };
 
+  const toggleMute = () => {
+    if (volume.value === 0) {
+      handleVolumeChange(previousVolume.value);
+    } else {
+      previousVolume.value = volume.value;
+      handleVolumeChange(0);
+    }
+  };
+
   const { inputPreview } = useUserState();
 
   const toggleInputPreview = () => {
@@ -125,6 +135,7 @@ export default function useInputControls(props) {
 
   return {
     volume,
+    toggleMute,
     position,
     durationFormatted,
     positionFormatted,

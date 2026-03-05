@@ -1,4 +1,4 @@
-export default function useTimeFormatter(seconds) {
+export function useTimeFormatter(seconds) {
   if (seconds == null) {
     return '';
   }

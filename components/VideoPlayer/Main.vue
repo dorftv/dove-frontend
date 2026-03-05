@@ -10,7 +10,7 @@ const props = defineProps({
 });
 
 const { previewOutputs } = useEntities();
-const { previewMode } = usePreviewMode();
+const { previewMode } = usePlayerMode();
 
 const whepFailed = ref(false);
 
