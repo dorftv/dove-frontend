@@ -5,7 +5,7 @@
   </div>
 
   <div v-else class="relative">
-    <div class="grid grid-cols-12 gap-4 pl-4 pr-8 py-4">
+    <div class="grid grid-cols-12 gap-4 px-4 lg:pl-4 lg:pr-8 py-4">
       <div class="col-span-12 md:col-span-6 lg:col-span-5">
         <SceneMain />
       </div>
@@ -18,12 +18,17 @@
         <ProgramMain />
       </div>
 
+      <!-- Mobile/tablet: inline outputs -->
+      <div class="col-span-12 lg:hidden order-last">
+        <OutputMain />
+      </div>
+
       <div class="col-span-12 md:order-last">
         <InputMain />
       </div>
     </div>
 
-    <!-- Output drawer tab handle — absolutely positioned to program row -->
+    <!-- Large screens: output drawer tab handle -->
     <div
       v-if="!outputOpen && tabTop !== null"
       class="output-tab"
@@ -42,7 +47,7 @@
     </div>
   </div>
 
-  <!-- Output drawer -->
+  <!-- Large screens: output drawer -->
   <Drawer v-model:visible="outputOpen" position="right" :modal="false" class="output-drawer">
     <template #header>
       <span class="font-medium text-sm">Outputs & Encoders</span>
@@ -59,7 +64,7 @@ const outputOpen = ref(false);
 const programRef = ref(null);
 const tabTop = ref(null);
 
-const { outputs, encoders } = useEntities();
+const { outputs } = useEntities();
 
 const statusItems = computed(() =>
   outputs.value.filter(o => !o.is_preview).map(o => ({ uid: o.uid, name: o.name, state: o.state }))
@@ -100,7 +105,7 @@ onUnmounted(() => ro?.disconnect());
   position: absolute;
   right: 0;
   transform: translateY(-50%);
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   gap: 3px;
@@ -112,6 +117,12 @@ onUnmounted(() => ro?.disconnect());
   border: 1px solid var(--p-surface-200);
   border-right: none;
   transition: background 0.15s;
+}
+
+@media (min-width: 1024px) {
+  .output-tab {
+    display: flex;
+  }
 }
 
 :root.p-dark .output-tab {
