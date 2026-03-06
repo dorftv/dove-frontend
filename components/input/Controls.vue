@@ -40,12 +40,6 @@
         <Icon name="ph:repeat" size="14px" />
       </button>
 
-      <!-- State badge -->
-      <span :class="stateBadgeClass(input.state)" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none" role="status">
-        <Icon :name="stateIcon(input.state)" size="10px" />
-        {{ input.state }}
-      </span>
-
       <!-- Spacer -->
       <div class="flex-grow" />
 
@@ -71,6 +65,16 @@
         </span>
       </div>
     </div>
+
+    <!-- Playlist details / spacer for equal height -->
+    <div class="h-4 flex items-center text-[10px] text-gray-500 dark:text-gray-400 px-0.5 mt-0.5">
+      <template v-if="input.type === 'playlist'">
+        <span v-if="input.details" class="truncate min-w-0">{{ input.details }}</span>
+        <div class="flex-grow" />
+        <span v-if="input.total_duration" class="whitespace-nowrap font-mono tabular-nums shrink-0 ml-1">{{ totalPositionFormatted }}/{{ totalDurationFormatted }}</span>
+        <span v-if="input.playlist?.length" class="whitespace-nowrap shrink-0 ml-1">({{ (input.index ?? 0) + 1 }}/{{ input.playlist.length }})</span>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -79,13 +83,15 @@ const props = defineProps({
   input: Object,
 });
 
-const { stateIcon, stateBadgeClass, volumeIcon } = useStateClass();
+const { volumeIcon } = useStateClass();
 
 const {
   volume,
   position,
   durationFormatted,
   positionFormatted,
+  totalPositionFormatted,
+  totalDurationFormatted,
   handleVolumeChange,
   handlePositionChange,
   submitPlay,

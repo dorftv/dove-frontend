@@ -32,8 +32,15 @@
             <div v-if="field.name !== 'type'" class="mb-2">
               <div v-if="!isEncoderField(field.name)" class="encoder-field mb-4">
                 <label :for="field.name" class="block font-bold text-sm mt-2 text-gray-700 dark:text-gray-300">{{ field.label }}</label>
+                <Select
+                  v-if="field.enum"
+                  v-model="formData[selectedType.key][field.name]"
+                  :options="field.enum"
+                  :placeholder="field.default"
+                  class="w-full text-sm"
+                />
                 <InputText
-                  v-if="field.type === 'string'"
+                  v-else-if="field.type === 'string'"
                   v-model="formData[selectedType.key][field.name]"
                   :id="field.name"
                   :placeholder="field.placeholder"

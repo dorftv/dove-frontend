@@ -22,6 +22,21 @@ export function useInputControls(props) {
 
   const positionFormatted = useTimeFormatter(position);
 
+  const totalPosition = ref(0);
+  const totalDuration = ref(0);
+  watchEffect(() => {
+    totalPosition.value = props.input.total_position || 0;
+    totalDuration.value = props.input.total_duration || 0;
+  });
+  const totalPositionFormatted = computed(() => {
+    if (!props.input.total_duration) return '';
+    return useTimeFormatter(totalPosition).value;
+  });
+  const totalDurationFormatted = computed(() => {
+    if (!props.input.total_duration) return '';
+    return useTimeFormatter(totalDuration).value;
+  });
+
   watchEffect(() => {
     duration.value = props.input.duration;
     position.value = props.input.position;
@@ -139,6 +154,8 @@ export function useInputControls(props) {
     position,
     durationFormatted,
     positionFormatted,
+    totalPositionFormatted,
+    totalDurationFormatted,
     handleVolumeChange,
     handlePositionChange,
     submitPlay,

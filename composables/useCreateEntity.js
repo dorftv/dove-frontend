@@ -66,7 +66,11 @@ export const useCreateEntity = (entityType) => {
         formData[type.key] = {};
         if (Array.isArray(type.fields)) {
           type.fields.forEach((field) => {
-            formData[type.key][field.name] = field.type === 'boolean' ? false : '';
+            if (field.default != null) {
+              formData[type.key][field.name] = field.default;
+            } else {
+              formData[type.key][field.name] = field.type === 'boolean' ? false : '';
+            }
           });
         }
 

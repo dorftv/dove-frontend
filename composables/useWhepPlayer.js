@@ -11,12 +11,21 @@ export function useWhepPlayer(props, { onError } = {}) {
   let failCount = 0;
   const MAX_RETRIES = 3;
 
+  const cleanupPlayer = async () => {
+    if (!player) return;
+    try {
+      await player.unload();
+    } catch {
+      // unload may fail if connection was never established
+    }
+    player.removeAllListeners();
+    player = null;
+  };
+
   const initializePlayer = async () => {
     if (!videoPlayer.value) return;
 
-    if (player) {
-      player.destroy();
-    }
+    await cleanupPlayer();
 
     player = new WebRTCPlayer({
       video: videoPlayer.value,
@@ -29,6 +38,7 @@ export function useWhepPlayer(props, { onError } = {}) {
       await player.load(url);
       failCount = 0;
       player.on('initial-connection-failed', handleConnectionFailed);
+      player.on('no-media', handleConnectionFailed);
 
       try {
         await videoPlayer.value.play();
@@ -78,10 +88,7 @@ export function useWhepPlayer(props, { onError } = {}) {
   });
 
   onUnmounted(() => {
-    if (player) {
-      player.off('connectionfailed', handleConnectionFailed);
-      player.destroy();
-    }
+    cleanupPlayer();
   });
 
   watch(() => props.uid, initializePlayer);
