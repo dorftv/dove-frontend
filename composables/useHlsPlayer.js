@@ -55,5 +55,12 @@ export function useHlsPlayer(props) {
 
   onMounted(setup);
 
+  // Sync mutedState → player.muted (handles cross-player exclusive unmute)
+  watch(() => mutedState.value[props.uid], (isMuted) => {
+    if (mediaPlayer.value) {
+      mediaPlayer.value.muted = isMuted;
+    }
+  });
+
   return { mediaPlayer, mutedState };
 }

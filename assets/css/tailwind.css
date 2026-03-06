@@ -48,6 +48,17 @@ body {
   }
 }
 
+/* Global slider knob — half default size */
+.p-slider-handle {
+  width: 10px !important;
+  height: 10px !important;
+  margin-top: -5px !important;
+}
+.p-slider-handle::before {
+  width: 6px !important;
+  height: 6px !important;
+}
+
 /* Slim slider — volume controls */
 .slim-slider .p-slider {
   @apply bg-gray-300 dark:bg-gray-700;
@@ -56,11 +67,8 @@ body {
 .slim-slider .p-slider-range {
   @apply bg-gray-500 dark:bg-gray-400;
 }
-.slim-slider .p-slider-handle {
-  @apply bg-gray-600 dark:bg-gray-300 border-none;
-  width: 8px;
-  height: 8px;
-  margin-top: -2.5px;
+.slim-slider .p-slider-handle::before {
+  @apply bg-gray-600 dark:bg-gray-100;
 }
 
 /* Slim slider accent — transport/seek bar */
@@ -71,9 +79,6 @@ body {
 .slim-slider-accent .p-slider-range {
   @apply bg-emerald-500;
 }
-.slim-slider-accent .p-slider-handle {
-  @apply bg-emerald-500 dark:bg-emerald-400 border-none;
-  width: 10px;
-  height: 10px;
-  margin-top: -3px;
+.slim-slider-accent .p-slider-handle::before {
+  @apply bg-emerald-500 dark:bg-emerald-400;
 }

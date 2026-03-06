@@ -46,9 +46,10 @@
           optionLabel="name"
           optionValue="uid"
           :modelValue="src"
-          @update:modelValue="(val) => handleChange('src', val)"
+          @update:modelValue="(val) => handleChange('src', val || 'None')"
           placeholder="Select input"
           size="small"
+          showClear
         />
       </div>
       <button @click="doRemoveSlot" class="flex items-center gap-1 text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 py-1 cursor-pointer">

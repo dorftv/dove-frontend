@@ -1,8 +1,11 @@
 <template>
   <div class="flex flex-col p-2" v-if="scene">
     <SceneHeader :scene="scene" />
-    <div v-if="mixerPreview || mixerEnabled" class="w-full aspect-video">
-      <VideoPlayerMain :uid="scene.uid" class="w-full h-full" />
+    <div v-if="mixerPreview || mixerEnabled" class="flex">
+      <div class="flex-grow min-w-0 aspect-video">
+        <VideoPlayerMain :uid="scene.uid" class="w-full h-full" />
+      </div>
+      <AudioMeter v-if="audioMeters" :uid="scene.uid" />
     </div>
     <div class="border-t border-gray-200 dark:border-gray-700">
       <button @click="slotsOpen = !slotsOpen" class="flex items-center gap-1.5 w-full px-3 py-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer">
@@ -47,7 +50,7 @@ const props = defineProps({
   active: Boolean
 });
 
-const { mixerPreview } = useUserState();
+const { mixerPreview, audioMeters } = useUserState();
 const mixerEnabled = ref(false);
 const slotsOpen = ref(true);
 const { addingSlot, dropOver, dragCount, addSlot, onDropAdd } = useSceneSlots(() => props.scene);

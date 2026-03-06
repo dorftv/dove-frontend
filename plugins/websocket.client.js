@@ -12,6 +12,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const mixers = useState('entities-mixers', () => []);
   const outputs = useState('entities-outputs', () => []);
   const encoders = useState('entities-encoders', () => []);
+  const audioLevels = useState('audio-levels', () => ({}));
   const isLoading = useState('entities-loading', () => true);
 
   const getEntitiesArray = (type) => {
@@ -103,11 +104,21 @@ export default defineNuxtPlugin((nuxtApp) => {
       error.value = null;
       reconnectDelay = 1000;
       lastMessage = Date.now();
+      fetchEntities();
     };
 
     ws.onmessage = (event) => {
       lastMessage = Date.now();
       const message = JSON.parse(event.data);
+
+      if (message.channel === 'LEVEL') {
+        const levels = Array.isArray(message.data) ? message.data : [message.data];
+        for (const l of levels) {
+          audioLevels.value[l.uid] = l;
+        }
+        return;
+      }
+
       const entities = getEntitiesArray(message.type);
       if (!entities) {
         console.warn('Unknown type:', message.type);

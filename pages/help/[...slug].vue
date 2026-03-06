@@ -39,7 +39,7 @@
         <article
           v-if="html"
           class="prose dark:prose-invert prose-emerald max-w-3xl
-                 prose-headings:font-semibold
+                 prose-headings:font-semibold prose-h1:text-2xl
                  prose-a:text-emerald-600 dark:prose-a:text-emerald-400
                  prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
                  prose-table:text-sm

@@ -94,6 +94,7 @@ export const useCreateEntity = (entityType) => {
     if (entityType === "inputs") {
       typesArray.forEach((type) => {
         formData[type.key].volume = 0.8;
+        formData[type.key].preview = true;
       });
     }
   };
@@ -129,6 +130,7 @@ export const useCreateEntity = (entityType) => {
       Object.keys(formData).forEach(key => delete formData[key]);
       initializeFormData(types.value);
       selectedResolution.value = defaultResolution.value;
+      activeTabIndex.value = 0;
       // Blur focus so Enter key doesn't re-trigger dialog
       document.activeElement?.blur();
     }

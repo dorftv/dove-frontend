@@ -1,18 +1,22 @@
 <template>
-  <div>
-    <media-player v-if="uid" ref="mediaPlayer" :muted="mutedState[uid]" viewType="video" autoplay stream-type="live" load="custom" :title="`${uid}`" :src="`/preview/hls/${uid}/index.m3u8`" class="aspect-video">
+  <div class="aspect-video bg-black relative group">
+    <media-player v-if="uid" ref="mediaPlayer" :muted="mutedState[uid]" viewType="video" autoplay stream-type="live" load="custom" :title="`${uid}`" :src="`/preview/hls/${uid}/index.m3u8`" class="w-full h-full">
       <media-provider></media-provider>
-      <media-video-layout></media-video-layout>
     </media-player>
+    <div class="absolute bottom-0 right-0 flex items-center gap-1 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <button @click="toggleMute" class="video-btn" :title="mutedState[uid] ? 'Unmute' : 'Mute'">
+        <Icon :name="mutedState[uid] ? 'ph:speaker-x' : 'ph:speaker-high'" size="16px" />
+      </button>
+      <button @click="toggleFullscreen" class="video-btn" title="Fullscreen">
+        <Icon name="ph:corners-out" size="16px" />
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import 'vidstack/player';
-import 'vidstack/player/layouts';
-import 'vidstack/player/ui';
 import 'vidstack/player/styles/default/theme.css';
-import 'vidstack/player/styles/default/layouts/video.css';
 
 const props = defineProps({
   uid: String,
@@ -21,4 +25,21 @@ const props = defineProps({
 });
 
 const { mediaPlayer, mutedState } = useHlsPlayer(props);
+const { setMutedState } = useMutedState();
+
+const toggleMute = () => {
+  setMutedState(props.uid, !mutedState.value[props.uid]);
+};
+
+const toggleFullscreen = () => {
+  mediaPlayer.value?.requestFullscreen();
+};
 </script>
+
+<style scoped>
+.video-btn {
+  @apply flex items-center justify-center w-7 h-7 rounded
+         text-white/80 hover:text-white bg-black/40 hover:bg-black/60
+         transition-all cursor-pointer;
+}
+</style>

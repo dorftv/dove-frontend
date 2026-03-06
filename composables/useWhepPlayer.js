@@ -93,5 +93,12 @@ export function useWhepPlayer(props, { onError } = {}) {
 
   watch(() => props.uid, initializePlayer);
 
+  // Sync mutedState → video.muted (handles cross-player exclusive unmute)
+  watch(() => mutedState.value[props.uid], (isMuted) => {
+    if (videoPlayer.value && videoPlayer.value.muted !== isMuted) {
+      videoPlayer.value.muted = isMuted;
+    }
+  });
+
   return { videoPlayer, mutedState };
 }

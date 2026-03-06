@@ -10,11 +10,14 @@
       <span>Mixer</span>
       <ToggleSwitch v-model="mixerPreview" class="toggle-sm" />
     </label>
+    <button @click="audioMeters = !audioMeters" class="meter-btn" :class="{ active: audioMeters }" title="Audio Meters">
+      <Icon name="ph:equalizer" size="14px" />
+    </button>
   </div>
 </template>
 
 <script setup>
-const { inputPreview, mixerPreview } = useUserState();
+const { inputPreview, mixerPreview, audioMeters } = useUserState();
 </script>
 
 <style scoped>
@@ -29,5 +32,16 @@ const { inputPreview, mixerPreview } = useUserState();
 
 .toggle-sm :deep(.p-toggleswitch) {
   transform: scale(0.75);
+}
+
+.meter-btn {
+  @apply flex items-center justify-center w-6 h-6 rounded cursor-pointer
+         text-gray-400 dark:text-gray-500 opacity-50
+         hover:text-gray-600 dark:hover:text-gray-300
+         transition-all duration-150;
+}
+
+.meter-btn.active {
+  @apply text-gray-600 dark:text-gray-300 opacity-100;
 }
 </style>

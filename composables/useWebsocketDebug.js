@@ -1,28 +1,31 @@
 export function useWebsocketDebug() {
   const messages = ref([]);
-  const filterChannel = ref(null);
-  const filterType = ref(null);
+  const filterChannel = ref([]);
+  const filterType = ref([]);
   const paused = ref(false);
+  const showLevels = ref(false);
   const MAX_MESSAGES = 500;
 
   let socket = null;
 
-  const channelOptions = ['CREATE', 'UPDATE', 'DELETE'];
-  const typeOptions = ['input', 'mixer', 'output', 'encoder'];
+  const channelOptions = ['CREATE', 'UPDATE', 'DELETE', 'LEVEL'];
+  const typeOptions = ['input', 'mixer', 'output', 'encoder', 'level'];
 
   const channelColor = (channel) => {
     const colors = {
       CREATE: 'text-green-400',
       UPDATE: 'text-blue-400',
       DELETE: 'text-red-400',
+      LEVEL: 'text-yellow-400',
     };
     return colors[channel] || 'text-gray-400';
   };
 
   const filteredMessages = computed(() => {
     return messages.value.filter(msg => {
-      if (filterChannel.value && msg.channel !== filterChannel.value) return false;
-      if (filterType.value && msg.type !== filterType.value) return false;
+      if (!showLevels.value && msg.channel === 'LEVEL') return false;
+      if (filterChannel.value?.length && !filterChannel.value.includes(msg.channel)) return false;
+      if (filterType.value?.length && !filterType.value.includes(msg.type)) return false;
       return true;
     });
   });
@@ -96,6 +99,7 @@ export function useWebsocketDebug() {
     filterChannel,
     filterType,
     paused,
+    showLevels,
     channelOptions,
     typeOptions,
     channelColor,

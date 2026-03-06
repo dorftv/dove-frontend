@@ -2,20 +2,22 @@
   <div class="bg-gray-900 rounded-lg p-4 text-xs font-mono">
     <!-- Toolbar -->
     <div class="flex items-center gap-2 mb-3">
-      <Select
+      <MultiSelect
         v-model="filterChannel"
         :options="channelOptions"
-        placeholder="All channels"
-        showClear
-        class="text-xs w-36"
+        placeholder="Channels"
+        class="text-xs w-48"
       />
-      <Select
+      <MultiSelect
         v-model="filterType"
         :options="typeOptions"
-        placeholder="All types"
-        showClear
-        class="text-xs w-36"
+        placeholder="Types"
+        class="text-xs w-48"
       />
+      <label class="flex items-center gap-1.5 text-gray-400 cursor-pointer select-none hover:text-gray-200">
+        <input type="checkbox" v-model="showLevels" class="accent-yellow-400" />
+        Audio Levels
+      </label>
       <div class="flex-grow" />
       <span class="text-gray-500">{{ filteredMessages.length }} messages</span>
       <button @click="clearMessages" class="text-gray-400 hover:text-white px-2 py-1 rounded hover:bg-gray-700 transition-colors">
@@ -53,5 +55,5 @@
 </template>
 
 <script setup>
-const { filterChannel, filterType, paused, channelOptions, typeOptions, channelColor, filteredMessages, clearMessages } = useWebsocketDebug();
+const { filterChannel, filterType, paused, showLevels, channelOptions, typeOptions, channelColor, filteredMessages, clearMessages } = useWebsocketDebug();
 </script>
