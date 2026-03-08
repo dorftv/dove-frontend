@@ -6,7 +6,7 @@
       <img :src="'/assets/logo.png'" alt="DOVE" class="w-40 sm:w-48 md:w-56 shrink-0" />
       <div class="flex flex-col justify-center">
         <p class="text-gray-700 dark:text-gray-300 mb-3">
-          <strong>DOVE</strong> (DORFTV Online Video Editor) is an API-driven live video mixing application.
+          <strong>DOVE</strong> (Dove Online Video Editor) is an API-driven live video mixing application.
           It combines multiple video and audio sources into scenes, mixes them into a live program output,
           and streams to various destinations.
         </p>

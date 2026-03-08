@@ -43,18 +43,20 @@ export function useInputControls(props) {
   });
 
   const handleVolumeChange = (newVolume) => {
-    volume.value = newVolume;
+    const val = Array.isArray(newVolume) ? newVolume[0] : newVolume;
+    volume.value = val;
     updateEntity('input', {
       uid: props.input.uid,
-      volume: newVolume / 100,
+      volume: val / 100,
     });
   };
 
   const handlePositionChange = (newPosition) => {
-    position.value = newPosition;
+    const val = Array.isArray(newPosition) ? newPosition[0] : newPosition;
+    position.value = val;
     updateEntity('input', {
       uid: props.input.uid,
-      position: newPosition,
+      position: val,
     });
   };
 

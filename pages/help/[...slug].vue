@@ -3,16 +3,31 @@
     <!-- Mobile nav -->
     <div class="md:hidden border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2">
       <div class="flex items-center gap-2 overflow-x-auto text-sm">
-        <NuxtLink
-          v-for="item in navItems" :key="item.slug"
-          :to="item.slug === 'index' ? '/help' : `/help/${item.slug}`"
-          class="shrink-0 px-3 py-1 rounded-full transition-colors"
-          :class="currentSlug === item.slug
-            ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
-            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
-        >
-          {{ item.title }}
-        </NuxtLink>
+        <template v-for="item in navSections" :key="item.slug || item.title">
+          <NuxtLink
+            v-if="!item.type"
+            :to="item.slug === 'index' ? '/help' : `/help/${item.slug}`"
+            class="shrink-0 px-3 py-1 rounded-full transition-colors"
+            :class="currentSlug === item.slug
+              ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+          >
+            {{ item.title }}
+          </NuxtLink>
+          <template v-else-if="item.type === 'group'">
+            <NuxtLink
+              v-for="child in item.children"
+              :key="child.slug"
+              :to="`/help/${child.slug}`"
+              class="shrink-0 px-3 py-1 rounded-full transition-colors"
+              :class="currentSlug === child.slug
+                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+            >
+              {{ child.title }}
+            </NuxtLink>
+          </template>
+        </template>
       </div>
     </div>
 
@@ -20,17 +35,43 @@
       <!-- Desktop sidebar -->
       <nav class="hidden md:block w-52 shrink-0 border-r border-gray-200 dark:border-gray-700 p-4">
         <ul class="space-y-0.5 text-sm sticky top-14">
-          <li v-for="item in navItems" :key="item.slug">
-            <NuxtLink
-              :to="item.slug === 'index' ? '/help' : `/help/${item.slug}`"
-              class="block px-3 py-1.5 rounded transition-colors"
-              :class="currentSlug === item.slug
-                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
-            >
-              {{ item.title }}
-            </NuxtLink>
-          </li>
+          <template v-for="item in navSections" :key="item.slug || item.title">
+            <li v-if="!item.type">
+              <NuxtLink
+                :to="item.slug === 'index' ? '/help' : `/help/${item.slug}`"
+                class="block px-3 py-1.5 rounded transition-colors"
+                :class="currentSlug === item.slug
+                  ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+              >
+                {{ item.title }}
+              </NuxtLink>
+            </li>
+            <template v-else-if="item.type === 'group'">
+              <li>
+                <button
+                  @click="toggleGroup(item.title)"
+                  class="w-full flex items-center justify-between px-3 py-1.5 rounded transition-colors font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <span>{{ item.title }}</span>
+                  <span class="text-xs">{{ openGroups.has(item.title) ? '▾' : '▸' }}</span>
+                </button>
+              </li>
+              <template v-if="openGroups.has(item.title)">
+                <li v-for="child in item.children" :key="child.slug">
+                  <NuxtLink
+                    :to="`/help/${child.slug}`"
+                    class="block pl-5 pr-3 py-1.5 rounded transition-colors"
+                    :class="currentSlug === child.slug
+                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                  >
+                    {{ child.title }}
+                  </NuxtLink>
+                </li>
+              </template>
+            </template>
+          </template>
         </ul>
       </nav>
 
@@ -62,14 +103,37 @@ import MarkdownIt from 'markdown-it'
 
 const route = useRoute()
 
-const navItems = [
+const navSections = [
   { slug: 'index', title: 'Overview' },
+  { slug: 'interface', title: 'Interface' },
+  { slug: 'scenes', title: 'Scenes' },
+  { slug: 'config', title: 'Configuration' },
+  {
+    type: 'group', title: 'Outputs',
+    children: [
+      { slug: 'outputs', title: 'Overview' },
+      { slug: 'encoders', title: 'Encoders' },
+    ],
+  },
+  {
+    type: 'group', title: 'Inputs',
+    children: [
+      { slug: 'inputs', title: 'All Inputs' },
+      { slug: 'inputs-playbin3', title: 'Streams & Files' },
+      { slug: 'inputs-playlist', title: 'Playlist' },
+      { slug: 'inputs-wpesrc', title: 'HTML / Web' },
+      { slug: 'inputs-ytdlp', title: 'yt-dlp' },
+      { slug: 'inputs-nodecg', title: 'NodeCG' },
+      { slug: 'inputs-testsrc', title: 'Test Source' },
+    ],
+  },
   { slug: 'previews', title: 'Previews' },
   { slug: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
-  { slug: 'interface', title: 'Interface' },
   { slug: 'connection-status', title: 'Connection Status' },
   { slug: 'debugging', title: 'Debugging' },
 ]
+
+const openGroups = ref(new Set())
 
 const md = new MarkdownIt({ html: true })
 
@@ -78,6 +142,25 @@ const currentSlug = computed(() => {
   if (!parts || parts.length === 0) return 'index'
   return parts.join('/')
 })
+
+// Auto-open the group that contains the current page
+watch(currentSlug, (slug) => {
+  for (const item of navSections) {
+    if (item.type === 'group' && item.children?.some(c => c.slug === slug)) {
+      openGroups.value = new Set([...openGroups.value, item.title])
+    }
+  }
+}, { immediate: true })
+
+function toggleGroup(title) {
+  const s = new Set(openGroups.value)
+  if (s.has(title)) {
+    s.delete(title)
+  } else {
+    s.add(title)
+  }
+  openGroups.value = s
+}
 
 const html = ref('')
 const error = ref('')
