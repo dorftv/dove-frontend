@@ -1,12 +1,11 @@
 <template>
   <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-3 py-1.5 flex items-center gap-1.5 text-xs">
     <!-- Name -->
-    <span
-      v-tooltip="`${scene.width}x${scene.height} · ${scene.sources?.length || 0} slots`"
-      class="truncate cursor-help text-sm text-gray-800 dark:text-gray-200 font-medium"
-    >
-      {{ scene.name }}
-    </span>
+    <UTooltip :text="`${scene.width}x${scene.height} · ${scene.sources?.length || 0} slots`">
+      <span class="truncate cursor-help text-sm text-gray-800 dark:text-gray-200 font-medium">
+        {{ scene.name }}
+      </span>
+    </UTooltip>
 
     <!-- Spacer -->
     <div class="flex-grow" />
@@ -21,7 +20,7 @@
       title="Delete"
       aria-label="Delete scene"
     >
-      <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
+      <Icon :name="deleting ? 'ph:spinner' : 'ph:trash'" size="11px" :class="{ 'animate-spin': deleting }" />
     </button>
   </div>
 </template>

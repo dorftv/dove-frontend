@@ -105,9 +105,10 @@ export const useCreateOutput = () => {
       if (enc.is_preview) return false;
       if (enc.type !== encoderType) return false;
       if (allowedElements.size > 0 && !allowedElements.has(enc.element)) return false;
-      if (formSrc && enc.src !== formSrc) return false;
-      if (formWidth && enc.width !== formWidth) return false;
-      if (formHeight && enc.height !== formHeight) return false;
+      // Only filter by src/dimensions when both sides have a value
+      if (formSrc && enc.src && String(enc.src) !== String(formSrc)) return false;
+      if (formWidth && enc.width && Number(enc.width) !== Number(formWidth)) return false;
+      if (formHeight && enc.height && Number(enc.height) !== Number(formHeight)) return false;
       return true;
     });
   };

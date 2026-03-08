@@ -26,7 +26,7 @@
         </div>
         <div class="flex gap-2">
           <dt class="font-medium w-28 shrink-0">Frontend</dt>
-          <dd class="text-gray-500 dark:text-gray-400">Nuxt, Vue, PrimeVue, Tailwind CSS</dd>
+          <dd class="text-gray-500 dark:text-gray-400">Nuxt, Vue, Nuxt UI, Tailwind CSS</dd>
         </div>
         <div class="flex gap-2">
           <dt class="font-medium w-28 shrink-0">Streaming</dt>

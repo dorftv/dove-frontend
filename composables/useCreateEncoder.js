@@ -1,6 +1,5 @@
 export const useCreateEncoder = () => {
   const isOpen = ref(false);
-  const op = ref();
   const notify = useNotify();
   const { mixers } = useEntities();
   const doveConfig = useDoveConfig();
@@ -97,9 +96,8 @@ export const useCreateEncoder = () => {
     }
   };
 
-  const toggle = (event) => {
-    op.value.toggle(event);
-    isOpen.value = true;
+  const toggle = () => {
+    isOpen.value = !isOpen.value;
   };
 
   const resetForm = () => {
@@ -115,7 +113,6 @@ export const useCreateEncoder = () => {
 
   watch(isOpen, (val) => {
     if (!val) {
-      op.value?.hide();
       resetForm();
       document.activeElement?.blur();
     }
@@ -135,7 +132,6 @@ export const useCreateEncoder = () => {
 
   return {
     isOpen,
-    op,
     toggle,
     encoderType,
     formData,

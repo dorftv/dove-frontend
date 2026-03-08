@@ -41,6 +41,8 @@ const toggleFullscreen = () => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+
 video {
   display: block;
   width: 100%;

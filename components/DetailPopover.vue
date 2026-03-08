@@ -1,10 +1,12 @@
 <template>
-  <Popover ref="op" appendTo="body">
-    <pre class="text-xs text-gray-700 dark:text-gray-300">{{ details }}</pre>
-  </Popover>
-  <button @click="op.toggle($event)" class="icon-btn" title="Details" aria-label="Show details">
-    <i class="pi pi-info-circle text-[11px]"></i>
-  </button>
+  <UPopover>
+    <button class="icon-btn" title="Details" aria-label="Show details">
+      <Icon name="ph:info" size="11px" />
+    </button>
+    <template #content>
+      <pre class="text-xs text-gray-700 dark:text-gray-300 p-3 max-w-lg overflow-auto">{{ details }}</pre>
+    </template>
+  </UPopover>
 </template>
 
 <script setup>
@@ -13,6 +15,5 @@ const props = defineProps({
 });
 
 const { enrichEntity } = useEntities();
-const op = ref();
 const details = computed(() => JSON.stringify(enrichEntity(props.entity), null, 2));
 </script>

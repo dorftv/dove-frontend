@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <header class="sticky top-0 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur border-b border-gray-200 dark:border-gray-700">
+    <header class="sticky top-0 z-50 bg-gray-50/90 dark:bg-gray-800/90 backdrop-blur border-b border-gray-200 dark:border-gray-700">
       <nav class="px-3 h-10 flex items-center text-sm" aria-label="Main navigation">
 
         <!-- Logo -->
@@ -23,7 +23,7 @@
         <button
           @click="cyclePreviewMode"
           class="hidden md:flex icon-btn text-[10px] font-mono tabular-nums mx-2"
-          v-tooltip.bottom="'Preview Type'"
+          title="Preview Type"
         >
           {{ previewModeLabel }}
         </button>
@@ -73,7 +73,7 @@
       </nav>
 
       <!-- Mobile dropdown -->
-      <div v-if="mobileMenuOpen" class="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 space-y-1">
+      <div v-if="mobileMenuOpen" class="md:hidden border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2 space-y-1">
         <NuxtLink to="/" @click="mobileMenuOpen = false" class="mobile-link">
           <Icon name="ph:house" size="16px" /> Home
         </NuxtLink>
@@ -150,6 +150,8 @@ useHead({
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+
 .icon-btn {
   @apply items-center justify-center w-7 h-7 rounded
          text-gray-500 dark:text-gray-400

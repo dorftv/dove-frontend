@@ -16,24 +16,24 @@
         <button
           v-if="!isInSceneSources"
           @click="submitAddInputToScene"
-          class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400"
+          class="icon-btn w-8 h-8 md:w-6 md:h-6 rounded hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400"
           title="Assign to slot"
           aria-label="Assign to slot"
         >
-          <i class="pi pi-plus-circle text-[11px]"></i>
+          <Icon name="ph:plus-circle" size="14px" />
         </button>
         <button
           v-else
           @click="submitRemoveInputFromScene"
-          class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-400"
+          class="icon-btn w-8 h-8 md:w-6 md:h-6 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400"
           title="Remove from slot"
           aria-label="Remove from slot"
         >
-          <i class="pi pi-minus-circle text-[11px]"></i>
+          <Icon name="ph:minus-circle" size="14px" />
         </button>
       </template>
       <span v-else class="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center opacity-40" title="Locked">
-        <i class="pi pi-lock text-[11px]"></i>
+        <Icon name="ph:lock" size="11px" />
       </span>
     </div>
   </div>

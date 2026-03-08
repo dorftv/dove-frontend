@@ -19,53 +19,54 @@
             <Icon :name="volumeIcon" size="14px" />
           </button>
           <span :title="volume + '%'">
-            <Slider
-              :modelValue="volume"
-              @update:modelValue="handleChange('volume', $event)"
+            <USlider
+              :model-value="volume"
+              @update:model-value="handleChange('volume', $event)"
               :min="0"
               :max="150"
-              class="w-24 slim-slider"
+              class="w-24"
+              size="xs"
               aria-label="Volume"
             />
           </span>
         </template>
         <button v-if="(!source.locked && !scene.src_locked) || isUnlocked" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
-          <i class="pi pi-cog text-[11px]"></i>
+          <Icon name="ph:gear" size="11px" />
         </button>
         <span v-if="(source.locked || scene.src_locked) && !isUnlocked" class="slot-btn opacity-40" title="Locked">
-          <i class="pi pi-lock text-[11px]"></i>
+          <Icon name="ph:lock" size="11px" />
         </span>
       </div>
     </div>
     <div v-if="open" class="px-3 pb-2 bg-blue-50/50 dark:bg-blue-900/10">
       <div class="flex items-center mb-1 mt-1">
         <span class="w-16 text-xs text-gray-600 dark:text-gray-400">src</span>
-        <Select
+        <USelect
           class="flex-grow"
-          :options="inputs"
-          optionLabel="name"
-          optionValue="uid"
-          :modelValue="src"
-          @update:modelValue="(val) => handleChange('src', val || 'None')"
+          :items="srcOptions"
+          label-key="name"
+          value-key="uid"
+          :model-value="src"
+          @update:model-value="(val) => handleChange('src', val || 'None')"
           placeholder="Select input"
-          size="small"
-          showClear
+          size="sm"
         />
       </div>
       <button @click="doRemoveSlot" class="flex items-center gap-1 text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 py-1 cursor-pointer">
-        <i class="pi pi-minus-circle text-[11px]"></i>
+        <Icon name="ph:minus-circle" size="11px" />
         Remove Slot
       </button>
       <div v-for="(value, key) in { alpha, width, height, xpos, ypos }" :key="key" class="flex items-center mb-1">
         <div v-if="getMax(key)" class="flex w-full">
           <span class="w-16 text-xs text-gray-600 dark:text-gray-400">{{ key }}</span>
-          <Slider
+          <USlider
             class="flex-grow mx-2"
-            :modelValue="value"
-            @update:modelValue="handleChange(key, $event)"
+            :model-value="value"
+            @update:model-value="handleChange(key, $event)"
             :step="1"
             :min="0"
             :max="getMax(key)"
+            size="xs"
           />
           <span class="w-16 text-right text-xs text-gray-600 dark:text-gray-400">{{ value }}/{{ getMax(key) }}</span>
         </div>
@@ -87,6 +88,7 @@ const emit = defineEmits(['close']);
 const { inputs, removeSlot, handleChange, getMax, toggleMute, volumeIcon, onDrop, src, alpha, width, height, xpos, ypos, volume, mute } = useSceneSources(() => props.scene, () => props.source);
 
 const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
+const srcOptions = computed(() => [{ name: '— Empty —', uid: 'None' }, ...inputs.value]);
 const open = ref(false);
 const dragOver = ref(false);
 

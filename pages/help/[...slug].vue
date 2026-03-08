@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-[calc(100vh-2.5rem)]">
     <!-- Mobile nav -->
-    <div class="md:hidden border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2">
+    <div class="md:hidden border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2">
       <div class="flex items-center gap-2 overflow-x-auto text-sm">
         <NuxtLink
           v-for="item in navItems" :key="item.slug"

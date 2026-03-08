@@ -13,8 +13,8 @@ export function useProxyItems() {
 
   function handleProxyName(itemLabel, fieldName, proxyType, selectedValue, formData) {
     const selectedItem = proxyItems.value[proxyType]?.find(item => item.url === selectedValue);
-    if (selectedItem) {
-      formData[itemLabel][fieldName] = selectedItem.name;
+    if (selectedItem && !formData[itemLabel]['name']) {
+      formData[itemLabel]['name'] = selectedItem.name;
     }
   }
 

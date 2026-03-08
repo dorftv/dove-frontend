@@ -1,6 +1,6 @@
 export function useDeleteEntity(entityType, getEntity) {
-  const { sceneMixers, programMixer } = useEntities();
-  const confirm = useConfirm();
+  const { sceneMixers, programMixer, outputs } = useEntities();
+  const confirm = useConfirmDialog();
   const notify = useNotify();
   const deleting = ref(false);
 
@@ -61,13 +61,28 @@ export function useDeleteEntity(entityType, getEntity) {
   const needsConfirmScene = (entity) => {
     const hasInputs = entity.sources?.some(s => s.src && s.src !== 'None');
     const pm = programMixer.value;
-    const isLive = pm?.sources?.some(s => s.src && s.src !== 'None' && s.src === entity.uid);
+    const activeSource = pm?.sources?.[pm?.active];
+    const isLive = activeSource?.src && activeSource.src !== 'None' && activeSource.src === entity.uid;
     if (isLive) return { message: `Delete scene "${entity.name}"? It is live on program.` };
     if (hasInputs) return { message: `Delete scene "${entity.name}"? It has inputs assigned.` };
     return null;
   };
 
+  const getEncoderOutputs = (uid) => {
+    return outputs.value.filter(o =>
+      (o.video_encoder && (o.video_encoder === uid || o.video_encoder?.uid === uid)) ||
+      (o.audio_encoder && (o.audio_encoder === uid || o.audio_encoder?.uid === uid))
+    );
+  };
+
   const needsConfirmOutputEncoder = (entity) => {
+    if (entityType === 'encoder') {
+      const using = getEncoderOutputs(entity.uid);
+      if (using.length > 0) {
+        const names = using.map(o => o.name).join(', ');
+        return { message: `Cannot delete encoder "${entity.name || entity.element}". Used by: ${names}. Remove the output(s) first.`, blocked: true };
+      }
+    }
     const state = entity.state;
     if (state === 'EOS' || state === 'ERROR' || state === 'NULL') return null;
     return { message: `Delete ${entityType} "${entity.name || entity.element}"?` };
@@ -84,8 +99,7 @@ export function useDeleteEntity(entityType, getEntity) {
         confirm.require({
           message: confirmation.message,
           header: 'Confirm',
-          acceptClass: 'p-button-danger',
-          accept: () => unlinkAndDelete(entity, confirmation.slots),
+            accept: () => unlinkAndDelete(entity, confirmation.slots),
         });
         return;
       }
@@ -95,11 +109,15 @@ export function useDeleteEntity(entityType, getEntity) {
       confirmation = needsConfirmOutputEncoder(entity);
     }
 
+    if (confirmation?.blocked) {
+      notify.warn(confirmation.message);
+      return;
+    }
+
     if (confirmation) {
       confirm.require({
         message: confirmation.message,
         header: 'Confirm',
-        acceptClass: 'p-button-danger',
         accept: () => doDelete(entity),
       });
     } else {

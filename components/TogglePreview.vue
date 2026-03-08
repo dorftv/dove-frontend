@@ -3,12 +3,12 @@
     <label class="toggle-label" :class="{ active: inputPreview }">
       <Icon :name="inputPreview ? 'ph:eye' : 'ph:eye-slash'" size="14px" />
       <span>Inputs</span>
-      <ToggleSwitch v-model="inputPreview" class="toggle-sm" />
+      <USwitch v-model="inputPreview" size="xs" />
     </label>
     <label class="toggle-label" :class="{ active: mixerPreview }">
       <Icon :name="mixerPreview ? 'ph:eye' : 'ph:eye-slash'" size="14px" />
       <span>Mixer</span>
-      <ToggleSwitch v-model="mixerPreview" class="toggle-sm" />
+      <USwitch v-model="mixerPreview" size="xs" />
     </label>
     <button @click="audioMeters = !audioMeters" class="meter-btn" :class="{ active: audioMeters }" title="Audio Meters">
       <Icon name="ph:equalizer" size="14px" />
@@ -21,6 +21,8 @@ const { inputPreview, mixerPreview, audioMeters } = useUserState();
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+
 .toggle-label {
   @apply flex items-center gap-1.5 text-xs cursor-pointer select-none
          text-gray-400 dark:text-gray-500 transition-colors duration-150;
@@ -28,10 +30,6 @@ const { inputPreview, mixerPreview, audioMeters } = useUserState();
 
 .toggle-label.active {
   @apply text-gray-600 dark:text-gray-300;
-}
-
-.toggle-sm :deep(.p-toggleswitch) {
-  transform: scale(0.75);
 }
 
 .meter-btn {

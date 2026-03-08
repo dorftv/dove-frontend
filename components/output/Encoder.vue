@@ -36,7 +36,7 @@
         title="Delete"
         aria-label="Delete encoder"
       >
-        <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
+        <Icon :name="deleting ? 'ph:spinner' : 'ph:trash'" size="11px" :class="{ 'animate-spin': deleting }" />
       </button>
     </div>
   </div>

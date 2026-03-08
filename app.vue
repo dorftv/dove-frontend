@@ -1,7 +1,8 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
-  <Toast position="bottom-right" />
-  <ConfirmDialog />
+  <UApp>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <UNotifications position="bottom-right" />
+  </UApp>
 </template>

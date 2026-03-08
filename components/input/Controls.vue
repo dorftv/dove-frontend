@@ -1,21 +1,24 @@
 <template>
   <div class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-b-lg px-2 py-1.5 text-xs" role="toolbar" :aria-label="`Controls for ${input.name}`">
-    <!-- Progress bar -->
-    <Slider
-      v-if="input.duration && input.show_controls"
-      :model-value="position"
-      @update:model-value="handlePositionChange"
-      :step="1"
-      :min="0"
-      :max="input.duration"
-      class="w-full slim-slider-accent"
-      aria-label="Playback position"
-    />
+    <!-- Progress bar (always reserve space) -->
+    <div class="h-3">
+      <USlider
+        v-if="input.duration && input.show_controls"
+        :model-value="position"
+        @update:model-value="handlePositionChange"
+        :step="1"
+        :min="0"
+        :max="input.duration"
+        class="w-full"
+        size="xs"
+        aria-label="Playback position"
+      />
+    </div>
 
     <!-- Transport controls row -->
-    <div class="flex items-center gap-1 mt-1">
-      <!-- Playback buttons -->
-      <div v-if="input.show_controls" class="flex items-center">
+    <div class="flex items-center gap-1 mt-1 h-6">
+      <!-- Playback buttons (always reserve space) -->
+      <div class="flex items-center" :class="{ 'invisible': !input.show_controls }">
         <button @click="submitStop" class="transport-btn" title="Stop" aria-label="Stop">
           <Icon name="ph:stop-fill" size="14px" />
         </button>
@@ -54,12 +57,13 @@
           <Icon :name="volumeIcon(volume)" size="14px" />
         </button>
         <span :title="volume + '%'">
-          <Slider
+          <USlider
             :model-value="volume"
             @update:model-value="handleVolumeChange"
             :min="0"
             :max="100"
-            class="w-16 slim-slider"
+            class="w-16"
+            size="xs"
             aria-label="Volume"
           />
         </span>
@@ -103,6 +107,8 @@ const {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+
 .transport-btn {
   @apply flex items-center justify-center w-6 h-6 rounded
          hover:bg-gray-300 dark:hover:bg-gray-700

@@ -1,108 +1,120 @@
 <template>
-  <Button
-    label="Add Encoder"
-    class="p-button-text text-xs"
-    icon="pi pi-plus-circle"
-    @click="toggle"
-  />
-  <Popover ref="op" appendTo="body" @hide="isOpen = false">
-    <div class="p-3 w-[32rem] max-w-[calc(100vw-1rem)] max-h-[80vh] overflow-y-auto">
-      <div class="text-sm font-medium mb-2">Add Encoder</div>
+  <div>
+    <UButton
+      label="Add Encoder"
+      variant="ghost"
+      size="xs"
+      icon="i-ph-plus-circle"
+      @click="isOpen = true"
+    />
+    <UModal v-model:open="isOpen">
+      <template #content>
+        <div class="p-4 w-full max-w-lg mx-auto">
+          <div class="text-sm font-medium mb-3">Add Encoder</div>
 
-      <form @submit.prevent="submitCreate()" class="space-y-2">
-        <div>
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Type</label>
-          <SelectButton
-            v-model="encoderType"
-            :options="typeOptions"
-            optionLabel="label"
-            optionValue="value"
-            :allowEmpty="false"
-            class="text-xs"
-            @update:model-value="onTypeChange"
-          />
+          <form @submit.prevent="submitCreate()" class="space-y-2">
+            <div>
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Type</label>
+              <UButtonGroup>
+                <UButton
+                  v-for="opt in typeOptions"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :color="encoderType === opt.value ? 'primary' : 'neutral'"
+                  :variant="encoderType === opt.value ? 'solid' : 'outline'"
+                  size="xs"
+                  @click="encoderType = opt.value; onTypeChange()"
+                />
+              </UButtonGroup>
+            </div>
+
+            <div>
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Element</label>
+              <USelect
+                :model-value="formData.element"
+                @update:model-value="onElementChange"
+                :items="elementOptions"
+                label-key="name"
+                value-key="element"
+                placeholder="Select encoder element"
+                required
+                class="w-full"
+                size="sm"
+              />
+            </div>
+
+            <div>
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Options</label>
+              <UInput
+                v-model="formData.options"
+                placeholder="Encoder options"
+                class="w-full"
+                size="sm"
+              />
+            </div>
+
+            <div v-if="encoderType === 'video'">
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Profile</label>
+              <UInput
+                v-model="formData.profile"
+                placeholder="e.g. high, main, baseline"
+                class="w-full"
+                size="sm"
+              />
+            </div>
+
+            <hr class="my-2 border-gray-200 dark:border-gray-600" />
+
+            <div>
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Source</label>
+              <USelect
+                v-model="formData.src"
+                :items="availSrc"
+                label-key="name"
+                value-key="value"
+                placeholder="Select Source"
+                class="w-full"
+                size="sm"
+              />
+            </div>
+
+            <div v-if="encoderType === 'video'">
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Resolution</label>
+              <USelect
+                v-model="selectedResolution"
+                :items="resolutionOptions"
+                label-key="label"
+                value-key="key"
+                placeholder="Select Resolution"
+                class="w-full"
+                size="sm"
+              />
+            </div>
+
+            <div>
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
+              <UInput
+                v-model="formData.name"
+                placeholder="Optional name"
+                class="w-full"
+                size="sm"
+              />
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+              <UButton type="button" label="Cancel" variant="outline" size="sm" @click="isOpen = false" />
+              <UButton type="submit" label="Create Encoder" color="primary" size="sm" />
+            </div>
+          </form>
         </div>
-
-        <div>
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Element</label>
-          <Select
-            :model-value="formData.element"
-            @update:model-value="onElementChange"
-            :options="elementOptions"
-            optionLabel="name"
-            optionValue="element"
-            placeholder="Select encoder element"
-            required
-            class="w-full text-sm"
-          />
-        </div>
-
-        <div>
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Options</label>
-          <InputText
-            v-model="formData.options"
-            placeholder="Encoder options"
-            class="w-full text-sm"
-          />
-        </div>
-
-        <div v-if="encoderType === 'video'">
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Profile</label>
-          <InputText
-            v-model="formData.profile"
-            placeholder="e.g. high, main, baseline"
-            class="w-full text-sm"
-          />
-        </div>
-
-        <hr class="my-2 border-gray-200 dark:border-gray-600" />
-
-        <div>
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Source</label>
-          <Select
-            v-model="formData.src"
-            :options="availSrc"
-            optionLabel="name"
-            optionValue="value"
-            placeholder="Select Source"
-            class="w-full text-sm"
-          />
-        </div>
-
-        <div v-if="encoderType === 'video'">
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Resolution</label>
-          <Select
-            v-model="selectedResolution"
-            :options="resolutionOptions"
-            optionLabel="label"
-            optionValue="key"
-            placeholder="Select Resolution"
-            class="w-full text-sm"
-          />
-        </div>
-
-        <div>
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
-          <InputText
-            v-model="formData.name"
-            placeholder="Optional name"
-            class="w-full text-sm"
-          />
-        </div>
-
-        <div class="flex justify-end space-x-2 mt-4">
-          <Button type="button" label="Cancel" class="p-button-outlined p-button-sm" @click="isOpen = false" />
-          <Button type="submit" label="Create Encoder" class="p-button-primary p-button-sm" />
-        </div>
-      </form>
-    </div>
-  </Popover>
+      </template>
+    </UModal>
+  </div>
 </template>
 
 <script setup>
 const {
   isOpen,
-  op,
   toggle,
   encoderType,
   formData,
@@ -119,4 +131,9 @@ const typeOptions = [
   { label: 'Video', value: 'video' },
   { label: 'Audio', value: 'audio' },
 ];
+
+const onToggleCreate = (e) => { if (e.detail === 'encoder') isOpen.value = !isOpen.value }
+const onCloseCreate = (e) => { if (e.detail === 'encoder') isOpen.value = false }
+onMounted(() => { window.addEventListener('toggle-create', onToggleCreate); window.addEventListener('close-create', onCloseCreate) })
+onUnmounted(() => { window.removeEventListener('toggle-create', onToggleCreate); window.removeEventListener('close-create', onCloseCreate) })
 </script>

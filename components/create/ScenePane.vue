@@ -1,44 +1,50 @@
 <template>
-  <Button
-    label="Add Scene"
-    class="p-button-text text-xs"
-    icon="pi pi-plus-circle"
-    v-if="addScene || isUnlocked"
-    @click="toggle"
-  />
-  <Popover ref="op" appendTo="body" @hide="isOpen = false">
-    <div class="p-3 w-80 max-w-[calc(100vw-1rem)]">
-      <div class="text-sm font-medium mb-2">Add Scene</div>
-      <form @submit.prevent="submitCreate('scene')" class="space-y-2">
-        <div class="mb-2">
-          <label for="name" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
-          <InputText
-            v-model="formData.scene.name"
-            id="name"
-            placeholder="Enter scene name"
-            class="w-full text-sm"
-          />
-        </div>
+  <div v-if="addScene || isUnlocked">
+    <UButton
+      label="Add Scene"
+      variant="ghost"
+      size="xs"
+      icon="i-ph-plus-circle"
+      @click="isOpen = true"
+    />
+    <UModal v-model:open="isOpen">
+      <template #content>
+        <div class="p-4 w-full max-w-sm mx-auto">
+          <div class="text-sm font-medium mb-3">Add Scene</div>
+          <form @submit.prevent="submitCreate('scene')" class="space-y-2">
+            <div>
+              <label for="name" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
+              <UInput
+                v-model="formData.scene.name"
+                id="name"
+                placeholder="Enter scene name"
+                class="w-full"
+                size="sm"
+              />
+            </div>
 
-        <div>
-          <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Resolution</label>
-          <Select
-            v-model="selectedResolution"
-            :options="resolutionOptions"
-            optionLabel="label"
-            optionValue="key"
-            placeholder="Select Resolution"
-            class="w-full text-sm"
-          />
-        </div>
+            <div>
+              <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Resolution</label>
+              <USelect
+                v-model="selectedResolution"
+                :items="resolutionOptions"
+                label-key="label"
+                value-key="key"
+                placeholder="Select Resolution"
+                class="w-full"
+                size="sm"
+              />
+            </div>
 
-        <div class="flex justify-end space-x-2 mt-4">
-          <Button type="button" label="Cancel" class="p-button-outlined p-button-sm" @click="isOpen = false" />
-          <Button type="submit" label="Create Scene" class="p-button-primary p-button-sm" />
+            <div class="flex justify-end space-x-2 pt-2">
+              <UButton type="button" label="Cancel" variant="outline" size="sm" @click="isOpen = false" />
+              <UButton type="submit" label="Create Scene" color="primary" size="sm" />
+            </div>
+          </form>
         </div>
-      </form>
-    </div>
-  </Popover>
+      </template>
+    </UModal>
+  </div>
 </template>
 
 <script setup>
@@ -46,7 +52,6 @@ const { isUnlocked } = useLocked()
 
 const {
   isOpen,
-  op,
   toggle,
   formData,
   submitCreate,
@@ -54,4 +59,9 @@ const {
   resolutionOptions,
   addScene,
 } = useCreateScene();
+
+const onToggleCreate = (e) => { if (e.detail === 'scene') isOpen.value = !isOpen.value }
+const onCloseCreate = (e) => { if (e.detail === 'scene') isOpen.value = false }
+onMounted(() => { window.addEventListener('toggle-create', onToggleCreate); window.addEventListener('close-create', onCloseCreate) })
+onUnmounted(() => { window.removeEventListener('toggle-create', onToggleCreate); window.removeEventListener('close-create', onCloseCreate) })
 </script>

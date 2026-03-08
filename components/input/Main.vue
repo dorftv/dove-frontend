@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-2">
+    <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-hidden p-2">
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
           <CreateInputPane />

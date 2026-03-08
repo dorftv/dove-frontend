@@ -37,6 +37,8 @@ const toggleFullscreen = () => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+
 .video-btn {
   @apply flex items-center justify-center w-7 h-7 rounded
          text-white/80 hover:text-white bg-black/40 hover:bg-black/60

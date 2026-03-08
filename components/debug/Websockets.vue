@@ -2,15 +2,17 @@
   <div class="bg-gray-900 rounded-lg p-4 text-xs font-mono">
     <!-- Toolbar -->
     <div class="flex items-center gap-2 mb-3">
-      <MultiSelect
+      <USelectMenu
         v-model="filterChannel"
-        :options="channelOptions"
+        :items="channelOptions"
+        multiple
         placeholder="Channels"
         class="text-xs w-48"
       />
-      <MultiSelect
+      <USelectMenu
         v-model="filterType"
-        :options="typeOptions"
+        :items="typeOptions"
+        multiple
         placeholder="Types"
         class="text-xs w-48"
       />

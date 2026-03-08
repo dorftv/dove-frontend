@@ -8,12 +8,11 @@
         :class="stateDotClass(output.state)"
         role="status"
       />
-      <span
-        v-tooltip="output.name + ' (' + output.type + ')'"
-        class="truncate cursor-help text-sm text-gray-800 dark:text-gray-300"
-      >
-        {{ output.name }}
-      </span>
+      <UTooltip :text="output.name + ' (' + output.type + ')'">
+        <span class="truncate cursor-help text-sm text-gray-800 dark:text-gray-300">
+          {{ output.name }}
+        </span>
+      </UTooltip>
       <span class="text-[10px] text-gray-500 shrink-0">{{ output.type }}</span>
       <div class="flex-grow" />
       <DetailPopover :entity="output" />
@@ -25,7 +24,7 @@
         title="Delete"
         aria-label="Delete output"
       >
-        <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
+        <Icon :name="deleting ? 'ph:spinner' : 'ph:trash'" size="11px" :class="{ 'animate-spin': deleting }" />
       </button>
     </div>
     <!-- Stats row -->
@@ -34,14 +33,14 @@
     </div>
     <!-- Encoder rows below -->
     <div v-if="videoEncoder || audioEncoder" class="flex flex-col gap-0.5 ml-3.5 mt-0.5">
-      <div v-if="videoEncoder" v-tooltip="videoEncoder.element + ' (' + videoEncoder.name + ')'" class="flex items-center gap-1">
+      <div v-if="videoEncoder" :title="videoEncoder.element + ' (' + videoEncoder.name + ')'" class="flex items-center gap-1">
         <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="stateDotClass(videoEncoder.state)" />
         <Icon name="ph:video-camera" size="11px" class="text-gray-400" />
         <span class="text-[10px] text-gray-500 dark:text-gray-400">{{ videoEncoder.element }}</span>
         <span v-if="videoEncoder.width && videoEncoder.height" class="text-[10px] text-gray-400">{{ videoEncoder.width }}x{{ videoEncoder.height }}</span>
         <span v-if="videoEncoder.details" class="text-[10px] text-red-400 truncate max-w-[8rem]">{{ videoEncoder.details }}</span>
       </div>
-      <div v-if="audioEncoder" v-tooltip="audioEncoder.element + ' (' + audioEncoder.name + ')'" class="flex items-center gap-1">
+      <div v-if="audioEncoder" :title="audioEncoder.element + ' (' + audioEncoder.name + ')'" class="flex items-center gap-1">
         <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="stateDotClass(audioEncoder.state)" />
         <Icon name="ph:speaker-high" size="11px" class="text-gray-400" />
         <span class="text-[10px] text-gray-500 dark:text-gray-400">{{ audioEncoder.element }}</span>

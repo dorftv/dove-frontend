@@ -51,7 +51,7 @@
             {{ inputsNoPreview.length }} without preview
           </button>
           <div v-if="showNoPreview"
-               class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden p-2 mt-2">
+               class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-hidden p-2 mt-2">
             <div class="input-grid-compact gap-3">
               <div v-for="input in inputsNoPreview" :key="input.uid" class="flex flex-col rounded-lg overflow-hidden">
                 <InputHeader :input="input" />
@@ -70,7 +70,7 @@
           <div class="flex items-center justify-between mb-2">
             <span class="font-medium text-sm text-gray-200">NodeCG</span>
             <button @click="nodecgOpen = false" class="text-gray-400 hover:text-gray-200">
-              <i class="pi pi-times text-xs"></i>
+              <Icon name="ph:x" size="12px" />
             </button>
           </div>
           <InputNodeCG />
@@ -79,43 +79,57 @@
     </div>
 
     <!-- Large screens: output drawer tab handle -->
-    <div
+    <UTooltip
       v-if="!outputOpen && tabTop !== null"
-      class="output-tab"
-      :style="{ top: tabTop + 'px' }"
-      @click="outputOpen = true"
-      v-tooltip.left="'Outputs'"
+      text="Outputs"
+      :popper="{ placement: 'left' }"
     >
-      <span class="output-tab-label">Outputs</span>
-      <span
-        v-for="item in statusItems"
-        :key="item.uid"
-        class="output-tab-dot"
-        :style="{ backgroundColor: stateColor(item.state) }"
-        v-tooltip.left="item.name + ' \u2014 ' + (item.state || 'NULL')"
-      />
-    </div>
+      <div
+        class="output-tab"
+        :style="{ top: tabTop + 'px' }"
+        @click="outputOpen = true"
+      >
+        <span class="output-tab-label">Outputs</span>
+        <UTooltip
+          v-for="item in statusItems"
+          :key="item.uid"
+          :text="item.name + ' \u2014 ' + (item.state || 'NULL')"
+          :popper="{ placement: 'left' }"
+        >
+          <span
+            class="output-tab-dot"
+            :style="{ backgroundColor: stateColor(item.state) }"
+          />
+        </UTooltip>
+      </div>
+    </UTooltip>
   </div>
 
   <!-- Large screens: output drawer -->
-  <Drawer v-model:visible="outputOpen" position="right" :modal="false" :dismissable="false" class="output-drawer">
+  <USlideover v-model:open="outputOpen" side="right" :overlay="false">
     <template #header>
       <span class="font-medium text-sm">Outputs & Encoders</span>
     </template>
-    <OutputMain />
-  </Drawer>
+    <template #body>
+      <OutputMain />
+    </template>
+  </USlideover>
 
   <!-- Large screens: NodeCG tab handle -->
-  <div
+  <UTooltip
     v-if="inputsNodeCG.length > 0 && nodecgTabTop !== null"
-    class="nodecg-tab"
-    :class="{ active: nodecgOpen }"
-    :style="{ top: nodecgTabTop + 'px' }"
-    @click="nodecgOpen = !nodecgOpen"
-    v-tooltip.left="'NodeCG'"
+    text="NodeCG"
+    :popper="{ placement: 'left' }"
   >
-    <span class="output-tab-label">NodeCG</span>
-  </div>
+    <div
+      class="nodecg-tab"
+      :class="{ active: nodecgOpen }"
+      :style="{ top: nodecgTabTop + 'px' }"
+      @click="nodecgOpen = !nodecgOpen"
+    >
+      <span class="output-tab-label">NodeCG</span>
+    </div>
+  </UTooltip>
 </template>
 
 <script setup>
@@ -145,14 +159,16 @@ function updateTabPosition() {
   nodecgTabTop.value = inputEl.offsetTop + inputEl.offsetHeight / 2;
 }
 
-// Close drawers on outside click, but ignore PrimeVue overlays (popovers, selects, etc.)
+// Close drawers on outside click, but ignore UI overlays
 let skipNextClick = false;
 watch(outputOpen, (val) => { if (val) skipNextClick = true; });
 watch(nodecgOpen, (val) => { if (val) skipNextClick = true; });
 const onDocumentClick = (e) => {
   if (skipNextClick) { skipNextClick = false; return; }
   if (!outputOpen.value && !nodecgOpen.value) return;
-  const overlay = e.target.closest('.p-drawer, .p-popover, .p-select-overlay, .p-dialog, .p-confirmdialog, .p-tooltip, .nodecg-panel, .nodecg-tab');
+  // Ignore clicks on elements removed from DOM (portal dropdowns clean up before bubbling completes)
+  if (!document.body.contains(e.target)) return;
+  const overlay = e.target.closest('[role="dialog"], [role="listbox"], .nodecg-panel, .nodecg-tab');
   if (!overlay) {
     outputOpen.value = false;
     nodecgOpen.value = false;
@@ -176,6 +192,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+
 .input-grid-compact {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -193,9 +211,7 @@ onUnmounted(() => {
   border-radius: 6px 0 0 6px;
   cursor: pointer;
   z-index: 100;
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
-  border-right: none;
+  @apply bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-r-0;
   transition: background 0.15s;
 }
 
@@ -205,17 +221,8 @@ onUnmounted(() => {
   }
 }
 
-:root.p-dark .output-tab {
-  background: var(--p-surface-800);
-  border-color: var(--p-surface-700);
-}
-
 .output-tab:hover {
-  background: var(--p-surface-50);
-}
-
-:root.p-dark .output-tab:hover {
-  background: var(--p-surface-700);
+  @apply bg-gray-100 dark:bg-gray-700;
 }
 
 .output-tab-label {
@@ -223,12 +230,8 @@ onUnmounted(() => {
   text-orientation: mixed;
   font-size: 11px;
   font-weight: 500;
-  color: var(--p-surface-600);
+  @apply text-gray-600 dark:text-gray-400;
   letter-spacing: 0.5px;
-}
-
-:root.p-dark .output-tab-label {
-  color: var(--p-surface-400);
 }
 
 .output-tab-dot {
@@ -236,10 +239,6 @@ onUnmounted(() => {
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-}
-
-.output-drawer {
-  width: 22rem !important;
 }
 
 .nodecg-tab {
@@ -254,9 +253,7 @@ onUnmounted(() => {
   border-radius: 6px 0 0 6px;
   cursor: pointer;
   z-index: 100;
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
-  border-right: none;
+  @apply bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-r-0;
   transition: background 0.15s;
 }
 
@@ -266,19 +263,9 @@ onUnmounted(() => {
   }
 }
 
-:root.p-dark .nodecg-tab {
-  background: var(--p-surface-800);
-  border-color: var(--p-surface-700);
-}
-
 .nodecg-tab:hover,
 .nodecg-tab.active {
-  background: var(--p-surface-50);
-}
-
-:root.p-dark .nodecg-tab:hover,
-:root.p-dark .nodecg-tab.active {
-  background: var(--p-surface-700);
+  @apply bg-gray-100 dark:bg-gray-700;
 }
 
 .nodecg-panel {

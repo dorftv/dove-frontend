@@ -9,7 +9,7 @@
     </div>
     <div class="border-t border-gray-200 dark:border-gray-700">
       <button @click="slotsOpen = !slotsOpen" class="flex items-center gap-1.5 w-full px-3 py-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer">
-        <i class="pi text-[10px]" :class="slotsOpen ? 'pi-chevron-down' : 'pi-chevron-right'" />
+        <Icon :name="slotsOpen ? 'ph:caret-down' : 'ph:caret-right'" size="10px" />
         <span>Slots</span>
         <span class="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-[10px] px-1.5 rounded-full font-mono">{{ scene.sources?.length || 0 }}</span>
       </button>
@@ -32,7 +32,7 @@
           @drop="onDropAdd"
         >
           <button @click="addSlot()" :disabled="addingSlot" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer disabled:opacity-50">
-            <i :class="addingSlot ? 'pi pi-spinner pi-spin' : 'pi pi-plus'" class="text-[10px]"></i>
+            <Icon :name="addingSlot ? 'ph:spinner' : 'ph:plus'" size="10px" :class="{ 'animate-spin': addingSlot }" />
             {{ dropOver ? 'Drop to add slot' : 'Add Slot' }}
           </button>
         </div>

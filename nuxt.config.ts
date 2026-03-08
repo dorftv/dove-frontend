@@ -1,5 +1,3 @@
-import Aura from '@primevue/themes/aura';
-
 export default defineNuxtConfig({
   experimental: {
     appManifest: false,
@@ -13,15 +11,7 @@ export default defineNuxtConfig({
   },
 
   devtools: { enabled: true },
-  css: ["@/assets/css/tailwind.css", "primeicons/primeicons.css"],
-  postcss: {
-    plugins: {
-      "postcss-import": {},
-      "tailwindcss/nesting": {},
-      tailwindcss: {},
-      autoprefixer: {},
-    },
-  },
+  css: ["@/assets/css/tailwind.css"],
 
   vite: {
     vue: {
@@ -62,22 +52,11 @@ export default defineNuxtConfig({
   },
 
   modulesDir: ['./node_modules'],
-  modules: ["@primevue/nuxt-module", "@nuxt/icon", "@nuxtjs/color-mode"],
+  modules: ["@nuxt/ui"],
 
   colorMode: {
     classSuffix: '',
     preference: 'system',
     fallback: 'light',
-  },
-
-  primevue: {
-    options: {
-      theme: {
-        preset: Aura,
-        options: {
-          darkModeSelector: '.dark',
-        },
-      },
-    },
   },
 })

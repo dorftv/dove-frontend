@@ -17,12 +17,11 @@
     />
 
     <!-- Name -->
-    <span
-      v-tooltip="input.name + ' (' + input.type + ')'"
-      class="truncate cursor-help text-sm text-gray-800 dark:text-gray-200 font-medium"
-    >
-      {{ input.name }}
-    </span>
+    <UTooltip :text="input.name + ' (' + input.type + ')'">
+      <span class="truncate cursor-help text-sm text-gray-800 dark:text-gray-200 font-medium">
+        {{ input.name }}
+      </span>
+    </UTooltip>
     <span class="text-[10px] text-gray-500">{{ input.type }}</span>
 
     <!-- Spacer -->
@@ -38,7 +37,7 @@
       title="Delete"
       aria-label="Delete input"
     >
-      <i :class="deleting ? 'pi pi-spinner pi-spin' : 'pi pi-trash'" class="text-[11px]"></i>
+      <Icon :name="deleting ? 'ph:spinner' : 'ph:trash'" size="11px" :class="{ 'animate-spin': deleting }" />
     </button>
     <button
       v-if="!inputPreview && inputEnabled"
