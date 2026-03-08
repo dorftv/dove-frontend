@@ -36,18 +36,22 @@ export default defineNuxtPlugin((nuxtApp) => {
     return `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
   };
 
+  const config = useState('dove-config');
+
   const fetchEntities = async () => {
     try {
-      const [inputsData, mixersData, outputsData, encodersData] = await Promise.all([
+      const [inputsData, mixersData, outputsData, encodersData, configData] = await Promise.all([
         $fetch('/api/inputs'),
         $fetch('/api/mixers'),
         $fetch('/api/outputs'),
         $fetch('/api/encoders'),
+        $fetch('/api/config'),
       ]);
       inputs.value = inputsData;
       mixers.value = mixersData;
       outputs.value = outputsData;
       encoders.value = encodersData;
+      config.value = configData;
       error.value = null;
     } catch (e) {
       error.value = 'Failed to load entities: ' + e.message;
