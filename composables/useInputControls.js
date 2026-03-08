@@ -102,6 +102,17 @@ export function useInputControls(props) {
     }
   };
 
+  const submitSkip = async (direction) => {
+    try {
+      await $fetch('/api/inputs', {
+        method: 'PUT',
+        body: { uid: props.input.uid, type: 'update', skip: direction },
+      });
+    } catch (error) {
+      notify.error('Failed to skip');
+    }
+  };
+
   const inputName = computed(() => {
     const input = inputs.value.find(input => input.uid === props.source?.src);
     return input ? input.name : '';
@@ -162,6 +173,7 @@ export function useInputControls(props) {
     submitPause,
     submitStop,
     submitLoop,
+    submitSkip,
     inputName,
     isInSceneSources,
     submitAddInputToScene,

@@ -19,14 +19,17 @@
     <div class="flex items-center gap-1 mt-1 h-6">
       <!-- Playback buttons (always reserve space) -->
       <div class="flex items-center" :class="{ 'invisible': !input.show_controls }">
-        <button @click="submitStop" class="transport-btn" title="Stop" aria-label="Stop">
-          <Icon name="ph:stop-fill" size="14px" />
+        <button v-if="input.type === 'playlist'" @click="submitSkip('previous')" class="transport-btn" title="Previous clip" aria-label="Previous clip">
+          <Icon name="ph:skip-back-fill" size="14px" />
         </button>
         <button @click="submitPlay" class="transport-btn" :class="{ 'text-green-400': input.state === 'PLAYING' }" title="Play" aria-label="Play">
           <Icon name="ph:play-fill" size="14px" />
         </button>
         <button @click="submitPause" class="transport-btn" :class="{ 'text-orange-400': input.state === 'PAUSED' }" title="Pause" aria-label="Pause">
           <Icon name="ph:pause-fill" size="14px" />
+        </button>
+        <button v-if="input.type === 'playlist'" @click="submitSkip('next')" class="transport-btn" title="Next clip" aria-label="Next clip">
+          <Icon name="ph:skip-forward-fill" size="14px" />
         </button>
       </div>
 
@@ -100,8 +103,8 @@ const {
   handlePositionChange,
   submitPlay,
   submitPause,
-  submitStop,
   submitLoop,
+  submitSkip,
   toggleMute,
 } = useInputControls(props);
 </script>
