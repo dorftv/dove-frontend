@@ -33,13 +33,3 @@ const toggleFullscreen = () => {
   mediaPlayer.value?.requestFullscreen();
 };
 </script>
-
-<style scoped>
-@reference "tailwindcss";
-
-.video-btn {
-  @apply flex items-center justify-center w-7 h-7 rounded
-         text-white/80 hover:text-white bg-black/50 hover:bg-black/70
-         transition-all cursor-pointer backdrop-blur-sm;
-}
-</style>

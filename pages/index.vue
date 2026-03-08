@@ -33,7 +33,7 @@
           NodeCG
           <span class="text-[10px] opacity-60">{{ inputsNodeCG.length }}</span>
         </button>
-        <div v-if="nodecgOpen" class="rounded-lg shadow-sm overflow-hidden p-2 mb-4" style="background: #2f3a4f; border: 1px solid #3a4660;">
+        <div v-if="nodecgOpen" class="rounded-lg shadow-sm overflow-hidden p-2 mb-4 bg-gray-800 border border-gray-700">
           <InputNodeCG />
         </div>
       </div>
@@ -85,7 +85,7 @@
       :popper="{ placement: 'left' }"
     >
       <div
-        class="output-tab"
+        class="side-tab"
         :style="{ top: tabTop + 'px' }"
         @click="outputOpen = true"
       >
@@ -122,7 +122,7 @@
     :popper="{ placement: 'left' }"
   >
     <div
-      class="nodecg-tab"
+      class="side-tab"
       :class="{ active: nodecgOpen }"
       :style="{ top: nodecgTabTop + 'px' }"
       @click="nodecgOpen = !nodecgOpen"
@@ -199,7 +199,7 @@ onUnmounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
-.output-tab {
+.side-tab {
   position: absolute;
   right: 0;
   transform: translateY(-50%);
@@ -216,12 +216,13 @@ onUnmounted(() => {
 }
 
 @media (min-width: 1024px) {
-  .output-tab {
+  .side-tab {
     display: flex;
   }
 }
 
-.output-tab:hover {
+.side-tab:hover,
+.side-tab.active {
   @apply bg-gray-100 dark:bg-gray-700;
 }
 
@@ -241,33 +242,6 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.nodecg-tab {
-  position: absolute;
-  right: 0;
-  transform: translateY(-50%);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 8px 6px;
-  border-radius: 6px 0 0 6px;
-  cursor: pointer;
-  z-index: 100;
-  @apply bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-r-0;
-  transition: background 0.15s;
-}
-
-@media (min-width: 1024px) {
-  .nodecg-tab {
-    display: flex;
-  }
-}
-
-.nodecg-tab:hover,
-.nodecg-tab.active {
-  @apply bg-gray-100 dark:bg-gray-700;
-}
-
 .nodecg-panel {
   position: absolute;
   top: 0;
@@ -280,7 +254,6 @@ onUnmounted(() => {
   padding: 12px;
   border-radius: 8px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  background: #2f3a4f;
-  border: 1px solid #3a4660;
+  @apply bg-gray-800 border border-gray-700;
 }
 </style>

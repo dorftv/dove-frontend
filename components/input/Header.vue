@@ -40,22 +40,13 @@
       <Icon :name="deleting ? 'ph:spinner' : 'ph:trash'" size="11px" :class="{ 'animate-spin': deleting }" />
     </button>
     <button
-      v-if="!inputPreview && inputEnabled"
+      v-if="!inputPreview"
       @click="$emit('enablePreview', toggleInputPreview())"
       class="icon-btn"
-      title="Disable preview"
-      aria-label="Disable preview"
+      :title="inputEnabled ? 'Disable preview' : 'Enable preview'"
+      :aria-label="inputEnabled ? 'Disable preview' : 'Enable preview'"
     >
-      <Icon name="uil:video-slash" size="14px" />
-    </button>
-    <button
-      v-if="!inputPreview && !inputEnabled"
-      @click="$emit('enablePreview', toggleInputPreview())"
-      class="icon-btn"
-      title="Enable preview"
-      aria-label="Enable preview"
-    >
-      <Icon name="uil:video" size="14px" />
+      <Icon :name="inputEnabled ? 'ph:video-camera-slash' : 'ph:video-camera'" size="14px" />
     </button>
   </div>
 </template>
