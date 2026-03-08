@@ -20,7 +20,6 @@
 <script setup>
 const props = defineProps({
   uid: String,
-  muted: String,
 });
 
 const emit = defineEmits(['error']);

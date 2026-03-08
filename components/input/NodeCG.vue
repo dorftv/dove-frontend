@@ -30,6 +30,5 @@ const props = defineProps({
   maxHeight: { type: String, default: null },
 });
 
-const container = ref(null);
 const iframeHeight = computed(() => props.maxHeight || '300px');
 </script>

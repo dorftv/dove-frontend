@@ -20,8 +20,6 @@ import 'vidstack/player/styles/default/theme.css';
 
 const props = defineProps({
   uid: String,
-  muted: String,
-  entity: Object,
 });
 
 const { mediaPlayer, mutedState } = useHlsPlayer(props);

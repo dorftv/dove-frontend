@@ -2,7 +2,6 @@
 defineProps({
   message: { type: String, default: 'Are you sure?' },
   header: { type: String, default: 'Confirm' },
-  acceptClass: { type: String, default: '' },
 })
 const emit = defineEmits(['close'])
 </script>

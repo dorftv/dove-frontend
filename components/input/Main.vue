@@ -14,7 +14,7 @@
             @enablePreview="toggleInputEnabled(input.uid)"
           />
           <div v-if="shouldShowPreview(input.uid) && input.preview" class="flex">
-            <VideoPlayerMain muted="true" :uid="input.uid" class="flex-grow min-w-0" />
+            <VideoPlayerMain :uid="input.uid" class="flex-grow min-w-0" />
             <AudioMeter v-if="audioMeters" :uid="input.uid" />
           </div>
           <InputControls :input="input" :state="input.state" :uid="input.uid" />

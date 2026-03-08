@@ -1,12 +1,11 @@
 <template>
-  <VideoPlayerHls v-if="useHls" :uid="uid" :muted="muted" />
-  <VideoPlayerWhep v-else :uid="uid" :muted="muted" @error="onWhepError" />
+  <VideoPlayerHls v-if="useHls" :uid="uid" />
+  <VideoPlayerWhep v-else :uid="uid" @error="onWhepError" />
 </template>
 
 <script setup>
 const props = defineProps({
   uid: String,
-  muted: String,
 });
 
 const { previewOutputs } = useEntities();
