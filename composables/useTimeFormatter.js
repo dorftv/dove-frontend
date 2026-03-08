@@ -1,11 +1,11 @@
 export function useTimeFormatter(seconds) {
-  if (seconds == null) {
-    return '';
-  }
-  const timeFormatted = computed(() => {
-    const hrs = Math.floor(seconds.value / 3600);
-    const mins = Math.floor((seconds.value % 3600) / 60);
-    const secs = seconds.value % 60;
+  return computed(() => {
+    const val = seconds.value;
+    if (val == null || val === 0) return '00:00';
+
+    const hrs = Math.floor(val / 3600);
+    const mins = Math.floor((val % 3600) / 60);
+    const secs = val % 60;
 
     const pad = (num) => (num < 10 ? '0' : '') + num;
     let formattedTime = `${pad(secs)}`;
@@ -22,6 +22,4 @@ export function useTimeFormatter(seconds) {
 
     return formattedTime;
   });
-
-  return timeFormatted;
 }

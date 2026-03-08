@@ -86,7 +86,6 @@ export function useSceneSources(getScene, getSource) {
 
   return {
     inputs,
-    updateEntity: handleChange,
     removeSlot,
     handleChange,
     getMax,

@@ -30,6 +30,7 @@ export default function useDoveConfig() {
         throw err;
       } finally {
         isLoading.value = false;
+        configPromise = null;
       }
     })();
 
