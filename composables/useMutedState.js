@@ -1,16 +1,13 @@
 export function useMutedState() {
   const mutedState = useState('muted-state', () => ({}));
-  const initializedEntities = useState('muted-initialized', () => new Set());
+  const initialized = useState('muted-initialized', () => ({}));
 
   const { sceneMixers, inputs, programMixer } = useEntities();
 
-  // Check if a uid has v4l2 audio anywhere in its chain
   const hasV4l2Audio = (uid) => {
-    // Direct v4l2 input
     const input = inputs.value.find(i => i.uid === uid);
     if (input?.type === 'v4l2src') return true;
 
-    // Scene containing a v4l2 input
     const scene = sceneMixers.value.find(s => s.uid === uid);
     if (scene) {
       return scene.sources?.some(src =>
@@ -18,7 +15,6 @@ export function useMutedState() {
       );
     }
 
-    // Program mixer — check active scene
     if (programMixer.value?.uid === uid) {
       const activeSource = programMixer.value.sources?.[programMixer.value.active];
       if (activeSource?.src) return hasV4l2Audio(activeSource.src);
@@ -27,56 +23,48 @@ export function useMutedState() {
     return false;
   };
 
-  const allEntities = computed(() => {
-    const entitySet = [...sceneMixers.value, ...inputs.value];
-    if (programMixer.value) {
-      entitySet.push(programMixer.value);
-    }
-    return entitySet;
+  const entityUids = computed(() => {
+    const uids = [
+      ...inputs.value.map(i => i.uid),
+      ...sceneMixers.value.map(s => s.uid),
+    ];
+    if (programMixer.value) uids.push(programMixer.value.uid);
+    return uids;
   });
-
-  const initializeMutedState = () => {
-    allEntities.value.forEach(entity => {
-      if (!initializedEntities.value.has(entity.uid)) {
-        initializedEntities.value.add(entity.uid);
-        mutedState.value[entity.uid] = true;
-      }
-    });
-    if (programMixer.value && !hasV4l2Audio(programMixer.value.uid)) {
-      mutedState.value[programMixer.value.uid] = false;
-    }
-  };
 
   const setMutedState = (uid, isMuted) => {
     if (isMuted) {
       mutedState.value[uid] = true;
     } else {
-      // Block unmute if v4l2 audio would cause feedback
       if (hasV4l2Audio(uid)) return;
-
-      Object.keys(mutedState.value).forEach(key => {
-        mutedState.value[key] = key === uid ? false : true;
-      });
+      // Exclusive unmute: mute everything else
+      const updated = {};
+      for (const key of Object.keys(mutedState.value)) {
+        updated[key] = key !== uid;
+      }
+      mutedState.value = updated;
     }
   };
 
-  initializeMutedState();
-
-  watch(allEntities, (newEntities) => {
-    newEntities.forEach(entity => {
-      if (!initializedEntities.value.has(entity.uid)) {
-        initializedEntities.value.add(entity.uid);
-        mutedState.value[entity.uid] = true;
-      }
-    });
-
-    // Force-mute any unmuted entity that now has v4l2 in its chain
-    Object.keys(mutedState.value).forEach(uid => {
-      if (!mutedState.value[uid] && hasV4l2Audio(uid)) {
+  // Watch uid list (not deep entity changes) to register new entities
+  watch(entityUids, (uids) => {
+    let hasNew = false;
+    for (const uid of uids) {
+      if (!initialized.value[uid]) {
+        initialized.value[uid] = true;
         mutedState.value[uid] = true;
+        hasNew = true;
       }
-    });
-  }, { deep: true });
+    }
+    // Auto-unmute program on first load if nothing else is unmuted
+    if (hasNew && programMixer.value) {
+      const pmUid = programMixer.value.uid;
+      const anyUnmuted = Object.keys(mutedState.value).some(k => !mutedState.value[k]);
+      if (!anyUnmuted && !hasV4l2Audio(pmUid)) {
+        mutedState.value[pmUid] = false;
+      }
+    }
+  }, { immediate: true });
 
   return {
     mutedState,

@@ -6,7 +6,7 @@
       :muted="mutedState[uid]"
       playsinline
     ></video>
-    <div class="absolute bottom-0 right-0 flex items-center gap-1 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    <div class="absolute bottom-0 right-0 flex items-center gap-1 p-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
       <button @click="toggleMute" class="video-btn" :title="mutedState[uid] ? 'Unmute' : 'Mute'">
         <Icon :name="mutedState[uid] ? 'ph:speaker-x' : 'ph:speaker-high'" size="16px" />
       </button>
@@ -52,7 +52,7 @@ video {
 
 .video-btn {
   @apply flex items-center justify-center w-7 h-7 rounded
-         text-white/80 hover:text-white bg-black/40 hover:bg-black/60
-         transition-all cursor-pointer;
+         text-white/80 hover:text-white bg-black/50 hover:bg-black/70
+         transition-all cursor-pointer backdrop-blur-sm;
 }
 </style>

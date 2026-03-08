@@ -5,6 +5,7 @@ let autoplayToastShown = false;
 export function useWhepPlayer(props, { onError } = {}) {
   const videoPlayer = ref(null);
   const { mutedState, setMutedState } = useMutedState();
+  const { programMixer } = useEntities();
   const toast = useToast();
 
   let player = null;
@@ -43,21 +44,22 @@ export function useWhepPlayer(props, { onError } = {}) {
       try {
         await videoPlayer.value.play();
       } catch {
-        mutedState.value[props.uid] = true;
+        setMutedState(props.uid, true);
         videoPlayer.value.muted = true;
         videoPlayer.value.play();
         if (!autoplayToastShown) {
           autoplayToastShown = true;
+          const pmUid = programMixer.value?.uid;
           toast.add({
-            severity: 'warn',
-            summary: 'Audio blocked by browser',
-            detail: 'Click anywhere to enable audio',
+            title: 'Audio blocked by browser',
+            description: 'Click anywhere to enable audio',
+            color: 'warning',
           });
+          document.addEventListener('click', () => {
+            if (pmUid) setMutedState(pmUid, false);
+            toast.clear();
+          }, { once: true });
         }
-        document.addEventListener('click', () => {
-          setMutedState(props.uid, false);
-          toast.removeAllGroups();
-        }, { once: true });
       }
     } catch (error) {
       console.error('Error loading player:', error);
