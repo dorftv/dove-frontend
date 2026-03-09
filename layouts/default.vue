@@ -93,18 +93,25 @@
         <NuxtLink to="/api/debug/docs" external target="_blank" class="mobile-link">
           <Icon name="ph:code" size="16px" /> API Docs
         </NuxtLink>
-        <button @click="cycleColorMode()" class="mobile-link w-full">
-          <Icon v-if="colorMode.value === 'dark'" name="ph:moon" size="16px" />
-          <Icon v-else-if="colorMode.value === 'light'" name="ph:sun" size="16px" />
-          <Icon v-else name="ph:monitor" size="16px" />
-          Color mode: {{ colorMode.preference }}
-        </button>
-        <button @click="cyclePreviewMode" class="mobile-link w-full">
-          <Icon name="ph:monitor-play" size="16px" />
-          Preview: {{ previewModeLabel }}
-        </button>
-        <div class="pt-2 mt-1 border-t border-gray-200 dark:border-gray-700">
-          <TogglePreview />
+        <div class="pt-2 mt-1 border-t border-gray-200 dark:border-gray-700 flex items-center gap-1">
+          <button @click="inputPreview = !inputPreview" class="icon-btn" :title="inputPreview ? 'Hide input previews' : 'Show input previews'">
+            <Icon :name="inputPreview ? 'ph:eye' : 'ph:eye-slash'" size="16px" :class="{ 'opacity-40': !inputPreview }" />
+          </button>
+          <button @click="mixerPreview = !mixerPreview" class="icon-btn" :title="mixerPreview ? 'Hide mixer preview' : 'Show mixer preview'">
+            <Icon :name="mixerPreview ? 'ph:monitor-play' : 'ph:monitor'" size="16px" :class="{ 'opacity-40': !mixerPreview }" />
+          </button>
+          <button @click="audioMeters = !audioMeters" class="icon-btn" :title="audioMeters ? 'Hide audio meters' : 'Show audio meters'">
+            <Icon name="ph:equalizer" size="16px" :class="{ 'opacity-40': !audioMeters }" />
+          </button>
+          <button @click="cyclePreviewMode" class="icon-btn" :title="`Preview: ${previewModeLabel}`">
+            <span class="text-[10px] font-mono">{{ previewModeLabel }}</span>
+          </button>
+          <div class="flex-grow" />
+          <button @click="cycleColorMode()" class="icon-btn" :title="`Color mode: ${colorMode.preference}`">
+            <Icon v-if="colorMode.value === 'dark'" name="ph:moon" size="16px" />
+            <Icon v-else-if="colorMode.value === 'light'" name="ph:sun" size="16px" />
+            <Icon v-else name="ph:monitor" size="16px" />
+          </button>
         </div>
       </div>
     </header>
@@ -121,6 +128,7 @@ const mobileMenuOpen = ref(false)
 const { wsStatus } = useEntities()
 const { load } = useServerLoad()
 const { previewMode, cycle: cyclePreviewMode } = usePlayerMode()
+const { inputPreview, mixerPreview, audioMeters } = useUserState()
 
 const previewModeLabel = computed(() => {
   if (previewMode.value === 'auto') return 'Auto';
