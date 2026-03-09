@@ -11,7 +11,7 @@
           {{ load.load_percent }}%
         </span>
         <span v-if="uptime" class="hidden md:inline text-[11px] font-mono tabular-nums ml-1 text-gray-400 dark:text-gray-500" :title="`Uptime: ${uptime}`">
-          {{ uptime }}
+          | Uptime: {{ uptime }}
         </span>
 
         <!-- Spacer -->
