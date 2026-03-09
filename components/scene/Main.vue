@@ -1,7 +1,7 @@
 <template>
   <div class="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-hidden h-full">
     <div class="flex flex-col md:flex-row">
-      <div class="order-2 md:order-first md:w-28 lg:w-48 border-t md:border-t-0 md:border-r border-gray-200 dark:border-gray-700">
+      <div class="md:order-first md:w-28 lg:w-48 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
         <CreateScenePane />
         <div class="flex md:flex-col overflow-x-auto md:overflow-x-visible">
           <button
@@ -20,7 +20,7 @@
           </button>
         </div>
       </div>
-      <div class="flex-grow min-w-0 order-1 md:order-last">
+      <div class="flex-grow min-w-0">
         <SceneScenes
           v-if="sceneMixers[activeIndex]"
           :scene="sceneMixers[activeIndex]"
