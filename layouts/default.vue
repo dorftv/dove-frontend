@@ -6,16 +6,13 @@
         <!-- Logo -->
         <NuxtLink to="/" class="font-bold text-emerald-600 dark:text-emerald-400 shrink-0">DOVE <span class="hidden md:inline font-normal text-gray-400 dark:text-gray-500">Online Video Editor</span></NuxtLink>
 
-        <!-- Server load -->
-        <span v-if="load" class="text-[11px] font-mono tabular-nums ml-3" :class="load.load_percent > 80 ? 'text-red-500' : load.load_percent > 50 ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'" :title="`Load: ${load.load1} / ${load.load5} / ${load.load15} (${load.cpu_count} cores)\nUptime: ${uptime}`">
-          {{ load.load_percent }}%
-        </span>
-        <span v-if="uptime" class="hidden md:inline text-[11px] font-mono tabular-nums ml-1 text-gray-400 dark:text-gray-500" :title="`Uptime: ${uptime}`">
-          | Uptime: {{ uptime }}
-        </span>
-
         <!-- Spacer -->
         <div class="flex-grow" />
+
+        <!-- Server load + uptime -->
+        <span v-if="load" class="text-[11px] font-mono tabular-nums mr-2" :class="load.load_percent > 80 ? 'text-red-500' : load.load_percent > 50 ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'" :title="`Load: ${load.load1} / ${load.load5} / ${load.load15} (${load.cpu_count} cores)\nUptime: ${uptime}`">
+          <span class="hidden md:inline">Load: </span>{{ load.load_percent }}%<template v-if="uptime"> | <span class="hidden md:inline">Uptime: </span>{{ uptime }}</template>
+        </span>
 
         <!-- Preview toggles (desktop) -->
         <div class="hidden md:block mr-1">
