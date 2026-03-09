@@ -1,23 +1,16 @@
 export function useServerLoad() {
   const load = useState('server-load', () => null);
-  let timer = null;
 
-  const fetchLoad = async () => {
-    try {
-      load.value = await $fetch('/api/load');
-    } catch {
-      load.value = null;
-    }
-  };
-
-  onMounted(() => {
-    fetchLoad();
-    timer = setInterval(fetchLoad, 5000);
+  const uptime = computed(() => {
+    const s = load.value?.uptime;
+    if (s == null) return '';
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    if (d > 0) return `${d}d ${h}h`;
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
   });
 
-  onUnmounted(() => {
-    clearInterval(timer);
-  });
-
-  return { load };
+  return { load, uptime };
 }

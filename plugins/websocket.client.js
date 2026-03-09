@@ -13,6 +13,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const outputs = useState('entities-outputs', () => []);
   const encoders = useState('entities-encoders', () => []);
   const audioLevels = useState('audio-levels', () => ({}));
+  const serverLoad = useState('server-load', () => null);
   const isLoading = useState('entities-loading', () => true);
 
   const getEntitiesArray = (type) => {
@@ -40,18 +41,20 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const fetchEntities = async () => {
     try {
-      const [inputsData, mixersData, outputsData, encodersData, configData] = await Promise.all([
+      const [inputsData, mixersData, outputsData, encodersData, configData, loadData] = await Promise.all([
         $fetch('/api/inputs'),
         $fetch('/api/mixers'),
         $fetch('/api/outputs'),
         $fetch('/api/encoders'),
         $fetch('/api/config'),
+        $fetch('/api/load'),
       ]);
       inputs.value = inputsData;
       mixers.value = mixersData;
       outputs.value = outputsData;
       encoders.value = encodersData;
       config.value = configData;
+      serverLoad.value = loadData;
       error.value = null;
     } catch (e) {
       error.value = 'Failed to load entities: ' + e.message;
@@ -119,6 +122,13 @@ export default defineNuxtPlugin((nuxtApp) => {
         const levels = Array.isArray(message.data) ? message.data : [message.data];
         for (const l of levels) {
           audioLevels.value[l.uid] = l;
+        }
+        return;
+      }
+
+      if (message.channel === 'TICK') {
+        if (serverLoad.value) {
+          serverLoad.value = { ...serverLoad.value, uptime: message.data.uptime };
         }
         return;
       }
