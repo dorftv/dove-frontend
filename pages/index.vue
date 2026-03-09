@@ -5,26 +5,21 @@
   </div>
 
   <div v-else class="relative">
-    <div class="grid grid-cols-12 gap-4 px-4 lg:pl-4 lg:pr-8 py-4">
-      <div class="col-span-12 md:col-span-6 lg:col-span-5">
+    <div class="grid grid-cols-12 gap-2 md:gap-3 lg:gap-4 px-2 md:px-4 lg:pl-4 lg:pr-8 py-2 md:py-4">
+      <div class="col-span-12 md:col-span-5">
         <SceneMain />
       </div>
 
-      <div class="col-span-12 md:col-span-6 lg:col-span-2">
+      <div class="col-span-12 md:col-span-2">
         <ProgramSwitch />
       </div>
 
-      <div class="col-span-12 md:col-span-6 lg:col-span-5" ref="programRef">
+      <div class="col-span-12 md:col-span-5" ref="programRef">
         <ProgramMain />
       </div>
 
-      <!-- Mobile/tablet: inline outputs -->
-      <div class="col-span-12 lg:hidden order-last">
-        <OutputMain />
-      </div>
-
-      <!-- Mobile: inline NodeCG toggle -->
-      <div v-if="inputsNodeCG.length > 0" class="col-span-12 lg:hidden order-last">
+      <!-- Mobile/tablet: inline NodeCG toggle -->
+      <div v-if="inputsNodeCG.length > 0" class="col-span-12 lg:hidden">
         <button
           @click="nodecgOpen = !nodecgOpen"
           class="flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-2"
@@ -38,7 +33,7 @@
         </div>
       </div>
 
-      <div class="col-span-12 md:order-last relative" ref="inputRef">
+      <div class="col-span-12 relative" ref="inputRef">
         <InputMain />
 
         <!-- Inputs without preview -->
@@ -75,6 +70,11 @@
           </div>
           <InputNodeCG />
         </div>
+      </div>
+
+      <!-- Mobile/tablet: inline outputs (last) -->
+      <div class="col-span-12 lg:hidden">
+        <OutputMain />
       </div>
     </div>
 

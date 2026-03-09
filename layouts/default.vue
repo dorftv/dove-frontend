@@ -11,7 +11,7 @@
 
         <!-- Server load + uptime -->
         <span v-if="load" class="text-[11px] font-mono tabular-nums mr-2" :class="load.load_percent > 80 ? 'text-red-500' : load.load_percent > 50 ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'" :title="`Load: ${load.load1} / ${load.load5} / ${load.load15} (${load.cpu_count} cores)\nUptime: ${uptime}`">
-          <span class="hidden md:inline">Load: </span>{{ load.load_percent }}%<template v-if="uptime"> | <span class="hidden md:inline">Uptime: </span>{{ uptime }}</template>
+          <span class="hidden lg:inline">Load: </span>{{ load.load_percent }}%<template v-if="uptime"> | <span class="hidden lg:inline">Uptime: </span>{{ uptime }}</template>
         </span>
 
         <!-- Preview toggles (desktop) -->
