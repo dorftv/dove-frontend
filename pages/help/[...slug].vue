@@ -1,34 +1,51 @@
 <template>
   <div class="min-h-[calc(100vh-2.5rem)]">
     <!-- Mobile nav -->
-    <div class="md:hidden border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2">
-      <div class="flex items-center gap-2 overflow-x-auto text-sm">
+    <div class="md:hidden border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <button
+        @click="mobileNavOpen = !mobileNavOpen"
+        class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
+        <span>{{ currentTitle }}</span>
+        <Icon :name="mobileNavOpen ? 'ph:caret-up' : 'ph:caret-down'" size="14px" class="text-gray-400" />
+      </button>
+      <nav v-if="mobileNavOpen" class="px-4 pb-3 space-y-0.5 text-sm">
         <template v-for="item in navSections" :key="item.slug || item.title">
           <NuxtLink
             v-if="!item.type"
             :to="item.slug === 'index' ? '/help' : `/help/${item.slug}`"
-            class="shrink-0 px-3 py-1 rounded-full transition-colors"
+            @click="mobileNavOpen = false"
+            class="block px-3 py-1.5 rounded transition-colors"
             :class="currentSlug === item.slug
               ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
           >
             {{ item.title }}
           </NuxtLink>
           <template v-else-if="item.type === 'group'">
-            <NuxtLink
-              v-for="child in item.children"
-              :key="child.slug"
-              :to="`/help/${child.slug}`"
-              class="shrink-0 px-3 py-1 rounded-full transition-colors"
-              :class="currentSlug === child.slug
-                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+            <button
+              @click="toggleGroup(item.title)"
+              class="w-full flex items-center justify-between px-3 py-1.5 rounded transition-colors font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              {{ child.title }}
-            </NuxtLink>
+              <span>{{ item.title }}</span>
+              <span class="text-xs">{{ openGroups.has(item.title) ? '▾' : '▸' }}</span>
+            </button>
+            <template v-if="openGroups.has(item.title)">
+              <NuxtLink
+                v-for="child in item.children" :key="child.slug"
+                :to="`/help/${child.slug}`"
+                @click="mobileNavOpen = false"
+                class="block pl-5 pr-3 py-1.5 rounded transition-colors"
+                :class="currentSlug === child.slug
+                  ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 font-medium'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'"
+              >
+                {{ child.title }}
+              </NuxtLink>
+            </template>
           </template>
         </template>
-      </div>
+      </nav>
     </div>
 
     <div class="flex max-w-6xl mx-auto">
@@ -133,6 +150,7 @@ const navSections = [
   { slug: 'debugging', title: 'Debugging' },
 ]
 
+const mobileNavOpen = ref(false)
 const openGroups = ref(new Set())
 
 const md = new MarkdownIt({ html: true })
@@ -141,6 +159,17 @@ const currentSlug = computed(() => {
   const parts = route.params.slug
   if (!parts || parts.length === 0) return 'index'
   return parts.join('/')
+})
+
+const currentTitle = computed(() => {
+  for (const item of navSections) {
+    if (!item.type && item.slug === currentSlug.value) return item.title
+    if (item.type === 'group') {
+      const child = item.children?.find(c => c.slug === currentSlug.value)
+      if (child) return `${item.title} › ${child.title}`
+    }
+  }
+  return 'Help'
 })
 
 // Auto-open the group that contains the current page
