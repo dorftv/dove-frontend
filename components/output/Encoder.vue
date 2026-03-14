@@ -5,7 +5,7 @@
       <span
         :title="encoder.state"
         class="w-2 h-2 rounded-full shrink-0"
-        :class="stateDotClass(encoder.state)"
+        :style="{ backgroundColor: stateColor(encoder.state) }"
         role="status"
       />
 
@@ -44,7 +44,7 @@
 
 <script setup>
 const { isUnlocked } = useLocked()
-const { stateDotClass } = useStateClass()
+const { stateColor } = useStateClass()
 
 const props = defineProps({
   encoder: Object,

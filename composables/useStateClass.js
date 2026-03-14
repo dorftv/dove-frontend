@@ -30,19 +30,6 @@ export function useStateClass() {
     return classes[state] || 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
   };
 
-  const stateDotClass = (state) => {
-    const classes = {
-      PLAYING: 'bg-green-500',
-      PAUSED: 'bg-orange-400',
-      NULL: 'bg-gray-400 dark:bg-gray-500',
-      READY: 'bg-gray-400 dark:bg-gray-500',
-      EOS: 'bg-red-500',
-      ERROR: 'bg-red-500',
-      BUFFERING: 'bg-orange-400',
-    };
-    return classes[state] || 'bg-gray-400';
-  };
-
   const volumeIcon = (volume, mute = false) => {
     if (mute || volume === 0) return 'ph:speaker-x';
     if (volume < 50) return 'ph:speaker-low';
@@ -56,9 +43,12 @@ export function useStateClass() {
       READY: '#3b82f6',
       NULL: '#6b7280',
       PENDING: '#6b7280',
+      EOS: '#ef4444',
+      ERROR: '#ef4444',
+      BUFFERING: '#f59e0b',
     };
     return colors[state] || '#6b7280';
   };
 
-  return { stateClass, stateIcon, stateBadgeClass, stateDotClass, stateColor, volumeIcon };
+  return { stateClass, stateIcon, stateBadgeClass, stateColor, volumeIcon };
 }

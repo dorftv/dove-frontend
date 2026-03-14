@@ -7,12 +7,7 @@
     <!-- State indicator -->
     <span
       class="w-2 h-2 rounded-full shrink-0"
-      :class="{
-        'bg-green-400': input.state === 'PLAYING',
-        'bg-orange-400': input.state === 'PAUSED',
-        'bg-red-400': input.state === 'ERROR',
-        'bg-gray-400': !['PLAYING', 'PAUSED', 'ERROR'].includes(input.state),
-      }"
+      :style="{ backgroundColor: stateColor(input.state) }"
       :title="input.state"
     />
 
@@ -52,6 +47,7 @@
 </template>
 
 <script setup>
+const { stateColor } = useStateClass()
 const { isUnlocked } = useLocked()
 
 const props = defineProps({
