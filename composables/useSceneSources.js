@@ -14,6 +14,7 @@ export function useSceneSources(getScene, getSource) {
   const ypos = ref(source().ypos);
   const volume = ref(source().volume * 100);
   const mute = ref(source().mute);
+  const sizing = ref(source().sizing || 'fit');
 
   watch(source, (s) => {
     src.value = s.src;
@@ -24,6 +25,7 @@ export function useSceneSources(getScene, getSource) {
     ypos.value = s.ypos;
     volume.value = s.volume * 100;
     mute.value = s.mute;
+    sizing.value = s.sizing || 'fit';
   });
 
   const handleChange = (prop, newValue) => {
@@ -36,6 +38,7 @@ export function useSceneSources(getScene, getSource) {
       case 'ypos': ypos.value = newValue; break;
       case 'volume': volume.value = newValue; newValue = newValue / 100; break;
       case 'mute': mute.value = newValue; break;
+      case 'sizing': sizing.value = newValue; break;
     }
 
     updateEntityInEntities('mixer', {
@@ -59,6 +62,37 @@ export function useSceneSources(getScene, getSource) {
     return typeMaxMap[type];
   };
 
+  const getMin = (type) => {
+    const s = scene();
+    if (type === 'xpos') return -s.width;
+    if (type === 'ypos') return -s.height;
+    return 0;
+  };
+
+  const getDefault = (type) => {
+    const s = scene();
+    const defaults = {
+      'alpha': 100,
+      'width': s.width,
+      'height': s.height,
+      'xpos': 0,
+      'ypos': 0,
+    };
+    return defaults[type] ?? 0;
+  };
+
+  const resetAll = () => {
+    for (const key of ['alpha', 'width', 'height', 'xpos', 'ypos']) {
+      handleChange(key, getDefault(key));
+    }
+    handleChange('sizing', 'fit');
+  };
+
+  const resetPosition = () => {
+    handleChange('xpos', 0);
+    handleChange('ypos', 0);
+  };
+
   const removeSlot = async () => {
     try {
       await $fetch('/api/mixer/remove_slot', {
@@ -73,8 +107,17 @@ export function useSceneSources(getScene, getSource) {
     }
   };
 
+  let _volumeBeforeMute = volume.value || 100;
+
   const toggleMute = () => {
-    handleChange('mute', !mute.value);
+    if (!mute.value) {
+      _volumeBeforeMute = volume.value || 100;
+      handleChange('volume', 0);
+      handleChange('mute', true);
+    } else {
+      handleChange('mute', false);
+      handleChange('volume', _volumeBeforeMute);
+    }
   };
 
   const volumeIcon = computed(() => volumeIconFn(volume.value, mute.value));
@@ -89,6 +132,10 @@ export function useSceneSources(getScene, getSource) {
     removeSlot,
     handleChange,
     getMax,
+    getMin,
+    getDefault,
+    resetAll,
+    resetPosition,
     toggleMute,
     volumeIcon,
     onDrop,
@@ -99,6 +146,7 @@ export function useSceneSources(getScene, getSource) {
     xpos,
     ypos,
     volume,
-    mute
+    mute,
+    sizing
   };
 }

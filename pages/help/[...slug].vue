@@ -136,7 +136,7 @@ const navSections = [
     type: 'group', title: 'Inputs',
     children: [
       { slug: 'inputs', title: 'All Inputs' },
-      { slug: 'inputs-playbin3', title: 'Streams & Files' },
+      { slug: 'inputs-uridecodebin3', title: 'Streams & Files' },
       { slug: 'inputs-playlist', title: 'Playlist' },
       { slug: 'inputs-wpesrc', title: 'HTML / Web' },
       { slug: 'inputs-ytdlp', title: 'yt-dlp' },
