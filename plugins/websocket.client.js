@@ -57,6 +57,11 @@ export default defineNuxtPlugin((nuxtApp) => {
       serverLoad.value = loadData;
       error.value = null;
     } catch (e) {
+      if (e?.response?.status === 401 || e?.status === 401 || e?.statusCode === 401) {
+        const { login } = useAuth();
+        login();
+        return;
+      }
       error.value = 'Failed to load entities: ' + e.message;
       console.error('Failed to load entities:', e);
     } finally {
@@ -205,11 +210,24 @@ export default defineNuxtPlugin((nuxtApp) => {
     }, 5000);
   };
 
-  nuxtApp.hook('app:mounted', () => {
-    fetchEntities().then(() => {
-      connect();
-      startHealthCheck();
-    });
+  // Suppress rendering errors during auth redirect to prevent 500 flash
+  let authRedirecting = false;
+  nuxtApp.hook('vue:error', (err) => {
+    if (authRedirecting) return false; // swallow error during redirect
+  });
+
+  nuxtApp.hook('app:mounted', async () => {
+    // Check auth state before loading entities
+    const { checkAuth, isAuthenticated, login } = useAuth();
+    await checkAuth();
+    if (!isAuthenticated.value) {
+      authRedirecting = true;
+      login();
+      return;
+    }
+    await fetchEntities();
+    connect();
+    startHealthCheck();
   });
 
   return {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="addOutput || isUnlocked">
+  <div v-if="canOutputs && (addOutput || canBypassLock)">
     <UButton
       label="Add Output"
       variant="ghost"
@@ -12,7 +12,7 @@
         <div class="p-4 w-full max-w-lg mx-auto">
           <div class="text-sm font-medium mb-3">Add Output</div>
 
-          <UButtonGroup class="hidden sm:inline-flex flex-wrap mb-3">
+          <div class="hidden sm:inline-flex flex-wrap mb-3">
             <UButton
               v-for="opt in typeOptions"
               :key="opt.value"
@@ -22,7 +22,7 @@
               size="xs"
               @click="activeTabIndex = opt.value"
             />
-          </UButtonGroup>
+          </div>
           <USelect
             v-model="activeTabIndex"
             :items="typeOptions"
@@ -240,7 +240,7 @@
 </template>
 
 <script setup>
-const { isUnlocked } = useLocked()
+const { canOutputs, canBypassLock } = useAuth()
 
 const {
   isOpen,

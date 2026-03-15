@@ -23,7 +23,7 @@
           <SceneInputs :source="source" :scene="scene" />
         </div>
         <div
-          v-if="!scene.src_locked || isUnlocked"
+          v-if="canSupervisor && ((!scene.src_locked && !scene.locked) || canBypassLock)"
           class="px-3 py-1.5 transition-colors duration-100"
           :class="{ 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-inset ring-blue-400': dropOver }"
           @dragover.prevent
@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-const { isUnlocked } = useLocked()
+const { canSupervisor, canBypassLock } = useAuth()
 
 const props = defineProps({
   scene: Object,

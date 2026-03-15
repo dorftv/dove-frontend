@@ -153,7 +153,7 @@ const navSections = [
 const mobileNavOpen = ref(false)
 const openGroups = ref(new Set())
 
-const md = new MarkdownIt({ html: true })
+const md = new MarkdownIt({ html: false })
 
 const currentSlug = computed(() => {
   const parts = route.params.slug

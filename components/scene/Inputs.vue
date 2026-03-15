@@ -14,7 +14,7 @@
       </span>
       <div class="flex items-center gap-0.5 shrink-0">
         <!-- Volume: mute icon + slider -->
-        <template v-if="!scene.src_locked || isUnlocked">
+        <template v-if="canSupervisor && ((!scene.src_locked && !scene.locked) || canBypassLock)">
           <button @click="toggleMute" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-orange-500 dark:text-orange-400': mute }" :title="mute ? 'Unmute' : 'Mute'" :aria-label="mute ? 'Unmute' : 'Mute'">
             <Icon :name="volumeIcon" size="14px" />
           </button>
@@ -30,10 +30,10 @@
             />
           </span>
         </template>
-        <button v-if="(!source.locked && !scene.src_locked) || isUnlocked" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
+        <button v-if="canSupervisor && ((!source.locked && !scene.src_locked && !scene.locked) || canBypassLock)" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
           <Icon name="ph:gear" size="11px" />
         </button>
-        <span v-if="(source.locked || scene.src_locked) && !isUnlocked" class="slot-btn opacity-40" title="Locked">
+        <span v-if="!canSupervisor || ((source.locked || scene.src_locked || scene.locked) && !canBypassLock)" class="slot-btn opacity-40" :title="canSupervisor ? 'Locked' : 'No permission'">
           <Icon name="ph:lock" size="11px" />
         </span>
       </div>
@@ -58,7 +58,7 @@
       </button>
       <div class="flex items-center mb-1">
         <span class="w-16 text-xs text-gray-600 dark:text-gray-400">sizing</span>
-        <UButtonGroup class="flex-grow">
+        <div class="inline-flex flex-grow">
           <UButton
             label="Fit"
             :color="sizing === 'fit' ? 'primary' : 'neutral'"
@@ -73,7 +73,7 @@
             size="xs"
             @click="handleChange('sizing', 'stretch')"
           />
-        </UButtonGroup>
+        </div>
         <button
           @click="resetAll"
           class="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-const { isUnlocked } = useLocked()
+const { canSupervisor, canBypassLock } = useAuth()
 
 const props = defineProps({
   source: Object,
@@ -132,8 +132,13 @@ const doRemoveSlot = () => {
   removeSlot();
 };
 
+const canEditSlot = computed(() =>
+  canSupervisor.value && ((!props.source.locked && !props.scene.src_locked && !props.scene.locked) || canBypassLock.value)
+);
+
 const handleDrop = (event) => {
   dragOver.value = false;
+  if (!canEditSlot.value) return;
   onDrop(event);
 };
 

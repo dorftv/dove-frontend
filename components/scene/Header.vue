@@ -20,7 +20,7 @@
     <!-- Actions -->
     <DetailPopover :entity="scene" />
     <button
-      v-if="!scene.locked || isUnlocked"
+      v-if="canSupervisor && (!scene.locked || canBypassLock)"
       @click="submitRemove"
       :disabled="deleting"
       class="icon-btn text-red-400 hover:text-red-300 disabled:opacity-50"
@@ -34,7 +34,7 @@
 
 <script setup>
 const { stateColor } = useStateClass()
-const { isUnlocked } = useLocked()
+const { canSupervisor, canBypassLock } = useAuth()
 
 const props = defineProps({
   scene: Object,

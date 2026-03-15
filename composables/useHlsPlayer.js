@@ -26,14 +26,17 @@ export function useHlsPlayer(props) {
       if (!autoplayToastShown) {
         autoplayToastShown = true;
         const pmUid = programMixer.value?.uid;
-        toast.add({
+        const t = toast.add({
           title: 'Audio blocked by browser',
           description: 'Click anywhere to enable audio',
           color: 'warning',
         });
         document.addEventListener('click', () => {
           if (pmUid) setMutedState(pmUid, false);
-          toast.clear();
+          document.querySelectorAll('video, media-player').forEach(v => {
+            if (v.paused) v.play().catch(() => {});
+          });
+          toast.remove(t.id);
         }, { once: true });
       }
     });

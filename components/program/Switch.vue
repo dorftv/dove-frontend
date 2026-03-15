@@ -8,7 +8,7 @@
       </div>
 
       <!-- Transition mode -->
-      <UButtonGroup>
+      <div class="inline-flex">
         <UButton
           v-for="opt in transitionOptions"
           :key="opt.value"
@@ -18,7 +18,7 @@
           size="sm"
           @click="transition = opt.value"
         />
-      </UButtonGroup>
+      </div>
 
       <!-- Duration -->
       <div v-if="transition === 'fade'" class="w-full max-w-48">

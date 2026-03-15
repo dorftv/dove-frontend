@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="canOutputs">
     <UButton
       label="Add Encoder"
       variant="ghost"
@@ -15,7 +15,7 @@
           <form @submit.prevent="submitCreate()" class="space-y-2">
             <div>
               <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Type</label>
-              <UButtonGroup>
+              <div class="inline-flex">
                 <UButton
                   v-for="opt in typeOptions"
                   :key="opt.value"
@@ -25,7 +25,7 @@
                   size="xs"
                   @click="encoderType = opt.value; onTypeChange()"
                 />
-              </UButtonGroup>
+              </div>
             </div>
 
             <div>
@@ -113,6 +113,8 @@
 </template>
 
 <script setup>
+const { canOutputs } = useAuth()
+
 const {
   isOpen,
   toggle,

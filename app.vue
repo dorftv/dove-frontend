@@ -1,8 +1,7 @@
 <template>
-  <UApp>
+  <UApp :toaster="{ position: 'bottom-right' }">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <UNotifications position="bottom-right" />
   </UApp>
 </template>

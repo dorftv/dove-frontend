@@ -12,7 +12,7 @@
       {{ inputName || 'Empty' }}
     </span>
     <div class="flex items-center gap-0.5 shrink-0">
-      <template v-if="!source.src_locked || isUnlocked">
+      <template v-if="canUser && (!source.src_locked || canBypassLock)">
         <button
           v-if="!isInSceneSources"
           @click="submitAddInputToScene"
@@ -32,7 +32,7 @@
           <Icon name="ph:minus-circle" size="14px" />
         </button>
       </template>
-      <span v-else class="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center opacity-40" title="Locked">
+      <span v-else-if="!canUser || (source.src_locked && !canBypassLock)" class="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center opacity-40" :title="canUser ? 'Locked' : 'No permission'">
         <Icon name="ph:lock" size="11px" />
       </span>
     </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-const { isUnlocked } = useLocked()
+const { canUser, canBypassLock } = useAuth()
 
 const props = defineProps({
   input: Object,

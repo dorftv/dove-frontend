@@ -25,7 +25,7 @@
     <!-- Actions -->
     <DetailPopover :entity="input" />
     <button
-      v-if="!input.locked || isUnlocked"
+      v-if="canUser && (!input.locked || canBypassLock)"
       @click="submitRemove"
       :disabled="deleting"
       class="icon-btn text-red-400 hover:text-red-300 disabled:opacity-50"
@@ -48,7 +48,7 @@
 
 <script setup>
 const { stateColor } = useStateClass()
-const { isUnlocked } = useLocked()
+const { canUser, canBypassLock } = useAuth()
 
 const props = defineProps({
   input: Object,

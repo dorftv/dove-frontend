@@ -29,7 +29,7 @@
       <!-- Action buttons -->
       <DetailPopover :entity="encoder" />
       <button
-        v-if="!encoder.locked || isUnlocked"
+        v-if="canOutputs && (!encoder.locked || canBypassLock)"
         @click="submitRemove"
         :disabled="deleting"
         class="icon-btn text-red-400 hover:text-red-300 disabled:opacity-50"
@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-const { isUnlocked } = useLocked()
+const { canOutputs, canBypassLock } = useAuth()
 const { stateColor } = useStateClass()
 
 const props = defineProps({

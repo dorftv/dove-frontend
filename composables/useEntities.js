@@ -31,6 +31,11 @@ export function useEntities() {
       outputs.value = outputsData;
       encoders.value = encodersData;
     } catch (e) {
+      if (e?.response?.status === 401 || e?.status === 401 || e?.statusCode === 401) {
+        const { login } = useAuth();
+        login();
+        return;
+      }
       error.value = 'Failed to load entities: ' + e.message;
       notify.error('Failed to load entities');
     } finally {

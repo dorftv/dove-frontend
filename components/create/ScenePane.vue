@@ -1,5 +1,5 @@
 <template>
-  <div v-if="addScene || isUnlocked">
+  <div v-if="canSupervisor && (addScene || canBypassLock)">
     <UButton
       label="Add Scene"
       variant="ghost"
@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-const { isUnlocked } = useLocked()
+const { canSupervisor, canBypassLock } = useAuth()
 
 const {
   isOpen,
