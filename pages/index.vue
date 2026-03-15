@@ -159,21 +159,7 @@ function updateTabPosition() {
   nodecgTabTop.value = inputEl.offsetTop + inputEl.offsetHeight / 2;
 }
 
-// Close drawers on outside click, but ignore UI overlays
-let skipNextClick = false;
-watch(outputOpen, (val) => { if (val) skipNextClick = true; });
-watch(nodecgOpen, (val) => { if (val) skipNextClick = true; });
-const onDocumentClick = (e) => {
-  if (skipNextClick) { skipNextClick = false; return; }
-  if (!outputOpen.value && !nodecgOpen.value) return;
-  // Ignore clicks on elements removed from DOM (portal dropdowns clean up before bubbling completes)
-  if (!document.body.contains(e.target)) return;
-  const overlay = e.target.closest('[role="dialog"], [role="listbox"], .nodecg-panel, .nodecg-tab');
-  if (!overlay) {
-    outputOpen.value = false;
-    nodecgOpen.value = false;
-  }
-};
+useDrawerClickOutside(outputOpen, nodecgOpen);
 
 let ro;
 watch([programRef, inputRef], ([progEl, inEl]) => {
@@ -184,11 +170,7 @@ watch([programRef, inputRef], ([progEl, inEl]) => {
   updateTabPosition();
 });
 
-onMounted(() => document.addEventListener('click', onDocumentClick));
-onUnmounted(() => {
-  ro?.disconnect();
-  document.removeEventListener('click', onDocumentClick);
-});
+onUnmounted(() => ro?.disconnect());
 </script>
 
 <style scoped>

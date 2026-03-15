@@ -6,45 +6,31 @@ export function useSceneSources(getScene, getSource) {
   const scene = () => toValue(getScene);
   const source = () => toValue(getSource);
 
-  const src = ref(source().src);
-  const alpha = ref(source().alpha * 100);
-  const width = ref(source().width);
-  const height = ref(source().height);
-  const xpos = ref(source().xpos);
-  const ypos = ref(source().ypos);
-  const volume = ref(source().volume * 100);
-  const mute = ref(source().mute);
-  const sizing = ref(source().sizing || 'fit');
-
-  watch(source, (s) => {
-    src.value = s.src;
-    alpha.value = s.alpha * 100;
-    width.value = s.width;
-    height.value = s.height;
-    xpos.value = s.xpos;
-    ypos.value = s.ypos;
-    volume.value = s.volume * 100;
-    mute.value = s.mute;
-    sizing.value = s.sizing || 'fit';
+  const fromSource = (s) => ({
+    src: s.src,
+    alpha: s.alpha * 100,
+    width: s.width,
+    height: s.height,
+    xpos: s.xpos,
+    ypos: s.ypos,
+    volume: s.volume * 100,
+    mute: s.mute,
+    sizing: s.sizing || 'fit',
   });
 
-  const handleChange = (prop, newValue) => {
-    switch (prop) {
-      case 'src': src.value = newValue; break;
-      case 'alpha': alpha.value = newValue; newValue = newValue / 100; break;
-      case 'width': width.value = newValue; break;
-      case 'height': height.value = newValue; break;
-      case 'xpos': xpos.value = newValue; break;
-      case 'ypos': ypos.value = newValue; break;
-      case 'volume': volume.value = newValue; newValue = newValue / 100; break;
-      case 'mute': mute.value = newValue; break;
-      case 'sizing': sizing.value = newValue; break;
-    }
+  // Props that need conversion from display value → API value
+  const toApi = { alpha: v => v / 100, volume: v => v / 100 };
 
+  const state = reactive(fromSource(source()));
+  watch(source, (s) => Object.assign(state, fromSource(s)));
+
+  const handleChange = (prop, newValue) => {
+    state[prop] = newValue;
+    const apiValue = toApi[prop] ? toApi[prop](newValue) : newValue;
     updateEntityInEntities('mixer', {
       uid: scene().uid,
       index: source().index,
-      [prop]: newValue
+      [prop]: apiValue
     });
   };
 
@@ -107,11 +93,11 @@ export function useSceneSources(getScene, getSource) {
     }
   };
 
-  let _volumeBeforeMute = volume.value || 100;
+  let _volumeBeforeMute = state.volume || 100;
 
   const toggleMute = () => {
-    if (!mute.value) {
-      _volumeBeforeMute = volume.value || 100;
+    if (!state.mute) {
+      _volumeBeforeMute = state.volume || 100;
       handleChange('volume', 0);
       handleChange('mute', true);
     } else {
@@ -120,7 +106,7 @@ export function useSceneSources(getScene, getSource) {
     }
   };
 
-  const volumeIcon = computed(() => volumeIconFn(volume.value, mute.value));
+  const volumeIcon = computed(() => volumeIconFn(state.volume, state.mute));
 
   const onDrop = (event) => {
     const uid = event.dataTransfer.getData('text/plain');
@@ -139,14 +125,6 @@ export function useSceneSources(getScene, getSource) {
     toggleMute,
     volumeIcon,
     onDrop,
-    src,
-    alpha,
-    width,
-    height,
-    xpos,
-    ypos,
-    volume,
-    mute,
-    sizing
+    ...toRefs(state),
   };
 }

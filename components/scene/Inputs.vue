@@ -14,7 +14,7 @@
       </span>
       <div class="flex items-center gap-0.5 shrink-0">
         <!-- Volume: mute icon + slider -->
-        <template v-if="canSupervisor && ((!scene.src_locked && !scene.locked) || canBypassLock)">
+        <template v-if="canEditVolume">
           <button @click="toggleMute" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-orange-500 dark:text-orange-400': mute }" :title="mute ? 'Unmute' : 'Mute'" :aria-label="mute ? 'Unmute' : 'Mute'">
             <Icon :name="volumeIcon" size="14px" />
           </button>
@@ -30,10 +30,10 @@
             />
           </span>
         </template>
-        <button v-if="canSupervisor && ((!source.locked && !scene.src_locked && !scene.locked) || canBypassLock)" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
+        <button v-if="canEditSlot" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
           <Icon name="ph:gear" size="11px" />
         </button>
-        <span v-if="!canSupervisor || ((source.locked || scene.src_locked || scene.locked) && !canBypassLock)" class="slot-btn opacity-40" :title="canSupervisor ? 'Locked' : 'No permission'">
+        <span v-if="!canEditSlot" class="slot-btn opacity-40" :title="canSupervisor ? 'Locked' : 'No permission'">
           <Icon name="ph:lock" size="11px" />
         </span>
       </div>
@@ -131,6 +131,10 @@ const doRemoveSlot = () => {
   emit('close');
   removeSlot();
 };
+
+const canEditVolume = computed(() =>
+  canSupervisor.value && ((!props.scene.src_locked && !props.scene.locked) || canBypassLock.value)
+);
 
 const canEditSlot = computed(() =>
   canSupervisor.value && ((!props.source.locked && !props.scene.src_locked && !props.scene.locked) || canBypassLock.value)

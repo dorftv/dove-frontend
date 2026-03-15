@@ -1,5 +1,6 @@
 export function useKeyboardShortcuts() {
   const { handleSceneClick, cutSceneToProgram } = useActiveScene();
+  const { toggle } = useCreateDialog();
 
   const onKeyDown = (event) => {
     const tag = event.target.tagName;
@@ -18,13 +19,7 @@ export function useKeyboardShortcuts() {
 
     const createMap = { i: 'input', o: 'output', s: 'scene', e: 'encoder' };
     if (createMap[event.key]) {
-      const target = createMap[event.key];
-      for (const type of Object.values(createMap)) {
-        if (type !== target) {
-          window.dispatchEvent(new CustomEvent('close-create', { detail: type }));
-        }
-      }
-      window.dispatchEvent(new CustomEvent('toggle-create', { detail: target }));
+      toggle(createMap[event.key]);
       return;
     }
 

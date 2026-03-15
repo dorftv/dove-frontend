@@ -60,8 +60,6 @@ const {
   addScene,
 } = useCreateScene();
 
-const onToggleCreate = (e) => { if (e.detail === 'scene') isOpen.value = !isOpen.value }
-const onCloseCreate = (e) => { if (e.detail === 'scene') isOpen.value = false }
-onMounted(() => { window.addEventListener('toggle-create', onToggleCreate); window.addEventListener('close-create', onCloseCreate) })
-onUnmounted(() => { window.removeEventListener('toggle-create', onToggleCreate); window.removeEventListener('close-create', onCloseCreate) })
+const { openDialog } = useCreateDialog()
+watch(openDialog, (type) => { isOpen.value = type === 'scene' })
 </script>

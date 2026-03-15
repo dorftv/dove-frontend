@@ -276,8 +276,6 @@ const typeOptions = computed(() =>
   }))
 )
 
-const onToggleCreate = (e) => { if (e.detail === 'output') isOpen.value = !isOpen.value }
-const onCloseCreate = (e) => { if (e.detail === 'output') isOpen.value = false }
-onMounted(() => { window.addEventListener('toggle-create', onToggleCreate); window.addEventListener('close-create', onCloseCreate) })
-onUnmounted(() => { window.removeEventListener('toggle-create', onToggleCreate); window.removeEventListener('close-create', onCloseCreate) })
+const { openDialog } = useCreateDialog()
+watch(openDialog, (type) => { isOpen.value = type === 'output' })
 </script>

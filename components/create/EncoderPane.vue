@@ -134,8 +134,6 @@ const typeOptions = [
   { label: 'Audio', value: 'audio' },
 ];
 
-const onToggleCreate = (e) => { if (e.detail === 'encoder') isOpen.value = !isOpen.value }
-const onCloseCreate = (e) => { if (e.detail === 'encoder') isOpen.value = false }
-onMounted(() => { window.addEventListener('toggle-create', onToggleCreate); window.addEventListener('close-create', onCloseCreate) })
-onUnmounted(() => { window.removeEventListener('toggle-create', onToggleCreate); window.removeEventListener('close-create', onCloseCreate) })
+const { openDialog } = useCreateDialog()
+watch(openDialog, (type) => { isOpen.value = type === 'encoder' })
 </script>

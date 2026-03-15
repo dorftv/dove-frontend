@@ -43,11 +43,37 @@ export default defineNuxtConfig({
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,
         },
-        '/assets': {
+        '/branding': {
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,
         },
         '/auth': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        // NodeCG proxy paths (only active when [nodecg] config exists in DOVE)
+        '/bundles': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/dashboard': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/node_modules': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/socket.io': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+          ws: true,
+        },
+        '/nodecg-api.min.js': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/socket.js': {
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,
         },
