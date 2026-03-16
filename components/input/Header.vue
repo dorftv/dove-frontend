@@ -36,7 +36,7 @@
     </button>
     <button
       v-if="!inputPreview"
-      @click="$emit('enablePreview', toggleInputPreview())"
+      @click="$emit('enablePreview')"
       class="icon-btn"
       :title="inputEnabled ? 'Disable preview' : 'Enable preview'"
       :aria-label="inputEnabled ? 'Disable preview' : 'Enable preview'"
@@ -55,10 +55,9 @@ const props = defineProps({
   inputEnabled: Boolean
 });
 
-const {
-  inputPreview,
-  toggleInputPreview,
-} = useInputControls(props);
+defineEmits(['enablePreview']);
+
+const { inputPreview } = useUserState();
 
 const { deleting, submitRemove } = useDeleteEntity('input', () => props.input);
 

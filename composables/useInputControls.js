@@ -155,12 +155,6 @@ export function useInputControls(props) {
     }
   };
 
-  const { inputPreview } = useUserState();
-
-  const toggleInputPreview = () => {
-    return !props.inputEnabled;
-  };
-
   return {
     volume,
     toggleMute,
@@ -180,7 +174,5 @@ export function useInputControls(props) {
     isInSceneSources,
     submitAddInputToScene,
     submitRemoveInputFromScene,
-    inputPreview,
-    toggleInputPreview,
   };
 }

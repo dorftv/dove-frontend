@@ -121,7 +121,13 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     ws.onmessage = (event) => {
       lastMessage = Date.now();
-      const message = JSON.parse(event.data);
+      let message;
+      try {
+        message = JSON.parse(event.data);
+      } catch (e) {
+        console.warn('Invalid WebSocket message:', event.data);
+        return;
+      }
 
       if (message.channel === 'LEVEL') {
         const levels = Array.isArray(message.data) ? message.data : [message.data];

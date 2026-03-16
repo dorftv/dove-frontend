@@ -1,7 +1,5 @@
 export default defineNuxtConfig({
-  experimental: {
-    appManifest: false,
-  },
+  compatibilityDate: '2026-03-16',
   ssr: false,
 
   runtimeConfig: {
@@ -77,11 +75,28 @@ export default defineNuxtConfig({
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,
         },
+        // NodeCG JS assets — caution: /api.js and /dashboard.js are generic paths
+        // that could collide with frontend assets if files with those names are added
+        '/dialog_opener.js': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/client_registration.js': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/api.js': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
+        '/dashboard.js': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
       },
     },
   },
 
-  modulesDir: ['./node_modules'],
   modules: ["@nuxt/ui"],
 
   colorMode: {

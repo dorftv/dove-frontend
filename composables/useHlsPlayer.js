@@ -41,12 +41,13 @@ export function useHlsPlayer(props) {
       }
     });
 
+    let loadTimeout = null;
     player.addEventListener('provider-change', (event) => {
       const provider = event.detail;
       if (provider?.type === 'hls') {
         provider.library = HLS;
         provider.config = { maxMaxBufferLength: 3 };
-        setTimeout(() => {
+        loadTimeout = setTimeout(() => {
           player.startLoading();
         }, 2000);
       }
@@ -59,7 +60,10 @@ export function useHlsPlayer(props) {
   };
 
   onMounted(setup);
-  onUnmounted(() => { mediaPlayer.value = null; });
+  onUnmounted(() => {
+    if (loadTimeout) clearTimeout(loadTimeout);
+    mediaPlayer.value = null;
+  });
 
   // Sync mutedState → player.muted (handles cross-player exclusive unmute)
   watch(() => mutedState.value[props.uid], (isMuted) => {

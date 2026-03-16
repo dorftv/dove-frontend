@@ -93,16 +93,16 @@ export function useSceneSources(getScene, getSource) {
     }
   };
 
-  let _volumeBeforeMute = state.volume || 100;
+  const volumeBeforeMute = ref(state.volume || 100);
 
   const toggleMute = () => {
     if (!state.mute) {
-      _volumeBeforeMute = state.volume || 100;
+      volumeBeforeMute.value = state.volume || 100;
       handleChange('volume', 0);
       handleChange('mute', true);
     } else {
       handleChange('mute', false);
-      handleChange('volume', _volumeBeforeMute);
+      handleChange('volume', volumeBeforeMute.value);
     }
   };
 

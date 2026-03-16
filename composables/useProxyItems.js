@@ -7,6 +7,8 @@ export function useProxyItems() {
       proxyItems.value[proxyType] = data;
     } catch (err) {
       console.error('Failed to fetch items:', err);
+      const notify = useNotify();
+      notify.error('Failed to load items');
       proxyItems.value[proxyType] = [];
     }
   }
