@@ -13,6 +13,8 @@
           </span>
           <span class="truncate text-gray-800 dark:text-gray-200">{{ getInputInfo(overlay.src).name }}</span>
           <span class="text-[10px] text-gray-500">{{ getInputInfo(overlay.src).type }}</span>
+          <div class="flex-grow" />
+          <DetailPopover :entity="getFullInput(overlay.src)" />
         </template>
         <template v-else>
           <span class="text-gray-400 dark:text-gray-500 italic">Empty</span>
@@ -24,5 +26,8 @@
 
 <script setup>
 const { programMixer, getInputInfo } = useProgram();
+const { inputs } = useEntities();
 const { stateIcon, stateBadgeClass } = useStateClass();
+
+const getFullInput = (uid) => inputs.value.find(input => input.uid === uid);
 </script>

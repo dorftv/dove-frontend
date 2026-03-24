@@ -146,6 +146,7 @@ const navSections = [
   },
   { slug: 'previews', title: 'Previews' },
   { slug: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
+  { slug: 'auth', title: 'Authentication' },
   { slug: 'connection-status', title: 'Connection Status' },
   { slug: 'debugging', title: 'Debugging' },
 ]

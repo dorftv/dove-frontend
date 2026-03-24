@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-px w-2 shrink-0 opacity-70">
+  <div class="flex gap-px w-4 shrink-0 opacity-70">
     <div class="flex-1 h-full relative meter-bg">
       <div class="absolute top-0 w-full bg-gray-800 dark:bg-gray-900 transition-[height] duration-150" :style="{ height: (100 - left) + '%' }" />
     </div>

@@ -1,3 +1,5 @@
+import { useDebounceFn } from '@vueuse/core';
+
 export function useInputControls(props) {
   const volume = ref(props.input.volume * 100);
   const { inputs, updateEntity } = useEntities();
@@ -42,13 +44,17 @@ export function useInputControls(props) {
     position.value = props.input.position;
   });
 
-  const handleVolumeChange = (newVolume) => {
-    const val = Array.isArray(newVolume) ? newVolume[0] : newVolume;
-    volume.value = val;
+  const sendVolumeUpdate = useDebounceFn((val) => {
     updateEntity('input', {
       uid: props.input.uid,
       volume: val / 100,
     });
+  }, 80);
+
+  const handleVolumeChange = (newVolume) => {
+    const val = Array.isArray(newVolume) ? newVolume[0] : newVolume;
+    volume.value = val;
+    sendVolumeUpdate(val);
   };
 
   const handlePositionChange = (newPosition) => {

@@ -18,7 +18,7 @@
           @click="transition = opt.value"
         >
           {{ opt.label }}
-          <kbd class="ml-1 text-[10px] bg-white/20 px-1 rounded font-mono">T</kbd>
+          <kbd v-if="transition !== opt.value" class="ml-1 text-[10px] bg-white/20 px-1 rounded font-mono">T</kbd>
         </UButton>
       </div>
 

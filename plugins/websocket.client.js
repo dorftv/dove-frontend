@@ -140,10 +140,13 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (message.channel === 'TICK') {
         if (serverLoad.value) {
           const updates = { uptime: message.data.uptime };
+          if (message.data.load1 != null) updates.load1 = message.data.load1;
+          if (message.data.load_percent != null) updates.load_percent = message.data.load_percent;
           if (message.data.rss_mb && serverLoad.value.memory) {
             updates.memory = { ...serverLoad.value.memory, rss_mb: message.data.rss_mb };
           }
           if (message.data.viewers != null) updates.viewers = message.data.viewers;
+          if (message.data.fds != null) updates.fds = message.data.fds;
           serverLoad.value = { ...serverLoad.value, ...updates };
         }
         return;

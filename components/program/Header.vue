@@ -5,8 +5,13 @@
         {{ programMixer.name || 'Program' }}
       </span>
     </UTooltip>
-    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-400">
-      LIVE
+    <span
+      class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none"
+      :class="programMixer.state === 'PLAYING'
+        ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-400'
+        : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+    >
+      {{ programMixer.state === 'PLAYING' ? 'LIVE' : programMixer.state }}
     </span>
     <div class="flex-grow" />
     <DetailPopover :entity="programMixer" />

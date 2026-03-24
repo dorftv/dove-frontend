@@ -6,7 +6,8 @@
   >
     <!-- State indicator -->
     <span
-      class="w-2 h-2 rounded-full shrink-0"
+      class="w-2.5 h-2.5 rounded-full shrink-0"
+      :class="{ 'animate-pulse': input.state === 'BUFFERING' || input.state === 'ERROR' }"
       :style="{ backgroundColor: stateColor(input.state) }"
       :title="input.state"
     />

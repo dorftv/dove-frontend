@@ -204,6 +204,7 @@ const typeOptions = computed(() =>
   }))
 )
 
-const { openDialog } = useCreateDialog()
+const { openDialog, close } = useCreateDialog()
 watch(openDialog, (type) => { isOpen.value = type === 'input' })
+watch(isOpen, (val) => { if (!val) close() })
 </script>

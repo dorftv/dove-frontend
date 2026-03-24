@@ -30,6 +30,10 @@
           <span class="text-gray-500 dark:text-gray-400">Uptime</span>
           <span>{{ uptime }}</span>
         </div>
+        <div v-if="load.fds" class="flex justify-between">
+          <span class="text-gray-500 dark:text-gray-400">File descriptors</span>
+          <span>{{ load.fds }}</span>
+        </div>
         <div class="pt-1 border-t border-gray-200 dark:border-gray-600 text-[10px] text-gray-400 dark:text-gray-500">
           CPU: {{ load.load1 }} / {{ load.load5 }} / {{ load.load15 }} ({{ load.cpu_count }} cores)
         </div>
