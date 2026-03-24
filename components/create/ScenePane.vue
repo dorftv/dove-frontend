@@ -1,12 +1,14 @@
 <template>
   <div v-if="canSupervisor && (addScene || canBypassLock)">
     <UButton
-      label="Add Scene"
       variant="ghost"
       size="xs"
       icon="i-ph-plus-circle"
       @click="isOpen = true"
-    />
+    >
+      Add Scene
+      <kbd class="ml-1 text-[10px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono">S</kbd>
+    </UButton>
     <UModal v-model:open="isOpen">
       <template #content>
         <div class="p-4 w-full max-w-sm mx-auto">

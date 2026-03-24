@@ -12,12 +12,14 @@
         <UButton
           v-for="opt in transitionOptions"
           :key="opt.value"
-          :label="opt.label"
           :color="transition === opt.value ? 'primary' : 'neutral'"
           :variant="transition === opt.value ? 'solid' : 'outline'"
           size="sm"
           @click="transition = opt.value"
-        />
+        >
+          {{ opt.label }}
+          <kbd class="ml-1 text-[10px] bg-white/20 px-1 rounded font-mono">T</kbd>
+        </UButton>
       </div>
 
       <!-- Duration -->
@@ -30,7 +32,7 @@
       </div>
 
       <!-- Take button -->
-      <UButton @click="cutSceneToProgram" :disabled="cutting || selectedScene.uid === activeScene?.uid" class="!px-4 !py-2 lg:!px-8 lg:!py-3" :color="transition === 'fade' ? 'warning' : 'error'">
+      <UButton @click="cutSceneToProgram" :disabled="cutting || selectedScene.uid === activeScene?.uid" :title="selectedScene.uid === activeScene?.uid ? 'Already live' : ''" class="!px-4 !py-2 lg:!px-8 lg:!py-3" :color="transition === 'fade' ? 'warning' : 'error'">
         <Icon v-if="cutting" name="ph:spinner" size="14px" class="animate-spin mr-2" />
         <span class="font-bold uppercase tracking-wider">{{ transition === 'fade' ? 'Auto' : 'Cut' }}</span>
         <kbd class="ml-3 text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-mono">Enter</kbd>

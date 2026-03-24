@@ -1,6 +1,8 @@
 export function useKeyboardShortcuts() {
-  const { handleSceneClick, cutSceneToProgram } = useActiveScene();
+  const { handleSceneClick, cutSceneToProgram, transition } = useActiveScene();
   const { toggle } = useCreateDialog();
+  const outputOpen = useState('output-drawer-open');
+  const nodecgOpen = useState('nodecg-panel-open');
 
   const onKeyDown = (event) => {
     const tag = event.target.tagName;
@@ -17,7 +19,22 @@ export function useKeyboardShortcuts() {
       return;
     }
 
-    const createMap = { i: 'input', o: 'output', s: 'scene', e: 'encoder' };
+    if (event.key === 't') {
+      transition.value = transition.value === 'cut' ? 'fade' : 'cut';
+      return;
+    }
+
+    if (event.key === 'o') {
+      outputOpen.value = !outputOpen.value;
+      return;
+    }
+
+    if (event.key === 'n') {
+      nodecgOpen.value = !nodecgOpen.value;
+      return;
+    }
+
+    const createMap = { i: 'input', s: 'scene' };
     if (createMap[event.key]) {
       toggle(createMap[event.key]);
       return;

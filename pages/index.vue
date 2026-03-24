@@ -4,6 +4,12 @@
     <span class="mt-2 text-sm">Loading...</span>
   </div>
 
+  <div v-else-if="error" class="flex flex-col items-center justify-center py-32 text-gray-400 dark:text-gray-500">
+    <Icon name="ph:warning-circle" size="32px" class="text-red-400" />
+    <span class="mt-2 text-sm text-red-400">{{ error }}</span>
+    <UButton class="mt-4" color="neutral" variant="outline" @click="retry">Retry</UButton>
+  </div>
+
   <div v-else class="relative">
     <div class="grid grid-cols-12 gap-2 md:gap-3 lg:gap-4 px-2 md:px-4 lg:pl-4 lg:pr-8 py-2 md:py-4">
       <div class="col-span-12 md:col-span-5">
@@ -133,13 +139,19 @@
 </template>
 
 <script setup>
-const { isLoading, outputs, inputsNodeCG, inputsNoPreview } = useEntities();
+const { isLoading, error, fetchEntities, outputs, inputsNodeCG, inputsNoPreview } = useEntities();
+
+const retry = async () => {
+  error.value = null;
+  isLoading.value = true;
+  await fetchEntities();
+};
 const showNoPreview = ref(false);
 const { stateColor } = useStateClass();
 useKeyboardShortcuts();
 
-const outputOpen = ref(false);
-const nodecgOpen = ref(false);
+const outputOpen = useState('output-drawer-open', () => false);
+const nodecgOpen = useState('nodecg-panel-open', () => false);
 const programRef = ref(null);
 const inputRef = ref(null);
 const tabTop = ref(null);
