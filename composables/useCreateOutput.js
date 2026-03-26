@@ -102,7 +102,6 @@ export const useCreateOutput = () => {
     const formHeight = baseCreate.formData[typeKey]?.height;
 
     return encoders.value.filter(enc => {
-      if (enc.is_preview) return false;
       if (enc.type !== encoderType) return false;
       if (allowedElements.size > 0 && !allowedElements.has(enc.element)) return false;
       // Only filter by src/dimensions when both sides have a value

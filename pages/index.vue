@@ -5,8 +5,8 @@
   </div>
 
   <div v-else-if="error" class="flex flex-col items-center justify-center py-32 text-gray-400 dark:text-gray-500">
-    <Icon name="ph:warning-circle" size="32px" class="text-red-400" />
-    <span class="mt-2 text-sm text-red-400">{{ error }}</span>
+    <DovePoop class="text-amber-800 dark:text-amber-600" />
+    <span class="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">Failed to load DOVE</span>
     <UButton class="mt-4" color="neutral" variant="outline" @click="retry">Retry</UButton>
   </div>
 

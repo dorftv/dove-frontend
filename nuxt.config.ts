@@ -49,6 +49,11 @@ export default defineNuxtConfig({
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,
         },
+        '/ws': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+          ws: true,
+        },
         // NodeCG proxy paths (only active when [nodecg] config exists in DOVE)
         '/bundles': {
           target: process.env.DOVE_API || 'http://localhost:5000',

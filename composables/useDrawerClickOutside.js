@@ -12,8 +12,10 @@ export function useDrawerClickOutside(...drawers) {
     if (!drawers.some(d => d.value)) { clickInProgress = false; return; }
     // Ignore clicks on elements removed from DOM (portal dropdowns clean up before bubbling completes)
     if (!document.body.contains(e.target)) { clickInProgress = false; return; }
-    const overlay = e.target.closest('[role="dialog"], [role="listbox"], .nodecg-panel, .nodecg-tab');
-    if (!overlay) {
+    // Skip clicks on teleported elements (modals, select dropdowns, etc.)
+    if (!e.target.closest('#__nuxt')) { clickInProgress = false; return; }
+    const excluded = e.target.closest('.nodecg-panel, .side-tab');
+    if (!excluded) {
       drawers.forEach(d => { d.value = false });
     }
     clickInProgress = false;
