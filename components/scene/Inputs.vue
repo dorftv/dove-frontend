@@ -29,6 +29,19 @@
               aria-label="Volume"
             />
           </span>
+          <button
+            @click="slotFiltersOpen = true"
+            class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700 relative"
+            title="Audio filters"
+            aria-label="Audio filters"
+          >
+            <Icon name="ph:waveform" size="12px" />
+            <span
+              v-if="slotFilterCount > 0"
+              class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
+            >{{ slotFilterCount }}</span>
+          </button>
+          <AudioFilters v-model:open="slotFiltersOpen" :mixer="scene" :slotIndex="source.index" />
         </template>
         <button v-if="canEditSlot" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
           <Icon name="ph:gear" size="11px" />
@@ -125,6 +138,8 @@ const inputMatch = computed(() => inputs.value.find(input => input.uid === src.v
 const srcOptions = computed(() => [{ name: '— Empty —', uid: 'None' }, ...inputs.value]);
 const open = ref(false);
 const dragOver = ref(false);
+const slotFiltersOpen = ref(false);
+const { filterCount: slotFilterCount } = useAudioFilters({ mixer: () => props.scene, slotIndex: () => props.source.index });
 
 const doRemoveSlot = () => {
   open.value = false;

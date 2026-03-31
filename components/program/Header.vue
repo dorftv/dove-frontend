@@ -14,10 +14,24 @@
       {{ programMixer.state === 'PLAYING' ? 'LIVE' : programMixer.state }}
     </span>
     <div class="flex-grow" />
+    <button
+      @click="filtersOpen = true"
+      class="flex items-center justify-center w-6 h-6 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors cursor-pointer relative"
+      title="Audio filters"
+    >
+      <Icon name="ph:waveform" size="12px" />
+      <span
+        v-if="programFilterCount > 0"
+        class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
+      >{{ programFilterCount }}</span>
+    </button>
+    <AudioFilters v-model:open="filtersOpen" :mixer="programMixer" />
     <DetailPopover :entity="programMixer" />
   </div>
 </template>
 
 <script setup>
 const { programMixer } = useEntities();
+const filtersOpen = ref(false);
+const { filterCount: programFilterCount } = useAudioFilters({ mixer: () => programMixer.value });
 </script>
