@@ -144,6 +144,7 @@ const navSections = [
       { slug: 'inputs-testsrc', title: 'Test Source' },
     ],
   },
+  { slug: 'audio-filters', title: 'Audio Filters' },
   { slug: 'previews', title: 'Previews' },
   { slug: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
   { slug: 'auth', title: 'Authentication' },
