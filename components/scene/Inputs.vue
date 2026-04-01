@@ -139,7 +139,7 @@ const srcOptions = computed(() => [{ name: '— Empty —', uid: 'None' }, ...in
 const open = ref(false);
 const dragOver = ref(false);
 const slotFiltersOpen = ref(false);
-const { filterCount: slotFilterCount } = useAudioFilters({ mixer: () => props.scene, slotIndex: () => props.source.index });
+const slotFilterCount = computed(() => props.source.audio_filters?.length ?? 0);
 
 const doRemoveSlot = () => {
   open.value = false;

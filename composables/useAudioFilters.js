@@ -119,86 +119,76 @@ const EQ10_BANDS = ['31', '62', '125', '250', '500', '1k', '2k', '4k', '8k', '16
  */
 export function useAudioFilters(opts) {
   const { updateEntity } = useEntities();
-
-  // Normalise legacy call: bare getter → { input: getter }
   const options = typeof opts === 'function' ? { input: opts } : opts;
 
   const getInput = options.input;
   const getMixer = options.mixer;
   const getSlotIndex = options.slotIndex;
 
-  const filters = computed(() => {
+  const { inputs: allInputs, mixers: allMixers } = useEntities();
+
+  // --- Read filters from entity store ---
+  const readFromStore = () => {
     if (getInput) {
       const inp = toValue(getInput);
-      return inp?.audio_filters || [];
-    }
-    if (getMixer && getSlotIndex) {
-      const mixer = toValue(getMixer);
-      const idx = toValue(getSlotIndex);
-      const source = mixer?.sources?.find(s => s.index === idx);
-      return source?.audio_filters || [];
+      const entity = inp?.uid ? allInputs.value.find(i => i.uid === inp.uid) : inp;
+      return entity?.audio_filters || [];
     }
     if (getMixer) {
-      const mixer = toValue(getMixer);
-      return mixer?.audio_filters || [];
+      const mixerRef = toValue(getMixer);
+      const mixer = mixerRef?.uid ? allMixers.value.find(m => m.uid === mixerRef.uid) : null;
+      if (!mixer) return [];
+      if (getSlotIndex) {
+        const idx = toValue(getSlotIndex);
+        const source = mixer.sources?.find(s => s.index === idx);
+        return source?.audio_filters || [];
+      }
+      return mixer.audio_filters || [];
     }
     return [];
-  });
+  };
+
+  // --- Filters state ---
+  // For inputs: entity gets replaced on splice → deep watcher catches it reliably.
+  // For mixers/slots: shallow merge in WebSocket handler means stale broadcasts
+  // can overwrite local state. Guard with sendInFlight flag.
+  const filters = ref(readFromStore());
+  let sendInFlight = false;
+
+  const entitySource = getInput ? allInputs : getMixer ? allMixers : null;
+  if (entitySource) {
+    watch(entitySource, () => {
+      if (sendInFlight) return;
+      filters.value = readFromStore();
+    }, { deep: true, immediate: false });
+  }
 
   const filterCount = computed(() => filters.value.length);
 
-  // Send filter update to backend via WebSocket
+  // --- Send to server ---
   const _send = (updatedFilters) => {
+    // Update local state + guard watcher against stale broadcasts
+    filters.value = updatedFilters;
+    sendInFlight = true;
+    setTimeout(() => { sendInFlight = false; }, 1000);
+
     if (getInput) {
       const inp = toValue(getInput);
-      if (!inp) { console.warn('[AudioFilters] _send: getInput returned null'); return; }
+      if (!inp) return;
       updateEntity('input', { uid: inp.uid, audio_filters: updatedFilters });
     } else if (getMixer && getSlotIndex) {
       const mixer = toValue(getMixer);
-      const idx = toValue(getSlotIndex);
-      console.warn('[AudioFilters] _send SLOT:', mixer?.uid?.substring(0,8), 'idx:', idx, 'filters:', updatedFilters.length);
-      updateEntity('mixer', { uid: mixer.uid, index: idx, audio_filters: updatedFilters });
+      updateEntity('mixer', { uid: mixer.uid, index: toValue(getSlotIndex), audio_filters: updatedFilters });
     } else if (getMixer) {
       const mixer = toValue(getMixer);
       updateEntity('mixer', { uid: mixer.uid, audio_filters: updatedFilters });
-    } else {
-      console.warn('[AudioFilters] _send: no target! getInput:', !!getInput, 'getMixer:', !!getMixer, 'getSlotIndex:', !!getSlotIndex);
     }
   };
 
-  // Throttled for continuous param changes (sliders)
   const sendParamUpdate = useThrottleFn(_send, 150);
 
-  // Immediate for structural changes (add/remove/toggle)
-  const sendStructuralUpdate = _send;
-
-  // Optimistic local state for structural changes
-  // Prevents the "add two filters quickly" bug where the second add
-  // uses stale server state before the first broadcast returns.
-  const pendingFilters = ref(null);
-  let pendingTimeout = null;
-
-  const effectiveFilters = computed(() => pendingFilters.value ?? filters.value);
-
-  // Clear pending state when server audio_filters actually matches our pending changes.
-  // Can't use a simple watch(filters) — entity broadcasts every 200ms for level meters,
-  // which creates new array refs and would wipe pendingFilters before the real update arrives.
-  watch(() => filters.value.length, (serverLen) => {
-    if (pendingFilters.value !== null && serverLen === pendingFilters.value.length) {
-      pendingFilters.value = null;
-      clearTimeout(pendingTimeout);
-    }
-  });
-
-  const setPending = (newFilters) => {
-    pendingFilters.value = newFilters;
-    clearTimeout(pendingTimeout);
-    // Fallback: clear after 3s even if server hasn't confirmed
-    pendingTimeout = setTimeout(() => { pendingFilters.value = null; }, 3000);
-  };
-
   const updateFilterParam = (index, paramName, value) => {
-    const current = [...effectiveFilters.value];
+    const current = [...filters.value];
     current[index] = {
       ...current[index],
       params: { ...current[index].params, [paramName]: value },
@@ -207,10 +197,9 @@ export function useAudioFilters(opts) {
   };
 
   const toggleFilter = (index) => {
-    const current = [...effectiveFilters.value];
+    const current = [...filters.value];
     current[index] = { ...current[index], enabled: !current[index].enabled };
-    setPending(current);
-    sendStructuralUpdate(current);
+    _send(current);
   };
 
   const addFilter = (type) => {
@@ -220,31 +209,26 @@ export function useAudioFilters(opts) {
     for (const [key, spec] of Object.entries(def.params)) {
       params[key] = spec.default;
     }
-    const newFilters = [...effectiveFilters.value, { type, enabled: true, params }];
-    setPending(newFilters);
-    sendStructuralUpdate(newFilters);
+    _send([...filters.value, { type, enabled: true, params }]);
   };
 
   const removeFilter = (index) => {
-    const newFilters = effectiveFilters.value.filter((_, i) => i !== index);
-    setPending(newFilters);
-    sendStructuralUpdate(newFilters);
+    _send(filters.value.filter((_, i) => i !== index));
   };
 
   const moveFilter = (fromIndex, toIndex) => {
-    if (toIndex < 0 || toIndex >= effectiveFilters.value.length) return;
-    const current = [...effectiveFilters.value];
+    if (toIndex < 0 || toIndex >= filters.value.length) return;
+    const current = [...filters.value];
     const [item] = current.splice(fromIndex, 1);
     current.splice(toIndex, 0, item);
-    setPending(current);
-    sendStructuralUpdate(current);
+    _send(current);
   };
 
   return {
     FILTER_TYPES,
     FILTER_CATEGORIES,
     EQ10_BANDS,
-    filters: effectiveFilters,
+    filters,
     filterCount,
     updateFilterParam,
     toggleFilter,
