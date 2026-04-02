@@ -1,11 +1,14 @@
 <template>
   <USlideover v-model:open="open" side="right" :overlay="false">
-    <template #header>
+    <template #title>
       <div class="flex items-center gap-2">
         <Icon name="ph:camera" size="16px" class="text-violet-400" />
         <span class="font-medium text-sm">Video Filters</span>
         <span class="text-xs text-gray-500 truncate">{{ headerLabel }}</span>
       </div>
+    </template>
+    <template #description>
+      <span class="sr-only">Filter chain for {{ headerLabel }}</span>
     </template>
     <template #body>
       <div class="space-y-1.5 text-sm">

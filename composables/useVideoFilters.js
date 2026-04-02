@@ -51,11 +51,11 @@ const FILTER_TYPES = {
   },
 };
 
-const FILTER_CATEGORIES = {
+const FILTER_CATEGORIES = Object.freeze({
   color: { label: 'Color', icon: 'ph:palette' },
   transform: { label: 'Transform', icon: 'ph:arrows-out-cardinal' },
   effects: { label: 'Effects', icon: 'ph:sparkle' },
-};
+});
 
 /**
  * Video filters composable — identical pattern to useAudioFilters,

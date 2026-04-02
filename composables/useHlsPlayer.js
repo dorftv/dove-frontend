@@ -47,6 +47,7 @@ export function useHlsPlayer(props) {
       if (provider?.type === 'hls') {
         provider.library = HLS;
         provider.config = { maxMaxBufferLength: 3 };
+        if (loadTimeout) clearTimeout(loadTimeout);
         loadTimeout = setTimeout(() => {
           player.startLoading();
         }, 2000);

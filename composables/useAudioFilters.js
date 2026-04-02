@@ -100,14 +100,14 @@ const FILTER_TYPES = {
   },
 };
 
-const FILTER_CATEGORIES = {
+const FILTER_CATEGORIES = Object.freeze({
   dynamics: { label: 'Dynamics', icon: 'ph:chart-bar' },
   eq: { label: 'EQ / Filter', icon: 'ph:equalizer' },
   spatial: { label: 'Spatial', icon: 'ph:arrows-out-line-horizontal' },
   effects: { label: 'Effects', icon: 'ph:sparkle' },
-};
+});
 
-const EQ10_BANDS = ['31', '62', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'];
+const EQ10_BANDS = Object.freeze(['31', '62', '125', '250', '500', '1k', '2k', '4k', '8k', '16k']);
 
 /**
  * Audio filters composable supporting three modes:

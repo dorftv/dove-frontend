@@ -2,10 +2,13 @@ import { useStorage } from '@vueuse/core';
 
 const MODES = ['auto', 'webrtc', 'hls'];
 
-const mode = useStorage('preview-mode', 'auto');
+let mode = null;
 
 export function usePlayerMode() {
-  // Validate stored value
+  if (!mode) {
+    mode = useStorage('preview-mode', 'auto');
+  }
+
   if (!MODES.includes(mode.value)) {
     mode.value = 'auto';
   }

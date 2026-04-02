@@ -46,7 +46,11 @@ export function useAudioOnlyPlayer(props) {
 
   onMounted(initPlayer);
   onUnmounted(() => {
-    if (player) { try { player.unload(); } catch {} player = null; }
+    if (player) {
+      player.removeAllListeners();
+      try { player.unload(); } catch {}
+      player = null;
+    }
   });
   watch(() => props.uid, initPlayer);
 
