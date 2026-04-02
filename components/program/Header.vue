@@ -25,7 +25,7 @@
         class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
       >{{ programFilterCount }}</span>
     </button>
-    <AudioFilters v-model:open="filtersOpen" :mixer="programMixer" />
+    <AudioFilters v-model:open="filtersOpen" :mixer="programMixer" :ctx="afCtx" />
     <button
       @click="vfOpen = true"
       class="flex items-center justify-center w-6 h-6 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors cursor-pointer relative"
@@ -37,7 +37,7 @@
         class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
       >{{ programVfCount }}</span>
     </button>
-    <VideoFilters v-model:open="vfOpen" :mixer="programMixer" />
+    <VideoFilters v-model:open="vfOpen" :mixer="programMixer" :ctx="vfCtx" />
     <DetailPopover :entity="programMixer" />
   </div>
 </template>
@@ -46,6 +46,8 @@
 const { programMixer } = useEntities();
 const filtersOpen = ref(false);
 const vfOpen = ref(false);
-const { filterCount: programFilterCount } = useAudioFilters({ mixer: () => programMixer.value });
-const { filterCount: programVfCount } = useVideoFilters({ mixer: () => programMixer.value });
+const afCtx = useAudioFilters({ mixer: () => programMixer.value });
+const vfCtx = useVideoFilters({ mixer: () => programMixer.value });
+const programFilterCount = afCtx.filterCount;
+const programVfCount = vfCtx.filterCount;
 </script>

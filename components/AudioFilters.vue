@@ -140,71 +140,15 @@ const props = defineProps({
   input: Object,
   mixer: Object,
   slotIndex: { type: Number, default: undefined },
+  ctx: { type: Object, default: null },
 });
 
 const open = defineModel('open', { type: Boolean, default: false });
 
-const filterOpts = computed(() => {
-  if (props.input) return { input: () => props.input };
-  if (props.mixer && props.slotIndex !== undefined)
-    return { mixer: () => props.mixer, slotIndex: () => props.slotIndex };
-  if (props.mixer) return { mixer: () => props.mixer };
-  return { input: () => null };
-});
-
-const {
-  FILTER_TYPES,
-  FILTER_CATEGORIES,
-  EQ10_BANDS,
-  filters,
-  updateFilterParam,
-  toggleFilter,
-  addFilter,
-  removeFilter,
-  moveFilter,
-} = useAudioFilters(filterOpts.value);
-
-const headerLabel = computed(() => {
-  if (props.input) return props.input.name;
-  if (props.mixer && props.slotIndex !== undefined) {
-    const source = props.mixer.sources?.[props.slotIndex];
-    return `${props.mixer.name} / ${source?.name || `Slot ${props.slotIndex + 1}`}`;
-  }
-  if (props.mixer) return props.mixer.name;
-  return '';
-});
-
-const getFilterLabel = (type) => FILTER_TYPES[type]?.label || type;
-const getCategoryLabel = (type) => FILTER_CATEGORIES[FILTER_TYPES[type]?.category]?.label || '';
-const getFilterParams = (type) => FILTER_TYPES[type]?.params || {};
-const hasParams = (type) => Object.keys(getFilterParams(type)).length > 0;
-const isEq10 = (type) => type === 'eq10';
-
-const getFiltersForCategory = (catKey) => {
-  return Object.fromEntries(
-    Object.entries(FILTER_TYPES).filter(([, def]) => def.category === catKey)
-  );
-};
-
-const getEq10BandLabel = (type, paramName) => {
-  if (type !== 'eq10') return null;
-  const match = paramName.match(/^band(\d+)$/);
-  if (!match) return null;
-  return EQ10_BANDS[parseInt(match[1])] || paramName;
-};
-
-const getDefaultStep = (spec) => {
-  const range = spec.max - spec.min;
-  if (range <= 1) return 0.01;
-  if (range <= 50) return 1;
-  return Math.max(1, Math.round(range / 100));
-};
-
-const formatValue = (value, spec) => {
-  const v = typeof value === 'number' ? value : parseFloat(value) || 0;
-  const display = spec.step && spec.step < 1 ? v.toFixed(2) : Math.round(v);
-  return spec.unit ? `${display}${spec.unit}` : display;
-};
+const { filterOpts, headerLabel } = useFilterOpts(props);
+const _ownCtx = props.ctx ? null : useAudioFilters(filterOpts.value);
+const { FILTER_TYPES, FILTER_CATEGORIES, filters, updateFilterParam, toggleFilter, addFilter, removeFilter, moveFilter } = toRaw(props.ctx) || _ownCtx;
+const { getFilterLabel, getCategoryLabel, getFilterParams, hasParams, isEq10, getFiltersForCategory, getEq10BandLabel, getDefaultStep, formatValue } = useFilterPresentation(FILTER_TYPES, FILTER_CATEGORIES);
 </script>
 
 <style scoped>

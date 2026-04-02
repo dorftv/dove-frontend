@@ -41,7 +41,20 @@
               class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
             >{{ slotFilterCount }}</span>
           </button>
-          <AudioFilters v-model:open="slotFiltersOpen" :mixer="scene" :slotIndex="source.index" />
+          <AudioFilters v-model:open="slotFiltersOpen" :mixer="scene" :slotIndex="source.index" :ctx="slotAf" />
+          <button
+            @click="slotVfOpen = true"
+            class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700 relative"
+            title="Video filters"
+            aria-label="Video filters"
+          >
+            <Icon name="ph:camera" size="12px" />
+            <span
+              v-if="slotVfCount > 0"
+              class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
+            >{{ slotVfCount }}</span>
+          </button>
+          <VideoFilters v-model:open="slotVfOpen" :mixer="scene" :slotIndex="source.index" :ctx="slotVf" />
         </template>
         <button v-if="canEditSlot" @click="open = !open" class="icon-btn w-7 h-7 md:w-5 md:h-5 hover:bg-gray-200 dark:hover:bg-gray-700" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Settings" aria-label="Settings">
           <Icon name="ph:gear" size="11px" />
@@ -139,7 +152,11 @@ const srcOptions = computed(() => [{ name: '— Empty —', uid: 'None' }, ...in
 const open = ref(false);
 const dragOver = ref(false);
 const slotFiltersOpen = ref(false);
-const slotFilterCount = computed(() => props.source.audio_filters?.length ?? 0);
+const slotVfOpen = ref(false);
+const slotAf = useAudioFilters({ mixer: () => props.scene, slotIndex: () => props.source.index });
+const slotVf = useVideoFilters({ mixer: () => props.scene, slotIndex: () => props.source.index });
+const slotFilterCount = slotAf.filterCount;
+const slotVfCount = slotVf.filterCount;
 
 const doRemoveSlot = () => {
   open.value = false;
