@@ -83,6 +83,19 @@
           >{{ filterCount }}</span>
         </button>
         <AudioFilters v-model:open="filtersOpen" :input="input" />
+        <button
+          @click="vfOpen = true"
+          class="transport-btn relative"
+          title="Video filters"
+          aria-label="Video filters"
+        >
+          <Icon name="ph:camera" size="12px" />
+          <span
+            v-if="vfCount > 0"
+            class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
+          >{{ vfCount }}</span>
+        </button>
+        <VideoFilters v-model:open="vfOpen" :input="input" />
       </div>
     </div>
 
@@ -105,7 +118,9 @@ const props = defineProps({
 
 const { volumeIcon } = useStateClass();
 const { filterCount } = useAudioFilters(() => props.input);
+const { filterCount: vfCount } = useVideoFilters(() => props.input);
 const filtersOpen = ref(false);
+const vfOpen = ref(false);
 
 const {
   volume,
