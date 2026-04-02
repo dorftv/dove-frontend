@@ -7,7 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && cd node_modules/@eyevinn/webrtc-player && npm install && npm run build"
+    "postinstall": "nuxt prepare"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.4.0",
@@ -17,7 +17,6 @@
     "tailwindcss": "^4.0.0"
   },
   "dependencies": {
-    "@eyevinn/webrtc-player": "git+https://github.com/Eyevinn/webrtc-player.git#main",
     "@vueuse/core": "^14.2.1",
     "hls.js": "^1.6.15",
     "markdown-it": "^14.1.0",

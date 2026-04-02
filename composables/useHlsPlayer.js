@@ -6,6 +6,8 @@ export function useHlsPlayer(props) {
   const { programMixer } = useEntities();
   const toast = useToast();
 
+  let loadTimeout = null;
+
   const setup = () => {
     const player = mediaPlayer.value;
     if (!player) return;
@@ -41,7 +43,6 @@ export function useHlsPlayer(props) {
       }
     });
 
-    let loadTimeout = null;
     player.addEventListener('provider-change', (event) => {
       const provider = event.detail;
       if (provider?.type === 'hls') {
@@ -63,6 +64,7 @@ export function useHlsPlayer(props) {
   onMounted(setup);
   onUnmounted(() => {
     if (loadTimeout) clearTimeout(loadTimeout);
+    loadTimeout = null;
     mediaPlayer.value = null;
   });
 
