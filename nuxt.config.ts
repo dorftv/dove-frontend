@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     },
   },
 
-  devtools: { enabled: true },
+  devtools: { enabled: process.dev },
   css: ["@/assets/css/tailwind.css"],
 
   vite: {

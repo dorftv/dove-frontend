@@ -13,6 +13,7 @@ export function useWhepPlayer(props, { onError } = {}) {
   let resourceUrl = null;  // WHEP resource URL (from POST Location header)
   let failCount = 0;
   let autoplayToastShown = false;
+  let volumeHandler = null;
   let statsInterval = null;
   let lastBytesReceived = 0;
   let stalledSince = 0;
@@ -52,6 +53,9 @@ export function useWhepPlayer(props, { onError } = {}) {
 
   const cleanup = () => {
     stopStatsMonitor();
+    if (volumeHandler && videoPlayer.value) {
+      videoPlayer.value.removeEventListener('volumechange', volumeHandler);
+    }
     if (pc) {
       pc.close();
       pc = null;
@@ -222,12 +226,13 @@ export function useWhepPlayer(props, { onError } = {}) {
   };
 
   onMounted(() => {
-    videoPlayer.value?.addEventListener('volumechange', () => {
+    volumeHandler = () => {
       const isMuted = videoPlayer.value?.muted;
       if (isMuted !== mutedState.value[props.uid]) {
         setMutedState(props.uid, isMuted);
       }
-    });
+    };
+    videoPlayer.value?.addEventListener('volumechange', volumeHandler);
     initializePlayer();
   });
 

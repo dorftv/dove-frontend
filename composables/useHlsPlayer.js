@@ -7,18 +7,22 @@ export function useHlsPlayer(props) {
   const toast = useToast();
 
   let loadTimeout = null;
+  let abortController = null;
 
   const setup = () => {
     const player = mediaPlayer.value;
     if (!player) return;
 
+    abortController = new AbortController();
+    const { signal } = abortController;
+
     player.addEventListener('media-mute-request', () => {
       setMutedState(props.uid, true);
-    });
+    }, { signal });
 
     player.addEventListener('media-unmute-request', () => {
       setMutedState(props.uid, false);
-    });
+    }, { signal });
 
     let autoplayToastShown = false;
 
@@ -41,7 +45,7 @@ export function useHlsPlayer(props) {
           toast.remove(t.id);
         }, { once: true });
       }
-    });
+    }, { signal });
 
     player.addEventListener('provider-change', (event) => {
       const provider = event.detail;
@@ -53,16 +57,17 @@ export function useHlsPlayer(props) {
           player.startLoading();
         }, 2000);
       }
-    });
+    }, { signal });
 
     player.addEventListener('hls-error', () => {
       const src = player.src;
       player.src = src;
-    });
+    }, { signal });
   };
 
   onMounted(setup);
   onUnmounted(() => {
+    abortController?.abort();
     if (loadTimeout) clearTimeout(loadTimeout);
     loadTimeout = null;
     mediaPlayer.value = null;
