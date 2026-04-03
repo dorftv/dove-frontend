@@ -7,7 +7,7 @@
       @click="isOpen = true"
     >
       Add Scene
-      <kbd class="ml-1 text-[10px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono">S</kbd>
+      <kbd class="ml-1 text-[11px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono hidden md:inline">S</kbd>
     </UButton>
     <UModal v-model:open="isOpen">
       <template #content>

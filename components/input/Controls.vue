@@ -102,7 +102,7 @@
     </div>
 
     <!-- Playlist details / spacer for equal height -->
-    <div class="h-4 flex items-center text-[10px] text-gray-500 dark:text-gray-400 px-0.5 mt-0.5">
+    <div class="h-4 flex items-center text-[11px] text-gray-500 dark:text-gray-400 px-0.5 mt-0.5">
       <template v-if="input.type === 'playlist'">
         <span v-if="input.details" class="truncate min-w-0">{{ input.details }}</span>
         <div class="flex-grow" />

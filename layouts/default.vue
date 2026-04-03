@@ -36,13 +36,17 @@
         <div class="flex items-center gap-0.5">
           <!-- WS indicator — always visible -->
           <NuxtLink to="/websockets" class="flex icon-btn" :title="`WebSocket: ${wsStatus}`" :aria-label="`WebSocket: ${wsStatus}`">
-            <span
-              class="w-2.5 h-2.5 rounded-full" role="status"
-              :class="{
-                'bg-green-500': wsStatus === 'connected',
-                'bg-red-500': wsStatus === 'disconnected',
-                'bg-orange-400 animate-pulse': wsStatus === 'reconnecting'
-              }"
+            <Icon
+              v-if="wsStatus === 'connected'" name="ph:check-circle-fill" size="14px"
+              class="text-green-500"
+            />
+            <Icon
+              v-else-if="wsStatus === 'reconnecting'" name="ph:arrow-clockwise" size="14px"
+              class="text-orange-400 animate-spin"
+            />
+            <Icon
+              v-else name="ph:x-circle-fill" size="14px"
+              class="text-red-500"
             />
           </NuxtLink>
 
@@ -144,6 +148,7 @@
     <main class="flex-grow" role="main">
       <slot />
     </main>
+    <KeyboardShortcuts />
   </div>
 </template>
 

@@ -18,12 +18,12 @@
           @click="transition = opt.value"
         >
           {{ opt.label }}
-          <kbd v-if="transition !== opt.value" class="ml-1 text-[10px] bg-white/20 px-1 rounded font-mono">T</kbd>
+          <kbd v-if="transition !== opt.value" class="ml-1 text-[11px] bg-white/20 px-1 rounded font-mono hidden md:inline">T</kbd>
         </UButton>
       </div>
 
       <!-- Duration -->
-      <div v-if="transition === 'fade'" class="w-full max-w-48">
+      <div class="w-full max-w-48" :class="{ 'opacity-30 pointer-events-none': transition !== 'fade' }">
         <div class="flex items-center justify-between mb-1.5">
           <span class="text-xs text-gray-500 dark:text-gray-400">Duration</span>
           <span class="text-xs font-medium text-gray-700 dark:text-gray-300 tabular-nums">{{ (transitionDuration / 1000).toFixed(1) }}s</span>
@@ -34,8 +34,8 @@
       <!-- Take button -->
       <UButton @click="cutSceneToProgram" :disabled="cutting || selectedScene.uid === activeScene?.uid" :title="selectedScene.uid === activeScene?.uid ? 'Already live' : ''" class="!px-4 !py-2 lg:!px-8 lg:!py-3" :color="transition === 'fade' ? 'warning' : 'error'">
         <Icon v-if="cutting" name="ph:spinner" size="14px" class="animate-spin mr-2" />
-        <span class="font-bold uppercase tracking-wider">{{ transition === 'fade' ? 'Auto' : 'Cut' }}</span>
-        <kbd class="ml-3 text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-mono">Enter</kbd>
+        <span class="font-bold uppercase tracking-wider">{{ transition === 'fade' ? 'Crossfade' : 'Cut' }}</span>
+        <kbd class="ml-3 text-[11px] bg-white/20 px-1.5 py-0.5 rounded font-mono hidden md:inline">Enter</kbd>
       </UButton>
 
       <!-- Preview label -->

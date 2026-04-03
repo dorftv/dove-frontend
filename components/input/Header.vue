@@ -18,7 +18,7 @@
         {{ input.name }}
       </span>
     </UTooltip>
-    <span class="text-[10px] text-gray-500">{{ input.type }}</span>
+    <span class="text-[11px] text-gray-500">{{ input.type }}</span>
 
     <!-- Spacer -->
     <div class="flex-grow" />

@@ -7,7 +7,7 @@
       @click="isOpen = true"
     >
       Add Input
-      <kbd class="ml-1 text-[10px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono">I</kbd>
+      <kbd class="ml-1 text-[11px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono hidden md:inline">I</kbd>
     </UButton>
     <UModal v-model:open="isOpen">
       <template #content>

@@ -96,7 +96,7 @@
         @click="outputOpen = true"
       >
         <span class="output-tab-label">Outputs</span>
-        <kbd class="text-[10px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono text-gray-600 dark:text-gray-400">O</kbd>
+        <kbd class="text-[11px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono text-gray-600 dark:text-gray-400 hidden md:inline">O</kbd>
         <UTooltip
           v-for="item in statusItems"
           :key="item.uid"
@@ -135,7 +135,7 @@
       @click="nodecgOpen = !nodecgOpen"
     >
       <span class="output-tab-label">NodeCG</span>
-      <kbd class="text-[10px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono text-gray-600 dark:text-gray-400">N</kbd>
+      <kbd class="text-[11px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono text-gray-600 dark:text-gray-400 hidden md:inline">N</kbd>
     </div>
   </UTooltip>
 </template>

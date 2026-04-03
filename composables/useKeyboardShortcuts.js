@@ -3,6 +3,7 @@ export function useKeyboardShortcuts() {
   const { toggle } = useCreateDialog();
   const outputOpen = useState('output-drawer-open');
   const nodecgOpen = useState('nodecg-panel-open');
+  const shortcutsOpen = useState('shortcuts-modal-open', () => false);
 
   const onKeyDown = (event) => {
     const tag = event.target.tagName;
@@ -40,8 +41,15 @@ export function useKeyboardShortcuts() {
       return;
     }
 
+    if (event.key === 'Escape') {
+      if (shortcutsOpen.value) { shortcutsOpen.value = false; return; }
+      if (outputOpen.value) { outputOpen.value = false; return; }
+      if (nodecgOpen.value) { nodecgOpen.value = false; return; }
+      return;
+    }
+
     if (event.key === '?') {
-      navigateTo('/help');
+      shortcutsOpen.value = !shortcutsOpen.value;
     }
   };
 
