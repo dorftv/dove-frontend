@@ -14,36 +14,39 @@
       {{ programMixer.state === 'PLAYING' ? 'LIVE' : programMixer.state }}
     </span>
     <div class="flex-grow" />
-    <button
-      @click="filtersOpen = true"
-      class="flex items-center justify-center w-6 h-6 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors cursor-pointer relative"
-      title="Audio filters"
-    >
-      <Icon name="ph:waveform" size="12px" />
-      <span
-        v-if="programFilterCount > 0"
-        class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
-      >{{ programFilterCount }}</span>
-    </button>
-    <AudioFilters v-model:open="filtersOpen" :mixer="programMixer" :ctx="afCtx" />
-    <button
-      @click="vfOpen = true"
-      class="flex items-center justify-center w-6 h-6 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors cursor-pointer relative"
-      title="Video filters"
-    >
-      <Icon name="ph:camera" size="12px" />
-      <span
-        v-if="programVfCount > 0"
-        class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
-      >{{ programVfCount }}</span>
-    </button>
-    <VideoFilters v-model:open="vfOpen" :mixer="programMixer" :ctx="vfCtx" />
+    <template v-if="canSupervisor">
+      <button
+        @click="filtersOpen = true"
+        class="flex items-center justify-center w-6 h-6 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors cursor-pointer relative"
+        title="Audio filters"
+      >
+        <Icon name="ph:waveform" size="12px" />
+        <span
+          v-if="programFilterCount > 0"
+          class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
+        >{{ programFilterCount }}</span>
+      </button>
+      <AudioFilters v-model:open="filtersOpen" :mixer="programMixer" :ctx="afCtx" />
+      <button
+        @click="vfOpen = true"
+        class="flex items-center justify-center w-6 h-6 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors cursor-pointer relative"
+        title="Video filters"
+      >
+        <Icon name="ph:camera" size="12px" />
+        <span
+          v-if="programVfCount > 0"
+          class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
+        >{{ programVfCount }}</span>
+      </button>
+      <VideoFilters v-model:open="vfOpen" :mixer="programMixer" :ctx="vfCtx" />
+    </template>
     <DetailPopover :entity="programMixer" />
   </div>
 </template>
 
 <script setup>
 const { programMixer } = useEntities();
+const { canSupervisor } = useAuth();
 const filtersOpen = ref(false);
 const vfOpen = ref(false);
 const afCtx = useAudioFilters({ mixer: () => programMixer.value });

@@ -144,7 +144,13 @@ const navSections = [
       { slug: 'inputs-testsrc', title: 'Test Source' },
     ],
   },
-  { slug: 'audio-filters', title: 'Audio Filters' },
+  {
+    type: 'group', title: 'Filters',
+    children: [
+      { slug: 'audio-filters', title: 'Audio' },
+      { slug: 'video-filters', title: 'Video' },
+    ],
+  },
   { slug: 'previews', title: 'Previews' },
   { slug: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
   { slug: 'auth', title: 'Authentication' },

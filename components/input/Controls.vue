@@ -70,32 +70,34 @@
             aria-label="Volume"
           />
         </span>
-        <button
-          @click="filtersOpen = true"
-          class="transport-btn relative"
-          title="Audio filters"
-          aria-label="Audio filters"
-        >
-          <Icon name="ph:waveform" size="12px" />
-          <span
-            v-if="filterCount > 0"
-            class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
-          >{{ filterCount }}</span>
-        </button>
-        <AudioFilters v-model:open="filtersOpen" :input="input" />
-        <button
-          @click="vfOpen = true"
-          class="transport-btn relative"
-          title="Video filters"
-          aria-label="Video filters"
-        >
-          <Icon name="ph:camera" size="12px" />
-          <span
-            v-if="vfCount > 0"
-            class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
-          >{{ vfCount }}</span>
-        </button>
-        <VideoFilters v-model:open="vfOpen" :input="input" />
+        <template v-if="canEditInput">
+          <button
+            @click="filtersOpen = true"
+            class="transport-btn relative"
+            title="Audio filters"
+            aria-label="Audio filters"
+          >
+            <Icon name="ph:waveform" size="12px" />
+            <span
+              v-if="filterCount > 0"
+              class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
+            >{{ filterCount }}</span>
+          </button>
+          <AudioFilters v-model:open="filtersOpen" :input="input" />
+          <button
+            @click="vfOpen = true"
+            class="transport-btn relative"
+            title="Video filters"
+            aria-label="Video filters"
+          >
+            <Icon name="ph:camera" size="12px" />
+            <span
+              v-if="vfCount > 0"
+              class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
+            >{{ vfCount }}</span>
+          </button>
+          <VideoFilters v-model:open="vfOpen" :input="input" />
+        </template>
       </div>
     </div>
 
@@ -116,6 +118,8 @@ const props = defineProps({
   input: Object,
 });
 
+const { canUser, canBypassLock } = useAuth();
+const canEditInput = computed(() => canUser.value && (!props.input.locked || canBypassLock.value));
 const { volumeIcon } = useStateClass();
 const { filterCount } = useAudioFilters(() => props.input);
 const { filterCount: vfCount } = useVideoFilters(() => props.input);
