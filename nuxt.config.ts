@@ -41,6 +41,10 @@ export default defineNuxtConfig({
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,
         },
+        '/whip': {
+          target: process.env.DOVE_API || 'http://localhost:5000',
+          changeOrigin: true,
+        },
         '/branding': {
           target: process.env.DOVE_API || 'http://localhost:5000',
           changeOrigin: true,

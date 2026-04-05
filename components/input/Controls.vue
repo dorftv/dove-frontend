@@ -101,6 +101,32 @@
       </div>
     </div>
 
+    <!-- WHIP publish controls -->
+    <div v-if="input.type === 'whip'" class="flex items-center gap-1 mt-1">
+      <template v-if="publishState === 'publishing'">
+        <span class="flex items-center gap-1 text-green-500 text-[11px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+          Publishing
+        </span>
+        <div class="flex-grow" />
+        <button @click="stopPublish" class="transport-btn text-red-400" title="Stop sharing" aria-label="Stop sharing">
+          <Icon name="ph:stop-fill" size="14px" />
+        </button>
+      </template>
+      <template v-else-if="publishState === 'connecting'">
+        <span class="text-[11px] text-yellow-500">Connecting...</span>
+      </template>
+      <template v-else>
+        <button @click="shareScreen" class="transport-btn" title="Share screen" aria-label="Share screen">
+          <Icon name="ph:monitor-arrow-up" size="14px" />
+        </button>
+        <button @click="shareCamera" class="transport-btn" title="Share camera" aria-label="Share camera">
+          <Icon name="ph:video-camera" size="14px" />
+        </button>
+        <span class="text-[11px] text-gray-500">Share screen or camera</span>
+      </template>
+    </div>
+
     <!-- Playlist details / spacer for equal height -->
     <div class="h-4 flex items-center text-[11px] text-gray-500 dark:text-gray-400 px-0.5 mt-0.5">
       <template v-if="input.type === 'playlist'">
@@ -125,6 +151,11 @@ const { filterCount } = useAudioFilters(() => props.input);
 const { filterCount: vfCount } = useVideoFilters(() => props.input);
 const filtersOpen = ref(false);
 const vfOpen = ref(false);
+
+// WHIP publisher (screencast)
+const inputUid = computed(() => props.input.uid);
+const { publishState, startScreenShare: shareScreen, startCamera: shareCamera, stop: stopPublish } =
+  props.input.type === 'whip' ? useWhipPublisher(inputUid) : { publishState: ref('idle'), startScreenShare: () => {}, startCamera: () => {}, stop: () => {} };
 
 const {
   volume,
