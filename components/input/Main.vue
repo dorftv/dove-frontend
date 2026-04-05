@@ -6,8 +6,8 @@
           <CreateInputPane />
         </div>
       </div>
-      <div class="input-grid gap-3">
-        <div v-for="input in inputsPreview" :key="input.uid" class="flex flex-col rounded-lg overflow-hidden">
+      <div ref="inputGridRef" class="input-grid gap-3">
+        <div v-for="input in orderedInputs" :key="input.uid" class="flex flex-col rounded-lg overflow-hidden">
           <InputHeader
             :input="input"
             :inputEnabled="isInputEnabled(input.uid)"
@@ -27,14 +27,38 @@
 </template>
 
 <script setup>
+import Sortable from 'sortablejs';
+
 const { inputsPreview } = useEntities();
 const {
   isInputEnabled,
   toggleInputEnabled,
   shouldShowPreview
 } = usePreviewEnabled();
-
 const { audioMeters } = useUserState();
+const { ordered: orderedInputs, saveOrder } = useEntityOrder('dove-input-order', inputsPreview);
+
+const inputGridRef = ref(null);
+let sortableInstance = null;
+
+onMounted(() => {
+  if (inputGridRef.value) {
+    sortableInstance = new Sortable(inputGridRef.value, {
+      animation: 150,
+      forceFallback: true,
+      filter: '[draggable=true]',
+      preventOnFilter: false,
+      ghostClass: 'input-drag-ghost',
+      onEnd: (evt) => {
+        if (evt.oldIndex === evt.newIndex) return;
+        const items = [...orderedInputs.value];
+        const [moved] = items.splice(evt.oldIndex, 1);
+        items.splice(evt.newIndex, 0, moved);
+        saveOrder(items);
+      },
+    });
+  }
+});
 </script>
 
 <style scoped>
@@ -47,5 +71,9 @@ const { audioMeters } = useUserState();
   .input-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
+}
+
+.input-drag-ghost {
+  opacity: 0.4;
 }
 </style>

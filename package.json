@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.2.1",
+    "@vueuse/integrations": "^14.2.1",
+    "sortablejs": "^1.15.6",
     "hls.js": "^1.6.15",
     "markdown-it": "^14.1.0",
     "vidstack": "^1.12.13"

@@ -19,34 +19,21 @@
         </div>
 
         <!-- Filter chain -->
-        <div
-          v-for="(filter, index) in filters"
-          :key="index + '-' + filter.type"
-          class="filter-card"
-          :class="{ 'filter-disabled': !filter.enabled }"
-        >
-          <!-- Filter header bar -->
-          <div class="filter-header">
-            <div class="flex items-center gap-1.5 min-w-0">
-              <!-- Reorder arrows -->
-              <div class="flex flex-col -my-1">
-                <button
-                  @click="moveFilter(index, index - 1)"
-                  :disabled="index === 0"
-                  class="reorder-btn"
-                  title="Move up"
-                ><Icon name="ph:caret-up-bold" size="8px" /></button>
-                <button
-                  @click="moveFilter(index, index + 1)"
-                  :disabled="index === filters.length - 1"
-                  class="reorder-btn"
-                  title="Move down"
-                ><Icon name="ph:caret-down-bold" size="8px" /></button>
+        <div ref="filterListRef" class="filter-chain-list">
+          <div
+            v-for="(filter, index) in filters"
+            :key="index + '-' + filter.type"
+            class="filter-card"
+            :class="{ 'filter-disabled': !filter.enabled }"
+          >
+            <!-- Filter header bar (entire header is drag handle) -->
+            <div class="filter-header filter-drag-handle cursor-grab">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <Icon name="ph:dots-six-vertical" size="12px" class="text-gray-600 hover:text-gray-300 shrink-0" />
+                <span class="filter-index">{{ index + 1 }}</span>
+                <span class="filter-type-label">{{ getFilterLabel(filter.type) }}</span>
+                <span class="filter-category-badge">{{ getCategoryLabel(filter.type) }}</span>
               </div>
-              <span class="filter-index">{{ index + 1 }}</span>
-              <span class="filter-type-label">{{ getFilterLabel(filter.type) }}</span>
-              <span class="filter-category-badge">{{ getCategoryLabel(filter.type) }}</span>
-            </div>
             <div class="flex items-center gap-1">
               <button
                 @click="toggleFilter(index)"
@@ -102,6 +89,7 @@
           <div v-else-if="!filter.enabled" class="px-3 py-1">
             <span class="text-[10px] text-amber-500/70 font-mono uppercase tracking-wider">Bypassed</span>
           </div>
+          </div>
         </div>
 
         <!-- Signal flow indicator -->
@@ -139,6 +127,7 @@
 </template>
 
 <script setup>
+
 const props = defineProps({
   input: Object,
   mixer: Object,
@@ -152,6 +141,37 @@ const { filterOpts, headerLabel } = useFilterOpts(props);
 const _ownCtx = props.ctx ? null : useAudioFilters(filterOpts.value);
 const { FILTER_TYPES, FILTER_CATEGORIES, filters, updateFilterParam, toggleFilter, addFilter, removeFilter, moveFilter } = toRaw(props.ctx) || _ownCtx;
 const { getFilterLabel, getCategoryLabel, getFilterParams, hasParams, isEq10, getFiltersForCategory, getEq10BandLabel, getDefaultStep, formatValue } = useFilterPresentation(FILTER_TYPES, FILTER_CATEGORIES);
+
+const filterListRef = ref(null);
+let sortableInstance = null;
+
+// Re-init SortableJS each time the slideover opens (DOM may be recreated)
+watch(open, (isOpen) => {
+  if (isOpen) {
+    nextTick(() => {
+      if (sortableInstance) {
+        sortableInstance.destroy();
+        sortableInstance = null;
+      }
+      const el = filterListRef.value;
+      if (el) {
+        import('sortablejs').then(({ default: Sortable }) => {
+          sortableInstance = new Sortable(el, {
+            handle: '.filter-drag-handle',
+            animation: 150,
+            ghostClass: 'filter-drag-ghost',
+            forceFallback: true,
+            fallbackTolerance: 3,
+            onEnd: (evt) => {
+              if (evt.oldIndex === evt.newIndex) return;
+              moveFilter(evt.oldIndex, evt.newIndex);
+            },
+          });
+        });
+      }
+    });
+  }
+});
 </script>
 
 <style scoped>
@@ -203,11 +223,11 @@ const { getFilterLabel, getCategoryLabel, getFilterParams, hasParams, isEq10, ge
          text-gray-500 hover:text-red-400 hover:bg-red-900/30
          cursor-pointer transition-colors;
 }
-.reorder-btn {
-  @apply flex items-center justify-center w-4 h-2.5
-         text-gray-600 hover:text-gray-300 cursor-pointer
-         disabled:opacity-20 disabled:cursor-default
-         transition-colors;
+.filter-drag-ghost {
+  @apply opacity-40;
+}
+.filter-chain-list {
+  @apply space-y-1.5;
 }
 .add-section {
   @apply pt-2 border-t border-gray-700/40;

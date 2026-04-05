@@ -14,13 +14,24 @@
         <span class="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-[10px] px-1.5 rounded-full font-mono">{{ scene.sources?.length || 0 }}</span>
       </button>
       <div v-show="slotsOpen">
-        <div
-          v-for="(source, i) in [...scene.sources].reverse()"
-          :key="source.index"
-          :class="i % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/60' : 'bg-white dark:bg-gray-800/30'"
-          class="border-b border-gray-100 dark:border-gray-700/50 last:border-b-0"
-        >
-          <SceneInputs :source="source" :scene="scene" />
+        <div ref="slotsContainer">
+          <div
+            v-for="(source, i) in reversedSources"
+            :key="source.index"
+            :data-index="source.index"
+            :class="i % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/60' : 'bg-white dark:bg-gray-800/30'"
+            class="border-b border-gray-100 dark:border-gray-700/50 last:border-b-0 flex items-center"
+          >
+            <div
+              v-if="canReorderSlots"
+              class="slot-drag-handle flex items-center justify-center px-1 self-stretch cursor-grab text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+            >
+              <Icon name="ph:dots-six-vertical" size="12px" />
+            </div>
+            <div class="flex-grow min-w-0">
+              <SceneInputs :source="source" :scene="scene" />
+            </div>
+          </div>
         </div>
         <div
           v-if="canSupervisor && ((!scene.src_locked && !scene.locked) || canBypassLock)"
@@ -42,6 +53,8 @@
 </template>
 
 <script setup>
+import { useSortable } from '@vueuse/integrations/useSortable'
+
 const { canSupervisor, canBypassLock } = useAuth()
 
 const props = defineProps({
@@ -51,7 +64,55 @@ const props = defineProps({
 });
 
 const { mixerPreview, audioMeters } = useUserState();
+const { updateEntity } = useEntities();
 const mixerEnabled = ref(false);
 const slotsOpen = ref(true);
 const { addingSlot, dropOver, dragCount, addSlot, onDropAdd } = useSceneSlots(() => props.scene);
+
+const canReorderSlots = computed(() =>
+  canSupervisor.value && ((!props.scene?.src_locked && !props.scene?.locked) || canBypassLock.value)
+);
+
+// Sorted by z-order descending: highest z-order first (visual top = highest layer)
+const reversedSources = computed(() =>
+  [...(props.scene?.sources || [])].sort((a, b) => (b.zorder ?? 0) - (a.zorder ?? 0))
+);
+
+const slotsContainer = ref(null);
+
+useSortable(slotsContainer, [], {
+  handle: '.slot-drag-handle',
+  animation: 150,
+  ghostClass: 'slot-drag-ghost',
+  dragClass: 'slot-drag-active',
+  onEnd: (evt) => {
+    if (evt.oldIndex === evt.newIndex) return;
+    // reversedSources is displayed highest-zorder-first.
+    // After drag, recalculate zorder so that visual position 0 = highest zorder.
+    const displayOrder = [...(props.scene?.sources || [])].sort((a, b) => (b.zorder ?? 0) - (a.zorder ?? 0));
+    const [moved] = displayOrder.splice(evt.oldIndex, 1);
+    displayOrder.splice(evt.newIndex, 0, moved);
+    // Assign zorder: first in display = highest zorder, last = lowest
+    const count = displayOrder.length;
+    displayOrder.forEach((source, displayIdx) => {
+      const newZorder = count - displayIdx + 1; // +1 to keep zorder >= 2
+      if (source.zorder !== newZorder) {
+        updateEntity('mixer', {
+          uid: props.scene.uid,
+          index: source.index,
+          zorder: newZorder,
+        });
+      }
+    });
+  },
+});
 </script>
+
+<style scoped>
+.slot-drag-ghost {
+  opacity: 0.4;
+}
+.slot-drag-active {
+  opacity: 0.8;
+}
+</style>

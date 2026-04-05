@@ -1,16 +1,23 @@
 export function useKeyboardShortcuts() {
   const { handleSceneClick, cutSceneToProgram, transition } = useActiveScene();
+  const { sceneMixers } = useEntities();
   const { toggle } = useCreateDialog();
   const outputOpen = useState('output-drawer-open');
   const nodecgOpen = useState('nodecg-panel-open');
   const shortcutsOpen = useState('shortcuts-modal-open', () => false);
+
+  const { getByVisualIndex } = useEntityOrder('dove-scene-order', sceneMixers);
 
   const onKeyDown = (event) => {
     const tag = event.target.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || event.target.isContentEditable) return;
 
     if (event.key >= '1' && event.key <= '9') {
-      handleSceneClick(Number(event.key) - 1);
+      const scene = getByVisualIndex(Number(event.key) - 1);
+      if (scene) {
+        const realIndex = sceneMixers.value.findIndex(s => s.uid === scene.uid);
+        if (realIndex >= 0) handleSceneClick(realIndex);
+      }
       return;
     }
 
