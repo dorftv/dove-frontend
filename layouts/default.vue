@@ -67,6 +67,10 @@
             <Icon name="ph:info" size="16px" />
           </NuxtLink>
 
+          <button v-if="canAdmin" @click="configExportOpen = true" class="hidden md:flex icon-btn" title="Export Config" aria-label="Export Config">
+            <Icon name="ph:download-simple" size="16px" />
+          </button>
+
           <button @click="cycleColorMode" class="hidden md:flex icon-btn" :title="`Color mode: ${colorMode.preference}`" :aria-label="`Color mode: ${colorMode.preference}`">
             <Icon v-if="colorMode.value === 'dark'" name="ph:moon" size="16px" />
             <Icon v-else-if="colorMode.value === 'light'" name="ph:sun" size="16px" />
@@ -148,6 +152,7 @@
     <main class="flex-grow" role="main">
       <slot />
     </main>
+    <ConfigExport v-model:open="configExportOpen" />
     <KeyboardShortcuts />
   </div>
 </template>
@@ -159,6 +164,7 @@ const { wsStatus } = useEntities()
 const { previewMode, cycle: cyclePreviewMode } = usePlayerMode()
 const { inputPreview, mixerPreview, audioMeters } = useUserState()
 const { user, authEnabled, authChecked, isAuthenticated, canAdmin, logout } = useAuth()
+const configExportOpen = ref(false)
 
 const previewModeLabel = computed(() => {
   if (previewMode.value === 'auto') return 'Auto';
