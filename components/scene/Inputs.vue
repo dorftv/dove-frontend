@@ -8,7 +8,12 @@
       @dragleave="dragOver = false"
       @drop="handleDrop"
     >
-      <span class="text-xs text-gray-400 dark:text-gray-500 w-8 shrink-0">{{ source.name }}</span>
+      <InlineEdit
+        :modelValue="source.name"
+        @update:modelValue="updateSlotName"
+        displayClass="text-xs text-gray-400 dark:text-gray-500 w-8 shrink-0"
+        inputClass="text-xs text-gray-400 dark:text-gray-500 w-12"
+      />
       <span class="truncate flex-grow" :class="inputMatch ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic'">
         {{ inputMatch ? inputMatch.name : 'Empty' }}
       </span>
@@ -146,6 +151,8 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 
 const { inputs, removeSlot, handleChange, getMax, getMin, getDefault, resetAll, resetPosition, toggleMute, volumeIcon, onDrop, src, alpha, width, height, xpos, ypos, volume, mute, sizing } = useSceneSources(() => props.scene, () => props.source);
+
+const updateSlotName = (newName) => handleChange('name', newName);
 
 const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
 const srcOptions = computed(() => [{ name: '— Empty —', uid: 'None' }, ...inputs.value]);

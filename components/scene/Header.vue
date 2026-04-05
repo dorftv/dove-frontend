@@ -7,12 +7,13 @@
       :title="scene.state"
     />
 
-    <!-- Name -->
-    <UTooltip :text="`${scene.width}x${scene.height} · ${scene.sources?.length || 0} slots`">
-      <span class="truncate cursor-help text-sm text-gray-800 dark:text-gray-200 font-medium">
-        {{ scene.name }}
-      </span>
-    </UTooltip>
+    <!-- Name (double-click to rename) -->
+    <InlineEdit
+      :modelValue="scene.name"
+      @update:modelValue="updateName"
+      displayClass="truncate text-sm text-gray-800 dark:text-gray-200 font-medium"
+      inputClass="text-sm text-gray-800 dark:text-gray-200 font-medium w-24"
+    />
 
     <!-- Spacer -->
     <div class="flex-grow" />
@@ -41,4 +42,9 @@ const props = defineProps({
 });
 
 const { deleting, submitRemove } = useDeleteEntity('scene', () => props.scene);
+const { updateEntity } = useEntities();
+
+const updateName = (newName) => {
+  updateEntity('mixer', { uid: props.scene.uid, name: newName });
+};
 </script>

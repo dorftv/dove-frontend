@@ -1,21 +1,26 @@
 <template>
   <span
     v-if="!editing"
-    @dblclick="startEdit"
-    class="cursor-text"
+    @click="startEdit"
+    class="group inline-flex items-center gap-0.5 cursor-text"
     :class="displayClass"
-    :title="'Double-click to rename'"
-  >{{ modelValue }}</span>
-  <input
-    v-else
-    ref="inputRef"
-    :value="modelValue"
-    @blur="save"
-    @keydown.enter="save"
-    @keydown.escape="cancel"
-    class="bg-transparent border-b border-blue-400 outline-none"
-    :class="inputClass"
-  />
+    title="Click to rename"
+  >
+    {{ modelValue }}
+    <Icon name="ph:pencil-simple" size="10px" class="opacity-0 group-hover:opacity-50 transition-opacity shrink-0" />
+  </span>
+  <span v-else class="inline-flex items-center gap-0.5">
+    <input
+      ref="inputRef"
+      :value="modelValue"
+      @blur="save"
+      @keydown.enter="save"
+      @keydown.escape="cancel"
+      class="bg-transparent border-b border-blue-400 outline-none"
+      :class="inputClass"
+    />
+    <kbd class="text-[9px] bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 px-1 rounded font-mono leading-relaxed shrink-0">&#9166;</kbd>
+  </span>
 </template>
 
 <script setup>

@@ -12,12 +12,13 @@
       :title="input.state"
     />
 
-    <!-- Name -->
-    <UTooltip :text="input.name + ' (' + input.type + ')'">
-      <span class="truncate cursor-help text-sm text-gray-800 dark:text-gray-200 font-medium">
-        {{ input.name }}
-      </span>
-    </UTooltip>
+    <!-- Name (double-click to rename) -->
+    <InlineEdit
+      :modelValue="input.name"
+      @update:modelValue="updateName"
+      displayClass="truncate text-sm text-gray-800 dark:text-gray-200 font-medium"
+      inputClass="text-sm text-gray-800 dark:text-gray-200 font-medium w-20"
+    />
     <span class="text-[11px] text-gray-500">{{ input.type }}</span>
 
     <!-- Spacer -->
@@ -61,6 +62,11 @@ defineEmits(['enablePreview']);
 const { inputPreview } = useUserState();
 
 const { deleting, submitRemove } = useDeleteEntity('input', () => props.input);
+const { updateEntity } = useEntities();
+
+const updateName = (newName) => {
+  updateEntity('input', { uid: props.input.uid, name: newName });
+};
 
 const onDragStart = (event) => {
   event.dataTransfer.setData('text/plain', props.input.uid);
