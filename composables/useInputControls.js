@@ -78,60 +78,22 @@ export function useInputControls(props) {
     });
   };
 
-  const submitPlay = async () => {
+  const submitInputUpdate = async (fields, errorMsg) => {
     try {
       await $fetch('/api/inputs', {
         method: 'PUT',
-        body: { uid: props.input.uid, type: 'update', state: 'PLAYING' },
+        body: { uid: props.input.uid, type: 'update', ...fields },
       });
-    } catch (error) {
-      notify.error('Failed to play input');
+    } catch {
+      notify.error(errorMsg);
     }
   };
 
-  const submitPause = async () => {
-    try {
-      await $fetch('/api/inputs', {
-        method: 'PUT',
-        body: { uid: props.input.uid, type: 'update', state: 'PAUSED' },
-      });
-    } catch (error) {
-      notify.error('Failed to pause input');
-    }
-  };
-
-  const submitStop = async () => {
-    try {
-      await $fetch('/api/inputs', {
-        method: 'PUT',
-        body: { uid: props.input.uid, type: 'update', state: 'NULL' },
-      });
-    } catch (error) {
-      notify.error('Failed to stop input');
-    }
-  };
-
-  const submitLoop = async (loopState) => {
-    try {
-      await $fetch('/api/inputs', {
-        method: 'PUT',
-        body: { uid: props.input.uid, type: 'update', loop: loopState },
-      });
-    } catch (error) {
-      notify.error('Failed to toggle loop');
-    }
-  };
-
-  const submitSkip = async (direction) => {
-    try {
-      await $fetch('/api/inputs', {
-        method: 'PUT',
-        body: { uid: props.input.uid, type: 'update', skip: direction },
-      });
-    } catch (error) {
-      notify.error('Failed to skip');
-    }
-  };
+  const submitPlay = () => submitInputUpdate({ state: 'PLAYING' }, 'Failed to play input');
+  const submitPause = () => submitInputUpdate({ state: 'PAUSED' }, 'Failed to pause input');
+  const submitStop = () => submitInputUpdate({ state: 'NULL' }, 'Failed to stop input');
+  const submitLoop = (loopState) => submitInputUpdate({ loop: loopState }, 'Failed to toggle loop');
+  const submitSkip = (direction) => submitInputUpdate({ skip: direction }, 'Failed to skip');
 
   // --- Scene/source context (only meaningful when props.scene & props.source exist) ---
 

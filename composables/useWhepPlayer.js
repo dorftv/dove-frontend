@@ -6,13 +6,11 @@
 export function useWhepPlayer(props, { onError } = {}) {
   const videoPlayer = ref(null);
   const { mutedState, setMutedState } = useMutedState();
-  const { programMixer } = useEntities();
-  const toast = useToast();
+  const { handleAutoplayBlocked } = useAutoplayToast();
 
   let pc = null;           // RTCPeerConnection
   let resourceUrl = null;  // WHEP resource URL (from POST Location header)
   let failCount = 0;
-  let autoplayToastShown = false;
   let volumeHandler = null;
   let statsInterval = null;
   let lastBytesReceived = 0;
@@ -174,25 +172,9 @@ export function useWhepPlayer(props, { onError } = {}) {
       try {
         await videoPlayer.value.play();
       } catch {
-        setMutedState(props.uid, true);
+        handleAutoplayBlocked(props.uid);
         videoPlayer.value.muted = true;
         try { await videoPlayer.value.play(); } catch {}
-        if (!autoplayToastShown) {
-          autoplayToastShown = true;
-          const pmUid = programMixer.value?.uid;
-          const t = toast.add({
-            title: 'Audio blocked by browser',
-            description: 'Click anywhere to enable audio',
-            color: 'warning',
-          });
-          document.addEventListener('click', () => {
-            if (pmUid) setMutedState(pmUid, false);
-            document.querySelectorAll('video').forEach(v => {
-              if (v.paused) v.play().catch(() => {});
-            });
-            toast.remove(t.id);
-          }, { once: true });
-        }
       }
     } catch (error) {
       console.error('WHEP player error:', error);

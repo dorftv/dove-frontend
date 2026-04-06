@@ -69,7 +69,7 @@ const updateName = (newName) => {
 };
 
 const onDragStart = (event) => {
-  event.dataTransfer.setData('text/plain', props.input.uid);
+  event.dataTransfer.setData('application/x-dove-input', props.input.uid);
   event.dataTransfer.effectAllowed = 'link';
 };
 </script>

@@ -15,10 +15,9 @@ export function useSceneSlots(getScene) {
         body: { uid: scene.uid },
       });
       if (src && result?.index !== undefined) {
-        updateEntity('mixer', {
-          uid: scene.uid,
-          index: result.index,
-          src,
+        await $fetch('/api/mixer/add_source', {
+          method: 'POST',
+          body: { src, target: scene.uid, index: result.index },
         });
       }
     } catch (error) {
@@ -31,7 +30,7 @@ export function useSceneSlots(getScene) {
   const onDropAdd = (event) => {
     dropOver.value = false;
     dragCount.value = 0;
-    const uid = event.dataTransfer.getData('text/plain');
+    const uid = event.dataTransfer.getData('application/x-dove-input');
     if (uid) addSlot(uid);
   };
 

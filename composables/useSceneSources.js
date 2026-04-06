@@ -22,10 +22,16 @@ export function useSceneSources(getScene, getSource) {
   const toApi = { alpha: v => v / 100, volume: v => v / 100 };
 
   const state = reactive(fromSource(source()));
-  watch(source, (s) => Object.assign(state, fromSource(s)));
+  let sendInFlight = false;
+  watch(source, (s) => {
+    if (sendInFlight) return;
+    Object.assign(state, fromSource(s));
+  });
 
   const handleChange = (prop, newValue) => {
     state[prop] = newValue;
+    sendInFlight = true;
+    setTimeout(() => { sendInFlight = false; }, 1000);
     const apiValue = toApi[prop] ? toApi[prop](newValue) : newValue;
     updateEntityInEntities('mixer', {
       uid: scene().uid,
@@ -108,14 +114,33 @@ export function useSceneSources(getScene, getSource) {
 
   const volumeIcon = computed(() => volumeIconFn(state.volume, state.mute));
 
+  const changeSource = async (raw) => {
+    const uid = typeof raw === 'object' ? raw?.uid : raw;
+    const isRemove = !uid || uid === 'None';
+    if (!isRemove && !inputs.value.some(i => i.uid === uid)) return;
+    try {
+      await $fetch(isRemove ? '/api/mixer/remove_source' : '/api/mixer/add_source', {
+        method: 'POST',
+        body: {
+          src: isRemove ? 'None' : uid,
+          target: scene().uid,
+          index: source().index,
+        },
+      });
+    } catch {
+      notify.error('Failed to change source');
+    }
+  };
+
   const onDrop = (event) => {
-    const uid = event.dataTransfer.getData('text/plain');
-    if (uid) handleChange('src', uid);
+    const uid = event.dataTransfer.getData('application/x-dove-input');
+    if (uid) changeSource(uid);
   };
 
   return {
     inputs,
     removeSlot,
+    changeSource,
     handleChange,
     getMax,
     getMin,

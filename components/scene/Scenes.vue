@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col p-2" v-if="scene">
     <SceneHeader :scene="scene" />
-    <div v-if="!hidePreview && (mixerPreview || mixerEnabled)" class="flex">
+    <div v-if="!hidePreview" class="flex">
       <div class="flex-grow min-w-0 aspect-video">
         <VideoPlayerMain :uid="scene.uid" class="w-full h-full" />
       </div>
@@ -14,8 +14,8 @@
             v-for="(source, i) in reversedSources"
             :key="source.index"
             :data-index="source.index"
-            :class="i % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/60' : 'bg-white dark:bg-gray-800/30'"
-            class="border-b border-gray-100 dark:border-gray-700/50 last:border-b-0 flex items-center"
+            :class="i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-100 dark:bg-gray-800'"
+            class="border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex items-center"
           >
             <div
               v-if="canReorderSlots"
@@ -59,9 +59,8 @@ const props = defineProps({
   hidePreview: Boolean,
 });
 
-const { mixerPreview, audioMeters } = useUserState();
+const { audioMeters } = useUserState();
 const { updateEntity } = useEntities();
-const mixerEnabled = ref(false);
 const { addingSlot, dropOver, dragCount, addSlot, onDropAdd } = useSceneSlots(() => props.scene);
 
 const canReorderSlots = computed(() =>

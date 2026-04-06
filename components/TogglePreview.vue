@@ -4,10 +4,6 @@
       <Icon :name="inputPreview ? 'ph:eye' : 'ph:eye-slash'" size="14px" />
       <span>Inputs</span>
     </button>
-    <button @click="mixerPreview = !mixerPreview" class="toggle-btn" :class="{ disabled: !mixerPreview }" title="Toggle mixer preview">
-      <Icon :name="mixerPreview ? 'ph:eye' : 'ph:eye-slash'" size="14px" />
-      <span>Mixer</span>
-    </button>
     <button @click="audioMeters = !audioMeters" class="toggle-btn" :class="{ disabled: !audioMeters }" title="Toggle audio meters">
       <Icon name="ph:equalizer" size="14px" />
     </button>
@@ -15,7 +11,7 @@
 </template>
 
 <script setup>
-const { inputPreview, mixerPreview, audioMeters } = useUserState();
+const { inputPreview, audioMeters } = useUserState();
 </script>
 
 <style scoped>

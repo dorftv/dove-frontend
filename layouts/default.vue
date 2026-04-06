@@ -130,9 +130,6 @@
           <button @click="inputPreview = !inputPreview" class="icon-btn" :title="inputPreview ? 'Hide input previews' : 'Show input previews'">
             <Icon :name="inputPreview ? 'ph:eye' : 'ph:eye-slash'" size="16px" :class="{ 'opacity-40': !inputPreview }" />
           </button>
-          <button @click="mixerPreview = !mixerPreview" class="icon-btn" :title="mixerPreview ? 'Hide mixer preview' : 'Show mixer preview'">
-            <Icon :name="mixerPreview ? 'ph:monitor-play' : 'ph:monitor'" size="16px" :class="{ 'opacity-40': !mixerPreview }" />
-          </button>
           <button @click="audioMeters = !audioMeters" class="icon-btn" :title="audioMeters ? 'Hide audio meters' : 'Show audio meters'">
             <Icon name="ph:equalizer" size="16px" :class="{ 'opacity-40': !audioMeters }" />
           </button>
@@ -162,7 +159,7 @@ const colorMode = useColorMode()
 const mobileMenuOpen = ref(false)
 const { wsStatus } = useEntities()
 const { previewMode, cycle: cyclePreviewMode } = usePlayerMode()
-const { inputPreview, mixerPreview, audioMeters } = useUserState()
+const { inputPreview, audioMeters } = useUserState()
 const { user, authEnabled, authChecked, isAuthenticated, canAdmin, logout } = useAuth()
 const configExportOpen = ref(false)
 

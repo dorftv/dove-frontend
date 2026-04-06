@@ -141,12 +141,13 @@
 </template>
 
 <script setup>
-const { isLoading, error, fetchEntities, outputs, inputsNodeCG, inputsNoPreview } = useEntities();
+const { isLoading, error, outputs, inputsNodeCG, inputsNoPreview } = useEntities();
+const { $ws } = useNuxtApp();
 
 const retry = async () => {
   error.value = null;
   isLoading.value = true;
-  await fetchEntities();
+  await $ws.fetchEntities();
 };
 const showNoPreview = ref(false);
 const { stateColor } = useStateClass();

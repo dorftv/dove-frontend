@@ -52,8 +52,7 @@
           @click="selectScene(scene)"
           class="relative rounded overflow-hidden cursor-pointer border-2 transition-colors"
           :class="[
-            scene.uid === selectedScene?.uid ? 'border-blue-500' : 'border-transparent hover:border-gray-400 dark:hover:border-gray-600',
-            scene.uid === activeScene?.uid ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-gray-800' : ''
+            scene.uid === selectedScene?.uid ? 'border-blue-400 border-3' : 'border-transparent hover:border-gray-400 dark:hover:border-gray-600'
           ]"
         >
           <div class="aspect-video bg-black">

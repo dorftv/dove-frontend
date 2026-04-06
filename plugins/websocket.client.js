@@ -246,7 +246,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   return {
     provide: {
-      ws: { sendMessage, status, connect, disconnect },
+      ws: { sendMessage, status, connect, disconnect, fetchEntities },
     },
   };
 });

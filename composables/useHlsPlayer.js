@@ -3,8 +3,7 @@ import HLS from 'hls.js';
 export function useHlsPlayer(props) {
   const mediaPlayer = ref(null);
   const { mutedState, setMutedState } = useMutedState();
-  const { programMixer } = useEntities();
-  const toast = useToast();
+  const { handleAutoplayBlocked } = useAutoplayToast();
 
   let loadTimeout = null;
   let abortController = null;
@@ -24,27 +23,9 @@ export function useHlsPlayer(props) {
       setMutedState(props.uid, false);
     }, { signal });
 
-    let autoplayToastShown = false;
-
     player.addEventListener('auto-play-fail', () => {
-      setMutedState(props.uid, true);
+      handleAutoplayBlocked(props.uid);
       nextTick(() => player.play());
-      if (!autoplayToastShown) {
-        autoplayToastShown = true;
-        const pmUid = programMixer.value?.uid;
-        const t = toast.add({
-          title: 'Audio blocked by browser',
-          description: 'Click anywhere to enable audio',
-          color: 'warning',
-        });
-        document.addEventListener('click', () => {
-          if (pmUid) setMutedState(pmUid, false);
-          document.querySelectorAll('video, media-player').forEach(v => {
-            if (v.paused) v.play().catch(() => {});
-          });
-          toast.remove(t.id);
-        }, { once: true });
-      }
     }, { signal });
 
     player.addEventListener('provider-change', (event) => {

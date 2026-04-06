@@ -6,7 +6,6 @@ export function useEntities() {
   const error = useState('entities-error', () => null);
   const wsStatus = useState('ws-status', () => 'disconnected');
   const isLoading = useState('entities-loading', () => true);
-  const notify = useNotify();
 
   const updateEntity = (type, updatedEntity) => {
     const { $ws } = useNuxtApp();
@@ -15,32 +14,6 @@ export function useEntities() {
       action: 'UPDATE',
       data: updatedEntity
     });
-  };
-
-  const fetchEntities = async () => {
-    try {
-      const [inputsData, mixersData, outputsData, encodersData] = await Promise.all([
-        $fetch('/api/inputs'),
-        $fetch('/api/mixers'),
-        $fetch('/api/outputs'),
-        $fetch('/api/encoders'),
-      ]);
-
-      inputs.value = inputsData;
-      mixers.value = mixersData;
-      outputs.value = outputsData;
-      encoders.value = encodersData;
-    } catch (e) {
-      if (e?.response?.status === 401 || e?.status === 401 || e?.statusCode === 401) {
-        const { login } = useAuth();
-        login();
-        return;
-      }
-      error.value = 'Failed to load entities: ' + e.message;
-      notify.error('Failed to load entities');
-    } finally {
-      isLoading.value = false;
-    }
   };
 
   const sceneInputs = computed(() => {
@@ -155,7 +128,6 @@ export function useEntities() {
     sceneMixers,
     programMixer,
     updateEntity,
-    fetchEntities,
     error,
     wsStatus,
     isLoading

@@ -5,15 +5,16 @@
         <div class="flex items-center gap-2">
           <CreateInputPane />
         </div>
+        <USlider v-model="inputSize" :min="160" :max="500" :step="10" class="w-20" size="xs" />
       </div>
-      <div ref="inputGridRef" class="input-grid gap-3">
+      <div ref="inputGridRef" class="input-grid gap-3" :style="{ '--input-size': inputSize + 'px' }">
         <div v-for="input in orderedInputs" :key="input.uid" class="flex flex-col rounded-lg overflow-hidden h-full">
           <InputHeader
             :input="input"
             :inputEnabled="isInputEnabled(input.uid)"
             @enablePreview="toggleInputEnabled(input.uid)"
           />
-          <div v-if="shouldShowPreview(input.uid) && input.preview" class="flex">
+          <div v-show="shouldShowPreview(input.uid) && input.preview" class="flex">
             <VideoPlayerMain v-if="input.has_video !== false" :uid="input.uid" class="flex-grow min-w-0" />
             <AudioOnlyPlayer v-else :uid="input.uid" class="flex-grow min-w-0" />
             <AudioMeter v-if="audioMeters && input.has_audio !== false" :uid="input.uid" />
@@ -28,8 +29,10 @@
 
 <script setup>
 import Sortable from 'sortablejs';
+import { useLocalStorage } from '@vueuse/core';
 
 const { inputsPreview } = useEntities();
+const inputSize = useLocalStorage('dove-input-size', 280);
 const {
   isInputEnabled,
   toggleInputEnabled,
@@ -62,13 +65,7 @@ onUnmounted(() => { if (sortableInstance) { sortableInstance.destroy(); sortable
 <style scoped>
 .input-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-}
-
-@media (min-width: 1024px) {
-  .input-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  }
+  grid-template-columns: repeat(auto-fill, minmax(var(--input-size, 280px), 1fr));
 }
 
 .input-drag-ghost {

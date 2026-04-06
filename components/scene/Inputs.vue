@@ -3,10 +3,10 @@
     <!-- Slot header row -->
     <div
       class="flex items-center gap-1 px-1.5 py-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-      :class="{ 'ring-2 ring-inset ring-blue-400': dragOver }"
+      :class="{ 'ring-2 ring-inset ring-blue-400': dragOver, 'bg-blue-50 dark:bg-blue-900/20': open }"
       @dragover.prevent
-      @dragenter.prevent="dragOver = true"
-      @dragleave="dragOver = false"
+      @dragenter.prevent="dragCount++; dragOver = true"
+      @dragleave="dragCount--; if (dragCount <= 0) { dragOver = false; dragCount = 0 }"
       @drop="handleDrop"
     >
       <!-- Slot name -->
@@ -17,24 +17,25 @@
         inputClass="text-xs text-gray-400 dark:text-gray-500 w-14"
       />
 
-      <!-- Source selector (always visible) -->
-      <USelect
-        v-if="canEditSlot"
-        class="w-20 md:w-28 shrink-0"
-        :items="srcOptions"
-        label-key="name"
-        value-key="uid"
-        :model-value="src"
-        @update:model-value="(val) => handleChange('src', val || 'None')"
-        placeholder="Select input"
-        size="xs"
-      />
+      <!-- Source selector (pointer-events disabled during drag to let drop through) -->
+      <div v-if="canEditSlot" class="flex-grow min-w-0" :class="{ 'pointer-events-none': dragOver }">
+        <USelect
+          class="w-full"
+          :items="srcOptions"
+          label-key="name"
+          value-key="uid"
+          :model-value="src"
+          @update:model-value="onSourceSelect"
+          placeholder="Select input"
+          size="xs"
+        />
+      </div>
       <span v-else class="truncate flex-grow" :class="inputMatch ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic'">
         {{ inputMatch ? inputMatch.name : 'Empty' }}
       </span>
 
       <!-- Controls -->
-      <div class="flex items-center gap-0.5">
+      <div class="flex items-center gap-0.5 shrink-0">
         <template v-if="canEditVolume">
           <button @click="toggleMute" class="icon-btn w-6 h-6" :class="{ 'text-orange-500 dark:text-orange-400': mute }" :title="mute ? 'Unmute' : 'Mute'">
             <Icon :name="volumeIcon" size="12px" />
@@ -68,7 +69,7 @@
     </div>
 
     <!-- Position & sizing panel (collapsible) -->
-    <div v-if="open && canEditSlot" class="px-3 pb-2 bg-blue-50/50 dark:bg-blue-900/10">
+    <div v-if="open && canEditSlot" class="px-3 pb-2 bg-blue-50 dark:bg-blue-900/20 border-l-2 border-blue-400/50">
       <!-- Filter buttons (visible here on narrow screens, hidden on lg where they're inline) -->
       <div class="flex items-center gap-1 mb-1 mt-1 lg:hidden">
         <button @click="slotFiltersOpen = true" class="icon-btn w-6 h-6 relative" title="Audio filters">
@@ -142,14 +143,23 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const { inputs, removeSlot, handleChange, getMax, getMin, getDefault, resetAll, resetPosition, toggleMute, volumeIcon, onDrop, src, alpha, width, height, xpos, ypos, volume, mute, sizing } = useSceneSources(() => props.scene, () => props.source);
+const { inputs, removeSlot, changeSource, handleChange, getMax, getMin, getDefault, resetAll, resetPosition, toggleMute, volumeIcon, onDrop, src, alpha, width, height, xpos, ypos, volume, mute, sizing } = useSceneSources(() => props.scene, () => props.source);
 
 const updateSlotName = (newName) => handleChange('name', newName);
 
 const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
-const srcOptions = computed(() => [{ name: '— Empty —', uid: 'None' }, ...inputs.value]);
+const srcOptions = computed(() => [
+  { name: '— Empty —', uid: 'None' },
+  ...inputs.value.map(i => ({ name: i.name, uid: i.uid })),
+]);
+
+const onSourceSelect = (val) => {
+  const uid = typeof val === 'object' ? val?.uid : val;
+  changeSource(uid || 'None');
+};
 const open = ref(false);
 const dragOver = ref(false);
+const dragCount = ref(0);
 const slotFiltersOpen = ref(false);
 const slotVfOpen = ref(false);
 const slotAf = useAudioFilters({ mixer: () => props.scene, slotIndex: () => props.source.index });
@@ -173,6 +183,7 @@ const canEditSlot = computed(() =>
 
 const handleDrop = (event) => {
   dragOver.value = false;
+  dragCount.value = 0;
   if (!canEditSlot.value) return;
   onDrop(event);
 };
