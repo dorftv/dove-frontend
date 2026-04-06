@@ -1,5 +1,17 @@
 import { useDebounceFn } from '@vueuse/core';
 
+/**
+ * Input controls composable — used in two contexts:
+ *
+ *   1. input/Controls.vue — props: { input }
+ *      Uses: volume, position, playback controls, toggleMute
+ *
+ *   2. input/SceneSources.vue — props: { input, source, scene }
+ *      Uses: inputName, isInSceneSources, submitAddInputToScene, submitRemoveInputFromScene
+ *
+ * Scene/source-specific members are guarded with optional chaining
+ * and return safe defaults when those props are absent.
+ */
 export function useInputControls(props) {
   const volume = ref(props.input.volume * 100);
   const { inputs, updateEntity } = useEntities();
@@ -121,16 +133,21 @@ export function useInputControls(props) {
     }
   };
 
+  // --- Scene/source context (only meaningful when props.scene & props.source exist) ---
+
   const inputName = computed(() => {
-    const input = inputs.value.find(input => input.uid === props.source?.src);
+    const input = inputs.value.find(i => i.uid === props.source?.src);
     return input ? input.name : '';
   });
 
   const isInSceneSources = computed(() => {
-    return props.scene?.sources.some(source => source.src === props.input?.uid && source.sink === props.source?.sink);
+    return props.scene?.sources?.some(
+      source => source.src === props.input?.uid && source.sink === props.source?.sink
+    ) ?? false;
   });
 
   const submitAddInputToScene = async () => {
+    if (!props.scene || !props.source) return;
     await $fetch('/api/mixer/add_source', {
       method: 'POST',
       body: {
@@ -142,6 +159,7 @@ export function useInputControls(props) {
   };
 
   const submitRemoveInputFromScene = async () => {
+    if (!props.scene || !props.source) return;
     await $fetch('/api/mixer/remove_source', {
       method: 'POST',
       body: {

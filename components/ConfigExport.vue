@@ -87,9 +87,14 @@ const loadPreview = async () => {
   loading.value = true;
   try {
     const response = await fetch(buildUrl());
+    if (!response.ok) {
+      preview.value = `Error: ${response.status} ${response.statusText}`;
+      return;
+    }
     preview.value = await response.text();
   } catch (e) {
     console.error('Config preview failed:', e);
+    preview.value = `Error: ${e.message}`;
   } finally {
     loading.value = false;
   }

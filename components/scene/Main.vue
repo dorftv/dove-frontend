@@ -37,11 +37,11 @@
     <div v-else class="flex flex-col">
       <div class="flex items-center gap-2 px-2 py-1 border-b border-gray-200 dark:border-gray-700">
         <CreateScenePane />
-        <div class="flex-grow" />
-        <USlider v-model="previewSize" :min="100" :max="400" :step="10" class="w-20" size="xs" />
         <button @click="viewMode = 'tabs'" class="view-toggle-btn" title="Tab view">
           <Icon name="ph:rows" size="14px" />
         </button>
+        <div class="flex-grow" />
+        <USlider v-model="previewSize" :min="100" :max="400" :step="10" class="w-20" size="xs" />
       </div>
 
       <!-- Compact scene preview grid -->
@@ -117,6 +117,7 @@ function initTabSortable() {
 }
 
 onMounted(() => { if (sceneTabsRef.value) initTabSortable(); });
+onUnmounted(() => { if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; } });
 watch(viewMode, (mode) => {
   if (mode === 'tabs') nextTick(() => initTabSortable());
 });

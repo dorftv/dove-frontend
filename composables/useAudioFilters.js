@@ -1,6 +1,6 @@
-import { useThrottleFn } from '@vueuse/core';
+import { useFilters } from './useFilters';
 
-const FILTER_TYPES = {
+const AUDIO_FILTER_TYPES = {
   // --- Dynamics ---
   compressor: {
     label: 'Compressor',
@@ -100,7 +100,7 @@ const FILTER_TYPES = {
   },
 };
 
-const FILTER_CATEGORIES = Object.freeze({
+const AUDIO_FILTER_CATEGORIES = Object.freeze({
   dynamics: { label: 'Dynamics', icon: 'ph:chart-bar' },
   eq: { label: 'EQ / Filter', icon: 'ph:equalizer' },
   spatial: { label: 'Spatial', icon: 'ph:arrows-out-line-horizontal' },
@@ -118,122 +118,8 @@ const EQ10_BANDS = Object.freeze(['31', '62', '125', '250', '500', '1k', '2k', '
  * Legacy call signature preserved: useAudioFilters(() => inputObj)
  */
 export function useAudioFilters(opts) {
-  const { updateEntity } = useEntities();
-  const options = typeof opts === 'function' ? { input: opts } : opts;
-
-  const getInput = options.input;
-  const getMixer = options.mixer;
-  const getSlotIndex = options.slotIndex;
-
-  const { inputs: allInputs, mixers: allMixers } = useEntities();
-
-  // --- Read filters from entity store ---
-  const readFromStore = () => {
-    if (getInput) {
-      const inp = toValue(getInput);
-      const entity = inp?.uid ? allInputs.value.find(i => i.uid === inp.uid) : inp;
-      return entity?.audio_filters || [];
-    }
-    if (getMixer) {
-      const mixerRef = toValue(getMixer);
-      const mixer = mixerRef?.uid ? allMixers.value.find(m => m.uid === mixerRef.uid) : null;
-      if (!mixer) return [];
-      if (getSlotIndex) {
-        const idx = toValue(getSlotIndex);
-        const source = mixer.sources?.find(s => s.index === idx);
-        return source?.audio_filters || [];
-      }
-      return mixer.audio_filters || [];
-    }
-    return [];
-  };
-
-  // --- Filters state ---
-  // For inputs: entity gets replaced on splice → deep watcher catches it reliably.
-  // For mixers/slots: shallow merge in WebSocket handler means stale broadcasts
-  // can overwrite local state. Guard with sendInFlight flag.
-  const filters = ref(readFromStore());
-  let sendInFlight = false;
-
-  const entitySource = getInput ? allInputs : getMixer ? allMixers : null;
-  if (entitySource) {
-    watch(entitySource, () => {
-      if (sendInFlight) return;
-      filters.value = readFromStore();
-    }, { deep: true, immediate: false });
-  }
-
-  const filterCount = computed(() => filters.value.length);
-
-  // --- Send to server ---
-  const _send = (updatedFilters) => {
-    // Update local state + guard watcher against stale broadcasts
-    filters.value = updatedFilters;
-    sendInFlight = true;
-    setTimeout(() => { sendInFlight = false; }, 1000);
-
-    if (getInput) {
-      const inp = toValue(getInput);
-      if (!inp) return;
-      updateEntity('input', { uid: inp.uid, audio_filters: updatedFilters });
-    } else if (getMixer && getSlotIndex) {
-      const mixer = toValue(getMixer);
-      updateEntity('mixer', { uid: mixer.uid, index: toValue(getSlotIndex), audio_filters: updatedFilters });
-    } else if (getMixer) {
-      const mixer = toValue(getMixer);
-      updateEntity('mixer', { uid: mixer.uid, audio_filters: updatedFilters });
-    }
-  };
-
-  const sendParamUpdate = useThrottleFn(_send, 150);
-
-  const updateFilterParam = (index, paramName, value) => {
-    const current = [...filters.value];
-    current[index] = {
-      ...current[index],
-      params: { ...current[index].params, [paramName]: value },
-    };
-    sendParamUpdate(current);
-  };
-
-  const toggleFilter = (index) => {
-    const current = [...filters.value];
-    current[index] = { ...current[index], enabled: !current[index].enabled };
-    _send(current);
-  };
-
-  const addFilter = (type) => {
-    const def = FILTER_TYPES[type];
-    if (!def) return;
-    const params = {};
-    for (const [key, spec] of Object.entries(def.params)) {
-      params[key] = spec.default;
-    }
-    _send([...filters.value, { type, enabled: true, params }]);
-  };
-
-  const removeFilter = (index) => {
-    _send(filters.value.filter((_, i) => i !== index));
-  };
-
-  const moveFilter = (fromIndex, toIndex) => {
-    if (toIndex < 0 || toIndex >= filters.value.length) return;
-    const current = [...filters.value];
-    const [item] = current.splice(fromIndex, 1);
-    current.splice(toIndex, 0, item);
-    _send(current);
-  };
-
   return {
-    FILTER_TYPES,
-    FILTER_CATEGORIES,
+    ...useFilters('audio_filters', AUDIO_FILTER_TYPES, AUDIO_FILTER_CATEGORIES, opts),
     EQ10_BANDS,
-    filters,
-    filterCount,
-    updateFilterParam,
-    toggleFilter,
-    addFilter,
-    removeFilter,
-    moveFilter,
   };
 }

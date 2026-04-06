@@ -96,13 +96,15 @@ export function useWhepPlayer(props, { onError } = {}) {
       }
     };
 
+    const currentPc = pc; // capture for stale closure detection in timeouts
     pc.oniceconnectionstatechange = () => {
+      if (pc !== currentPc) return; // stale — connection was replaced
       const state = pc?.iceConnectionState;
       if (state === 'connected' || state === 'completed') {
-        // Start media timeout — if no track arrives within 5s, reconnect
         if (!mediaReceived) {
           mediaTimeout = setTimeout(() => {
-            if (!mediaReceived && pc) {
+            if (pc !== currentPc) return;
+            if (!mediaReceived) {
               console.warn('WHEP: connected but no media, reconnecting');
               setTimeout(initializePlayer, 100);
             }
@@ -116,8 +118,8 @@ export function useWhepPlayer(props, { onError } = {}) {
           setTimeout(initializePlayer, 500);
         }
       } else if (state === 'disconnected') {
-        // Brief disconnection — wait before reconnecting (might recover)
         setTimeout(() => {
+          if (pc !== currentPc) return;
           if (pc?.iceConnectionState === 'disconnected') {
             failCount++;
             if (failCount < MAX_RETRIES) setTimeout(initializePlayer, 500);

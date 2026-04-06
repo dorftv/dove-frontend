@@ -36,15 +36,17 @@ export function useWhipPublisher(inputUid) {
 
     peerConnection = new RTCPeerConnection();
 
+    const currentPc = peerConnection; // capture for stale closure detection
     peerConnection.oniceconnectionstatechange = () => {
+      if (peerConnection !== currentPc) return;
       const state = peerConnection?.iceConnectionState;
       if (state === 'connected' || state === 'completed') {
         publishState.value = 'publishing';
       } else if (state === 'failed') {
         cleanup('error');
       } else if (state === 'disconnected') {
-        // Brief disconnection — wait before giving up (ICE may recover)
         setTimeout(() => {
+          if (peerConnection !== currentPc) return;
           if (peerConnection?.iceConnectionState === 'disconnected') cleanup();
         }, DISCONNECT_GRACE_MS);
       }

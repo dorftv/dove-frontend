@@ -19,8 +19,8 @@ export function useEntityOrder(storageKey, entities) {
       const indexA = order.indexOf(a.uid);
       const indexB = order.indexOf(b.uid);
       if (indexA === -1 && indexB === -1) return 0;
-      if (indexA === -1) return 1;
-      if (indexB === -1) return 1;
+      if (indexA === -1) return 1;   // A unknown → push after B
+      if (indexB === -1) return -1;  // B unknown → push after A
       return indexA - indexB;
     });
   });

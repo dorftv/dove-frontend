@@ -7,7 +7,7 @@
         </div>
       </div>
       <div ref="inputGridRef" class="input-grid gap-3">
-        <div v-for="input in orderedInputs" :key="input.uid" class="flex flex-col rounded-lg overflow-hidden">
+        <div v-for="input in orderedInputs" :key="input.uid" class="flex flex-col rounded-lg overflow-hidden h-full">
           <InputHeader
             :input="input"
             :inputEnabled="isInputEnabled(input.uid)"
@@ -45,9 +45,6 @@ onMounted(() => {
   if (inputGridRef.value) {
     sortableInstance = new Sortable(inputGridRef.value, {
       animation: 150,
-      forceFallback: true,
-      filter: '[draggable=true]',
-      preventOnFilter: false,
       ghostClass: 'input-drag-ghost',
       onEnd: (evt) => {
         if (evt.oldIndex === evt.newIndex) return;
@@ -59,6 +56,7 @@ onMounted(() => {
     });
   }
 });
+onUnmounted(() => { if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; } });
 </script>
 
 <style scoped>
