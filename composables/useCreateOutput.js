@@ -93,7 +93,8 @@ export const useCreateOutput = () => {
     try {
       return await $fetch(path, { method: 'PUT', body });
     } catch (error) {
-      notify.error('Failed to create output');
+      const detail = error?.data?.detail;
+      notify.error(typeof detail === 'string' ? detail : 'Failed to create output');
     }
   };
 

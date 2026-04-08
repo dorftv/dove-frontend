@@ -92,7 +92,8 @@ export const useCreateEncoder = () => {
     try {
       return await $fetch('/api/encoders', { method: 'PUT', body });
     } catch (error) {
-      notify.error('Failed to create encoder');
+      const detail = error?.data?.detail;
+      notify.error(typeof detail === 'string' ? detail : 'Failed to create encoder');
     }
   };
 

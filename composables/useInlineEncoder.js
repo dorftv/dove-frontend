@@ -136,8 +136,9 @@ export function useInlineEncoder(encoderOptions, formData, types) {
     try {
       const result = await $fetch('/api/encoders', { method: 'PUT', body });
       return result.uid;
-    } catch {
-      notify.error('Failed to create encoder');
+    } catch (error) {
+      const detail = error?.data?.detail;
+      notify.error(typeof detail === 'string' ? detail : 'Failed to create encoder');
       return null;
     }
   };

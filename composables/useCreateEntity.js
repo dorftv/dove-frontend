@@ -108,7 +108,8 @@ export const useCreateEntity = (entityType) => {
     try {
       return await $fetch(submitPath, { method: 'PUT', body });
     } catch (error) {
-      notify.error(`Failed to create ${entityType === 'mixers' ? 'scene' : entityType.slice(0, -1)}`);
+      const detail = error?.data?.detail;
+      notify.error(typeof detail === 'string' ? detail : `Failed to create ${entityType === 'mixers' ? 'scene' : entityType.slice(0, -1)}`);
     }
   };
 
