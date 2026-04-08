@@ -1,5 +1,10 @@
 <template>
   <div v-if="selectedScene" class="border-t border-gray-200 dark:border-gray-700">
+    <!-- Scene name label -->
+    <div class="px-2 py-0.5 text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-1">
+      <Icon name="ph:stack" size="10px" />
+      <span class="truncate">{{ selectedScene.name }}</span>
+    </div>
     <div
       v-for="(source, i) in sortedSources"
       :key="source.index"
@@ -12,11 +17,9 @@
 </template>
 
 <script setup>
-const { selectedScene } = useActiveScene();
+defineProps({ input: Object });
 
-const props = defineProps({
-  input: Object,
-});
+const { selectedScene } = useActiveScene();
 
 // Sort by z-order descending to match scene slot display order
 const sortedSources = computed(() =>

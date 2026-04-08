@@ -14,7 +14,7 @@ export function useDrawerClickOutside(...drawers) {
     if (!document.body.contains(e.target)) { clickInProgress = false; return; }
     // Skip clicks on teleported elements (modals, select dropdowns, etc.)
     if (!e.target.closest('#__nuxt')) { clickInProgress = false; return; }
-    const excluded = e.target.closest('.nodecg-panel, .side-tab');
+    const excluded = e.target.closest('.nodecg-panel, .nodecg-content, .nodecg-toggle, .side-tab');
     if (!excluded) {
       drawers.forEach(d => { d.value = false });
     }

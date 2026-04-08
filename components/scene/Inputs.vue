@@ -2,7 +2,7 @@
   <div class="w-full flex flex-col text-sm text-gray-700 dark:text-gray-300">
     <!-- Slot header row -->
     <div
-      class="flex items-center gap-1 px-1.5 py-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+      class="flex items-center gap-1 px-1.5 py-1 md:py-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
       :class="{ 'ring-2 ring-inset ring-blue-400': dragOver, 'bg-blue-50 dark:bg-blue-900/20': open }"
       @dragover.prevent
       @dragenter.prevent="dragCount++; dragOver = true"
@@ -44,7 +44,7 @@
             :model-value="volume"
             @update:model-value="handleChange('volume', $event)"
             :min="0" :max="150"
-            class="w-16"
+            class="w-24 md:w-16"
             size="xs"
           />
           <!-- Filter buttons: inline on large screens, moved to settings panel on small -->

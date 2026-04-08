@@ -204,7 +204,7 @@ watch(open, (isOpen) => {
   @apply flex items-center gap-2;
 }
 .param-label {
-  @apply text-[11px] text-gray-400 w-16 shrink-0 text-right font-mono;
+  @apply text-[11px] text-gray-400 w-12 sm:w-16 shrink-0 text-right font-mono;
 }
 .param-value {
   @apply text-[10px] w-14 text-right tabular-nums font-mono;

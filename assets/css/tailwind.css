@@ -53,3 +53,13 @@ body {
            transition-all cursor-pointer backdrop-blur-sm;
   }
 }
+
+/* Touch devices: larger hit areas */
+@media (pointer: coarse) {
+  .icon-btn {
+    @apply w-9 h-9;
+  }
+  .video-btn {
+    @apply w-10 h-10;
+  }
+}

@@ -14,7 +14,7 @@
     </div>
 
     <!-- Compact row: transport + filter badges + settings gear -->
-    <div class="flex items-center gap-0.5 h-6">
+    <div class="flex items-center gap-1 h-6">
       <!-- Play/Pause -->
       <div class="flex items-center" :class="{ 'invisible': !input.show_controls }">
         <button v-if="input.type === 'playlist'" @click="submitSkip('previous')" class="transport-btn" title="Previous clip"><Icon name="ph:skip-back-fill" size="13px" /></button>
@@ -165,5 +165,11 @@ const {
          hover:bg-gray-300 dark:hover:bg-gray-700
          hover:text-gray-900 dark:hover:text-white
          transition-colors duration-100 cursor-pointer;
+}
+
+@media (pointer: coarse) {
+  .transport-btn {
+    @apply w-9 h-9;
+  }
 }
 </style>

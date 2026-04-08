@@ -6,12 +6,12 @@ export function useMutedState() {
 
   const hasV4l2Audio = (uid) => {
     const input = inputs.value.find(i => i.uid === uid);
-    if (input?.type === 'v4l2src') return true;
+    if (input?.type === 'v4l2src' && input.has_audio !== false) return true;
 
     const scene = sceneMixers.value.find(s => s.uid === uid);
     if (scene) {
       return scene.sources?.some(src =>
-        inputs.value.find(i => i.uid === src.src && i.type === 'v4l2src')
+        inputs.value.find(i => i.uid === src.src && i.type === 'v4l2src' && i.has_audio !== false)
       );
     }
 
