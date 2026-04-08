@@ -98,7 +98,30 @@ const AUDIO_FILTER_TYPES = {
       feedback: { min: 0, max: 0.9, step: 0.01, default: 0.0 },
     },
   },
+  denoise: {
+    label: 'Denoise',
+    category: 'effects',
+    params: {
+      vad_threshold: { min: 0, max: 1, step: 0.01, default: 0.0, label: 'VAD' },
+    },
+  },
 };
+
+// Encoder-only filters. audioloudnorm has a 3s lookahead — unsuitable for live
+// input/mixer/slot chains but perfect for encoder output chains where matching
+// video delay is auto-applied by the backend.
+const ENCODER_FILTER_TYPES = Object.freeze({
+  loudnorm: {
+    label: 'Loudness Norm',
+    category: 'mastering',
+    params: {
+      target: { min: -40, max: -5, step: 0.5, default: -24, unit: 'LUFS' },
+      range: { min: 1, max: 50, step: 0.5, default: 7, unit: 'LU' },
+      peak: { min: -9, max: 0, step: 0.1, default: -2, unit: 'dBTP' },
+      offset: { min: -99, max: 99, step: 0.1, default: 0, unit: 'dB' },
+    },
+  },
+});
 
 const AUDIO_FILTER_CATEGORIES = Object.freeze({
   dynamics: { label: 'Dynamics', icon: 'ph:chart-bar' },
@@ -107,19 +130,31 @@ const AUDIO_FILTER_CATEGORIES = Object.freeze({
   effects: { label: 'Effects', icon: 'ph:sparkle' },
 });
 
+const ENCODER_FILTER_CATEGORIES = Object.freeze({
+  ...AUDIO_FILTER_CATEGORIES,
+  mastering: { label: 'Mastering', icon: 'ph:broadcast' },
+});
+
 const EQ10_BANDS = Object.freeze(['31', '62', '125', '250', '500', '1k', '2k', '4k', '8k', '16k']);
 
 /**
- * Audio filters composable supporting three modes:
- *   - Input mode:  useAudioFilters({ input: () => inputObj })
- *   - Mixer mode:  useAudioFilters({ mixer: () => mixerObj })
- *   - Slot mode:   useAudioFilters({ mixer: () => mixerObj, slotIndex: () => index })
+ * Audio filters composable supporting four modes:
+ *   - Input mode:    useAudioFilters({ input: () => inputObj })
+ *   - Mixer mode:    useAudioFilters({ mixer: () => mixerObj })
+ *   - Slot mode:     useAudioFilters({ mixer: () => mixerObj, slotIndex: () => index })
+ *   - Encoder mode:  useAudioFilters({ encoder: () => encoderObj })
+ *     (encoder mode adds the 'loudnorm' filter which is not available on other entities)
  *
  * Legacy call signature preserved: useAudioFilters(() => inputObj)
  */
 export function useAudioFilters(opts) {
+  const isEncoder = opts && typeof opts === 'object' && !!opts.encoder;
+  const types = isEncoder
+    ? { ...AUDIO_FILTER_TYPES, ...ENCODER_FILTER_TYPES }
+    : AUDIO_FILTER_TYPES;
+  const categories = isEncoder ? ENCODER_FILTER_CATEGORIES : AUDIO_FILTER_CATEGORIES;
   return {
-    ...useFilters('audio_filters', AUDIO_FILTER_TYPES, AUDIO_FILTER_CATEGORIES, opts),
+    ...useFilters('audio_filters', types, categories, opts),
     EQ10_BANDS,
   };
 }

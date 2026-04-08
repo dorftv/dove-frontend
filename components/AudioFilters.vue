@@ -15,6 +15,7 @@ const props = defineProps({
   input: Object,
   mixer: Object,
   slotIndex: { type: Number, default: undefined },
+  encoder: Object,
   ctx: { type: Object, default: null },
 });
 

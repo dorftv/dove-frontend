@@ -8,6 +8,7 @@ export function useFilterOpts(props) {
     if (props.mixer && props.slotIndex !== undefined)
       return { mixer: () => props.mixer, slotIndex: () => props.slotIndex };
     if (props.mixer) return { mixer: () => props.mixer };
+    if (props.encoder) return { encoder: () => props.encoder };
     return { input: () => null };
   });
 
@@ -18,6 +19,7 @@ export function useFilterOpts(props) {
       return `${props.mixer.name} / ${source?.name || `Slot ${props.slotIndex + 1}`}`;
     }
     if (props.mixer) return props.mixer.name;
+    if (props.encoder) return props.encoder.name || 'Encoder';
     return '';
   });
 

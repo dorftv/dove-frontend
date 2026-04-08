@@ -17,8 +17,9 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
   const getInput = options.input;
   const getMixer = options.mixer;
   const getSlotIndex = options.slotIndex;
+  const getEncoder = options.encoder;
 
-  const { inputs: allInputs, mixers: allMixers } = useEntities();
+  const { inputs: allInputs, mixers: allMixers, encoders: allEncoders } = useEntities();
 
   // --- Read filters from entity store ---
   const readFromStore = () => {
@@ -38,6 +39,11 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
       }
       return mixer[fieldName] || [];
     }
+    if (getEncoder) {
+      const encRef = toValue(getEncoder);
+      const entity = encRef?.uid ? allEncoders.value.find(e => e.uid === encRef.uid) : encRef;
+      return entity?.[fieldName] || [];
+    }
     return [];
   };
 
@@ -48,7 +54,7 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
   const filters = ref(readFromStore());
   let sendInFlight = false;
 
-  const entitySource = getInput ? allInputs : getMixer ? allMixers : null;
+  const entitySource = getInput ? allInputs : getMixer ? allMixers : getEncoder ? allEncoders : null;
   if (entitySource) {
     watch(entitySource, () => {
       if (sendInFlight) return;
@@ -75,6 +81,10 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
     } else if (getMixer) {
       const mixer = toValue(getMixer);
       updateEntity('mixer', { uid: mixer.uid, [fieldName]: updatedFilters });
+    } else if (getEncoder) {
+      const enc = toValue(getEncoder);
+      if (!enc) return;
+      updateEntity('encoder', { uid: enc.uid, [fieldName]: updatedFilters });
     }
   };
 
