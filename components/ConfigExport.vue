@@ -33,6 +33,15 @@
             <span>Global settings</span>
             <span class="text-[10px] text-amber-500">admin only</span>
           </label>
+          <UAlert
+            v-if="canAdmin && includeSettings"
+            color="warning"
+            variant="subtle"
+            icon="ph:warning"
+            title="Export includes credentials"
+            description="The TOML will contain plaintext auth.cookie_secret and auth.api_tokens. Treat the file as a secret."
+            :ui="{ root: 'py-2', title: 'text-xs font-medium', description: 'text-[11px]' }"
+          />
         </div>
 
         <div class="flex gap-2">
@@ -57,6 +66,7 @@ const open = defineModel('open', { type: Boolean, default: false });
 
 const { inputs, sceneMixers, outputs } = useEntities();
 const { canAdmin } = useAuth();
+const toast = useToast();
 
 const includeInputs = ref(true);
 const includeScenes = ref(true);
@@ -102,6 +112,13 @@ const loadPreview = async () => {
 
 const download = () => {
   if (!preview.value) return;
+  if (includeSettings.value && canAdmin.value) {
+    toast.add({
+      title: 'Credentials included',
+      description: 'The TOML will contain plaintext auth.cookie_secret and auth.api_tokens. Treat the file as a secret.',
+      color: 'warning',
+    });
+  }
   const blob = new Blob([preview.value], { type: 'application/toml' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
