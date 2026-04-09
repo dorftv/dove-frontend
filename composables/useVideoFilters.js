@@ -49,12 +49,80 @@ const VIDEO_FILTER_TYPES = {
     label: 'Blur', category: 'effects',
     params: { sigma: { min: 0.1, max: 10, step: 0.1, default: 1.2 } },
   },
+  chromakey: {
+    label: 'Chroma Key', category: 'overlay',
+    params: {},
+  },
+pixelate: {
+    label: 'Pixelate', category: 'effects',
+    params: {
+      block_width: { min: 0.001, max: 0.5, step: 0.001, default: 0.022, label: 'Width' },
+      block_height: { min: 0.001, max: 0.5, step: 0.001, default: 0.029, label: 'Height' },
+    },
+  },
+  cartoon: {
+    label: 'Cartoon', category: 'effects',
+    params: {
+      triplevel: { min: 0, max: 1, step: 0.01, default: 1.0, label: 'Tri Level' },
+      diffspace: { min: 0, max: 0.1, step: 0.001, default: 0.004, label: 'Diff Space' },
+    },
+  },
+  glow: {
+    label: 'Glow', category: 'effects',
+    params: {
+      blur: { min: 0, max: 1, step: 0.01, default: 0.5 },
+    },
+  },
+  vignette: {
+    label: 'Vignette', category: 'effects',
+    params: {
+      aspect: { min: 0, max: 1, step: 0.01, default: 0.5 },
+      clearcenter: { min: 0, max: 1, step: 0.01, default: 0.0, label: 'Clear Center' },
+      soft: { min: 0, max: 1, step: 0.01, default: 0.6 },
+    },
+  },
+  grain: {
+    label: 'Film Grain', category: 'effects',
+    params: {
+      grain_amount: { min: 0, max: 1, step: 0.01, default: 0.1, label: 'Amount' },
+      blur_amount: { min: 0, max: 1, step: 0.01, default: 0.5, label: 'Blur' },
+      dust_amount: { min: 0, max: 1, step: 0.01, default: 0.0, label: 'Dust' },
+      flicker: { min: 0, max: 1, step: 0.01, default: 0.0 },
+    },
+  },
+  glitch: {
+    label: 'Glitch', category: 'effects',
+    params: {
+      glitch_frequency: { min: 0, max: 1, step: 0.01, default: 0.5, label: 'Frequency' },
+      block_height: { min: 0, max: 1, step: 0.01, default: 0.5, label: 'Block Height' },
+      shift_intensity: { min: 0, max: 1, step: 0.01, default: 0.5, label: 'Shift' },
+      color_glitching_intensity: { min: 0, max: 1, step: 0.01, default: 0.5, label: 'Color Glitch' },
+    },
+  },
+  scanlines: {
+    label: 'Scanlines', category: 'effects',
+    params: {},
+  },
+  sobel: {
+    label: 'Sobel Edge', category: 'effects',
+    params: {},
+  },
+  colorhalftone: {
+    label: 'Color Halftone', category: 'color',
+    params: {
+      dot_radius: { min: 0, max: 1, step: 0.01, default: 0.4, label: 'Dot Radius' },
+      cyan_angle: { min: 0, max: 1, step: 0.01, default: 0.3, label: 'Cyan Angle' },
+      magenta_angle: { min: 0, max: 1, step: 0.01, default: 0.45, label: 'Magenta Angle' },
+      yellow_angle: { min: 0, max: 1, step: 0.01, default: 0.25, label: 'Yellow Angle' },
+    },
+  },
 };
 
 const VIDEO_FILTER_CATEGORIES = Object.freeze({
   color: { label: 'Color', icon: 'ph:palette' },
   transform: { label: 'Transform', icon: 'ph:arrows-out-cardinal' },
   effects: { label: 'Effects', icon: 'ph:sparkle' },
+  overlay: { label: 'Overlay', icon: 'ph:eraser' },
 });
 
 /**
