@@ -8,40 +8,38 @@
       <AudioMeter v-if="audioMeters" :uid="scene.uid" />
     </div>
     <div class="border-t border-gray-200 dark:border-gray-700">
-      <div>
-        <div ref="slotsContainer">
+      <div ref="slotsContainer">
+        <div
+          v-for="(source, i) in reversedSources"
+          :key="source.index"
+          :data-index="source.index"
+          :class="i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-100 dark:bg-gray-800'"
+          class="border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex items-center"
+        >
           <div
-            v-for="(source, i) in reversedSources"
-            :key="source.index"
-            :data-index="source.index"
-            :class="i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-100 dark:bg-gray-800'"
-            class="border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex items-center"
+            v-if="canReorderSlots"
+            class="slot-drag-handle flex items-center justify-center px-1 self-stretch cursor-grab text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
           >
-            <div
-              v-if="canReorderSlots"
-              class="slot-drag-handle flex items-center justify-center px-1 self-stretch cursor-grab text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
-            >
-              <Icon name="ph:dots-six-vertical" size="12px" />
-            </div>
-            <div class="flex-grow min-w-0">
-              <SceneInputs :source="source" :scene="scene" />
-            </div>
+            <Icon name="ph:dots-six-vertical" size="12px" />
+          </div>
+          <div class="flex-grow min-w-0">
+            <SceneInputs :source="source" :scene="scene" />
           </div>
         </div>
-        <div
-          v-if="canSupervisor && ((!scene.src_locked && !scene.locked) || canBypassLock)"
-          class="px-3 py-1.5 transition-colors duration-100"
-          :class="{ 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-inset ring-blue-400': dropOver }"
-          @dragover.prevent
-          @dragenter.prevent="dragCount++; dropOver = true"
-          @dragleave="dragCount--; if (dragCount <= 0) { dropOver = false; dragCount = 0 }"
-          @drop="onDropAdd"
-        >
-          <button @click="addSlot()" :disabled="addingSlot" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer disabled:opacity-50">
-            <Icon :name="addingSlot ? 'ph:spinner' : 'ph:plus'" size="10px" :class="{ 'animate-spin': addingSlot }" />
-            {{ dropOver ? 'Drop to add slot' : 'Add Slot' }}
-          </button>
-        </div>
+      </div>
+      <div
+        v-if="canSupervisor && ((!scene.src_locked && !scene.locked) || canBypassLock)"
+        class="px-3 py-1.5 transition-colors duration-100"
+        :class="{ 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-inset ring-blue-400': dropOver }"
+        @dragover.prevent
+        @dragenter.prevent="dragCount++; dropOver = true"
+        @dragleave="dragCount--; if (dragCount <= 0) { dropOver = false; dragCount = 0 }"
+        @drop="onDropAdd"
+      >
+        <button @click="addSlot()" :disabled="addingSlot" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer disabled:opacity-50">
+          <Icon :name="addingSlot ? 'ph:spinner' : 'ph:plus'" size="10px" :class="{ 'animate-spin': addingSlot }" />
+          {{ dropOver ? 'Drop to add slot' : 'Add Slot' }}
+        </button>
       </div>
     </div>
   </div>
