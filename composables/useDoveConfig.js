@@ -20,7 +20,7 @@ export default function useDoveConfig() {
 
     configPromise = (async () => {
       try {
-        const data = await $fetch('/api/config');
+        const data = await useApiFetch('/api/config');
         config.value = data;
         return config.value;
       } catch (err) {

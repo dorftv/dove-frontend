@@ -96,7 +96,9 @@ const buildUrl = () => {
 const loadPreview = async () => {
   loading.value = true;
   try {
-    const response = await fetch(buildUrl());
+    const response = await fetch(buildUrl(), {
+      headers: useAuthHeaders(),
+    });
     if (!response.ok) {
       preview.value = `Error: ${response.status} ${response.statusText}`;
       return;

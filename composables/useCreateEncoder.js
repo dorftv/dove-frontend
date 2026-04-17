@@ -25,7 +25,7 @@ export const useCreateEncoder = () => {
 
   const fetchEncoderConfigs = async () => {
     try {
-      const data = await $fetch('/api/config/encoder');
+      const data = await useApiFetch('/api/config/encoder');
       encoderConfigs.video = data.video || [];
       encoderConfigs.audio = data.audio || [];
     } catch (error) {
@@ -90,7 +90,7 @@ export const useCreateEncoder = () => {
 
     isOpen.value = false;
     try {
-      return await $fetch('/api/encoders', { method: 'PUT', body });
+      return await useApiFetch('/api/encoders', { method: 'PUT', body });
     } catch (error) {
       const detail = error?.data?.detail;
       notify.error(typeof detail === 'string' ? detail : 'Failed to create encoder');

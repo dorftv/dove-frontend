@@ -15,7 +15,7 @@ export const useCreateOutput = () => {
 
   const fetchEncoderOptions = async () => {
     try {
-      const data = await $fetch('/api/config/encoder');
+      const data = await useApiFetch('/api/config/encoder');
       encoderOptions.audio_encoder = data.audio || [];
       encoderOptions.video_encoder = data.video || [];
       encoderOptions.mux = data.mux || [];
@@ -91,7 +91,7 @@ export const useCreateOutput = () => {
     const path = `/api/outputs/${itemType}`;
     baseCreate.isOpen.value = false;
     try {
-      return await $fetch(path, { method: 'PUT', body });
+      return await useApiFetch(path, { method: 'PUT', body });
     } catch (error) {
       const detail = error?.data?.detail;
       notify.error(typeof detail === 'string' ? detail : 'Failed to create output');

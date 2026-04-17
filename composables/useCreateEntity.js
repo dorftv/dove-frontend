@@ -44,7 +44,7 @@ export const useCreateEntity = (entityType) => {
           ]
         }];
       } else {
-        const data = await $fetch(`${path}/types`);
+        const data = await useApiFetch(`${path}/types`);
         if (typeof data === 'object' && !Array.isArray(data)) {
           types.value = Object.entries(data).map(([key, value]) => ({ key, ...value }));
         } else {
@@ -106,7 +106,7 @@ export const useCreateEntity = (entityType) => {
     const submitPath = entityType === 'mixers' ? '/api/mixers' : `${path}/${itemType}`;
     isOpen.value = false;
     try {
-      return await $fetch(submitPath, { method: 'PUT', body });
+      return await useApiFetch(submitPath, { method: 'PUT', body });
     } catch (error) {
       const detail = error?.data?.detail;
       notify.error(typeof detail === 'string' ? detail : `Failed to create ${entityType === 'mixers' ? 'scene' : entityType.slice(0, -1)}`);

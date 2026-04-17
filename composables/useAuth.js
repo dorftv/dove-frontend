@@ -25,20 +25,34 @@ export function useAuth() {
 
   const checkAuth = async () => {
     try {
-      const data = await $fetch('/auth/me')
+      const token = localStorage.getItem('dove-api-token')
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const data = await $fetch('/auth/me', { headers })
       authEnabled.value = data.auth_enabled
       if (data.authenticated) {
         user.value = data
       } else {
         user.value = null
+        // Clear invalid stored token so OIDC can take over
+        if (localStorage.getItem('dove-api-token')) {
+          localStorage.removeItem('dove-api-token')
+        }
       }
     } catch {
       user.value = null
+      // Clear stored token on auth failure
+      if (localStorage.getItem('dove-api-token')) {
+        localStorage.removeItem('dove-api-token')
+      }
     }
     authChecked.value = true
   }
 
   const login = () => {
+    if (localStorage.getItem('dove-api-token')) {
+      console.error('API token auth failed')
+      return
+    }
     const origin = window.location.origin
     window.location.href = `/auth/login?redirect_base=${encodeURIComponent(origin)}`
   }

@@ -206,7 +206,7 @@ async function fetchDoc(slug) {
   html.value = ''
   error.value = ''
   try {
-    const raw = await $fetch(`/api/docs/${slug}.md`, { responseType: 'text' })
+    const raw = await useApiFetch(`/api/docs/${slug}.md`, { responseType: 'text' })
     html.value = md.render(raw)
   } catch (e) {
     error.value = `not found`

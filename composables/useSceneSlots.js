@@ -10,12 +10,12 @@ export function useSceneSlots(getScene) {
     const scene = toValue(getScene);
     addingSlot.value = true;
     try {
-      const result = await $fetch('/api/mixer/add_slot', {
+      const result = await useApiFetch('/api/mixer/add_slot', {
         method: 'POST',
         body: { uid: scene.uid },
       });
       if (src && result?.index !== undefined) {
-        await $fetch('/api/mixer/add_source', {
+        await useApiFetch('/api/mixer/add_source', {
           method: 'POST',
           body: { src, target: scene.uid, index: result.index },
         });

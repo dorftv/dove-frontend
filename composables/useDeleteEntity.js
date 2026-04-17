@@ -8,10 +8,10 @@ export function useDeleteEntity(entityType, getEntity) {
     deleting.value = true;
     try {
       if (entityType === 'encoder') {
-        await $fetch(`/api/encoders/${entity.uid}`, { method: 'DELETE' });
+        await useApiFetch(`/api/encoders/${entity.uid}`, { method: 'DELETE' });
       } else {
         const path = { input: '/api/inputs', output: '/api/outputs', scene: '/api/mixers' }[entityType];
-        await $fetch(path, { method: 'DELETE', body: { uid: entity.uid } });
+        await useApiFetch(path, { method: 'DELETE', body: { uid: entity.uid } });
       }
     } catch (error) {
       notify.error(`Failed to remove ${entityType}`);
@@ -24,7 +24,7 @@ export function useDeleteEntity(entityType, getEntity) {
     deleting.value = true;
     try {
       for (const { sceneUid, index } of sceneSlots) {
-        await $fetch('/api/mixer/remove_source', {
+        await useApiFetch('/api/mixer/remove_source', {
           method: 'POST',
           body: { src: 'None', target: sceneUid, index },
         });

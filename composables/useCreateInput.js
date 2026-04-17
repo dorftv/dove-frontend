@@ -15,7 +15,7 @@ export const useCreateInput = () => {
   const submitCutProgram = async () => {
     if (selectedSceneProgram.value) {
       try {
-        await $fetch('/api/mixer/cut_program', {
+        await useApiFetch('/api/mixer/cut_program', {
           method: 'POST',
           body: { src: selectedScene.uid },
         });
@@ -29,7 +29,7 @@ export const useCreateInput = () => {
   const submitAddToScene = async (responseJson) => {
     if (selectedScene.uid && selectedScene.slot !== null) {
       try {
-        await $fetch('/api/mixer/add_source', {
+        await useApiFetch('/api/mixer/add_source', {
           method: 'POST',
           body: {
             src: responseJson.uid,

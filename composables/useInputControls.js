@@ -80,7 +80,7 @@ export function useInputControls(props) {
 
   const submitInputUpdate = async (fields, errorMsg) => {
     try {
-      await $fetch('/api/inputs', {
+      await useApiFetch('/api/inputs', {
         method: 'PUT',
         body: { uid: props.input.uid, type: 'update', ...fields },
       });
@@ -110,7 +110,7 @@ export function useInputControls(props) {
 
   const submitAddInputToScene = async () => {
     if (!props.scene || !props.source) return;
-    await $fetch('/api/mixer/add_source', {
+    await useApiFetch('/api/mixer/add_source', {
       method: 'POST',
       body: {
         src: props.input.uid,
@@ -122,7 +122,7 @@ export function useInputControls(props) {
 
   const submitRemoveInputFromScene = async () => {
     if (!props.scene || !props.source) return;
-    await $fetch('/api/mixer/remove_source', {
+    await useApiFetch('/api/mixer/remove_source', {
       method: 'POST',
       body: {
         src: "None",

@@ -5,6 +5,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   let lastMessage = 0;
   let healthInterval = null;
 
+  const authHeaders = () => {
+    const token = localStorage.getItem('dove-api-token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   const status = useState('ws-status', () => 'disconnected');
   const error = useState('entities-error', () => null);
 
@@ -25,29 +30,34 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const getWsUrl = () => {
     const config = useRuntimeConfig();
-    if (config.public.wsUrl) return config.public.wsUrl;
-
-    // In dev, connect directly to backend on port 5000 using same hostname
-    // (works for both localhost and LAN access from mobile)
-    if (process.dev) {
-      return `ws://${window.location.hostname}:5000/ws`;
+    let url;
+    if (config.public.wsUrl) {
+      url = config.public.wsUrl;
+    } else if (process.dev) {
+      // In dev, connect directly to backend on port 5000 using same hostname
+      url = `ws://${window.location.hostname}:5000/ws`;
+    } else {
+      // In production, WS goes through the same host (reverse proxy handles it)
+      url = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
     }
 
-    // In production, WS goes through the same host (reverse proxy handles it)
-    return `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
+    const token = localStorage.getItem('dove-api-token');
+    if (token) url += `${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+    return url;
   };
 
   const config = useState('dove-config');
 
   const fetchEntities = async () => {
     try {
+      const headers = authHeaders();
       const [inputsData, mixersData, outputsData, encodersData, configData, loadData] = await Promise.all([
-        $fetch('/api/inputs'),
-        $fetch('/api/mixers'),
-        $fetch('/api/outputs'),
-        $fetch('/api/encoders'),
-        $fetch('/api/config'),
-        $fetch('/api/load'),
+        $fetch('/api/inputs', { headers }),
+        $fetch('/api/mixers', { headers }),
+        $fetch('/api/outputs', { headers }),
+        $fetch('/api/encoders', { headers }),
+        $fetch('/api/config', { headers }),
+        $fetch('/api/load', { headers }),
       ]);
       inputs.value = inputsData;
       mixers.value = mixersData;

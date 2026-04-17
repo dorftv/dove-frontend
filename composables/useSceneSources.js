@@ -87,7 +87,7 @@ export function useSceneSources(getScene, getSource) {
 
   const removeSlot = async () => {
     try {
-      await $fetch('/api/mixer/remove_slot', {
+      await useApiFetch('/api/mixer/remove_slot', {
         method: 'POST',
         body: {
           uid: scene().uid,
@@ -119,7 +119,7 @@ export function useSceneSources(getScene, getSource) {
     const isRemove = !uid || uid === 'None';
     if (!isRemove && !inputs.value.some(i => i.uid === uid)) return;
     try {
-      await $fetch(isRemove ? '/api/mixer/remove_source' : '/api/mixer/add_source', {
+      await useApiFetch(isRemove ? '/api/mixer/remove_source' : '/api/mixer/add_source', {
         method: 'POST',
         body: {
           src: isRemove ? 'None' : uid,

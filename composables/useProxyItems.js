@@ -3,7 +3,7 @@ export function useProxyItems() {
 
   async function fetchItems(proxyType) {
     try {
-      const data = await $fetch(`/proxy/${proxyType}`);
+      const data = await useApiFetch(`/proxy/${proxyType}`);
       proxyItems.value[proxyType] = data;
     } catch (err) {
       console.error('Failed to fetch items:', err);

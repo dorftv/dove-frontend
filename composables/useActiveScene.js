@@ -44,7 +44,7 @@ export function useActiveScene() {
         body.transition = 'fade';
         body.duration = transitionDuration.value;
       }
-      await $fetch('/api/mixer/cut_program', {
+      await useApiFetch('/api/mixer/cut_program', {
         method: 'POST',
         body,
       });
