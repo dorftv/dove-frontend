@@ -7,13 +7,13 @@ export function useAutoplayToast() {
   const { programMixer } = useEntities();
   const { setMutedState } = useMutedState();
 
-  let shown = false;
+  const shown = useState('autoplay-toast-shown', () => false);
 
   const handleAutoplayBlocked = (uid) => {
     setMutedState(uid, true);
 
-    if (shown) return;
-    shown = true;
+    if (shown.value) return;
+    shown.value = true;
 
     const pmUid = programMixer.value?.uid;
     const t = toast.add({

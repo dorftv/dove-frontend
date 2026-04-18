@@ -11,26 +11,32 @@ export function useOutputList() {
     showPreview.value ? encoders.value : encoders.value.filter(e => !e.is_preview)
   );
 
-  const groupBySrc = (items, key) => {
+  const outputGroups = computed(() => {
     const groups = {};
-    for (const item of items) {
+    for (const item of filteredOutputs.value) {
       const src = item.src || 'unknown';
       if (!groups[src]) {
-        groups[src] = { src, name: resolveEntity(src)?.name || src, [key]: [] };
+        groups[src] = { src, name: resolveEntity(src)?.name || src, outputs: [] };
       }
-      groups[src][key].push(item);
+      groups[src].outputs.push(item);
     }
     return Object.values(groups);
-  };
-
-  const outputGroups = computed(() => groupBySrc(filteredOutputs.value, 'outputs'));
+  });
 
   const encoderGroups = computed(() => {
-    const groups = groupBySrc(filteredEncoders.value, 'encoders');
-    for (const group of groups) {
+    const groups = {};
+    for (const item of filteredEncoders.value) {
+      const src = item.src || 'unknown';
+      if (!groups[src]) {
+        groups[src] = { src, name: resolveEntity(src)?.name || src, encoders: [] };
+      }
+      groups[src].encoders.push(item);
+    }
+    const result = Object.values(groups);
+    for (const group of result) {
       group.encoders.sort((a, b) => (a.type === 'video' ? -1 : 1) - (b.type === 'video' ? -1 : 1));
     }
-    return groups;
+    return result;
   });
 
   const tabs = computed(() => [
