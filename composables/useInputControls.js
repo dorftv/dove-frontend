@@ -84,8 +84,9 @@ export function useInputControls(props) {
         method: 'PUT',
         body: { uid: props.input.uid, type: 'update', ...fields },
       });
-    } catch {
-      notify.error(errorMsg);
+    } catch (error) {
+      const detail = error?.data?.detail;
+      notify.error(typeof detail === 'string' ? detail : errorMsg);
     }
   };
 
