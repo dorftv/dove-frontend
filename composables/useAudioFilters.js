@@ -153,8 +153,6 @@ const ENCODER_FILTER_CATEGORIES = Object.freeze({
   mastering: { label: 'Mastering', icon: 'ph:broadcast' },
 });
 
-const EQ10_BANDS = Object.freeze(['31', '62', '125', '250', '500', '1k', '2k', '4k', '8k', '16k']);
-
 /**
  * Audio filters composable supporting four modes:
  *   - Input mode:    useAudioFilters({ input: () => inputObj })
@@ -173,6 +171,5 @@ export function useAudioFilters(opts) {
   const categories = isEncoder ? ENCODER_FILTER_CATEGORIES : AUDIO_FILTER_CATEGORIES;
   return {
     ...useFilters('audio_filters', types, categories, opts),
-    EQ10_BANDS,
   };
 }

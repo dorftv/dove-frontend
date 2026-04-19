@@ -42,7 +42,6 @@ export function useFilterPresentation(FILTER_TYPES, FILTER_CATEGORIES) {
   };
 
   return {
-    EQ10_BANDS,
     getFilterLabel,
     getCategoryLabel,
     getFilterParams,
