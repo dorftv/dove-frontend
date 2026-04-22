@@ -1,8 +1,6 @@
 <template>
   <div class="aspect-video bg-black relative group">
-    <media-player v-if="uid" ref="mediaPlayer" :muted="mutedState[uid]" viewType="video" autoplay stream-type="live" load="custom" :title="`${uid}`" :src="`/preview/hls/${uid}/index.m3u8`" class="w-full h-full">
-      <media-provider></media-provider>
-    </media-player>
+    <video v-if="uid" ref="mediaPlayer" :muted="mutedState[uid]" autoplay playsinline class="w-full h-full"></video>
     <span class="absolute top-1 left-1 text-[9px] font-mono text-white/50 bg-black/30 px-1 rounded sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">HLS</span>
     <div class="absolute bottom-0 right-0 flex items-center gap-1 p-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
       <button @click="toggleMute" class="video-btn" :title="mutedState[uid] ? 'Unmute' : 'Mute'">
@@ -16,9 +14,6 @@
 </template>
 
 <script setup>
-import 'vidstack/player';
-import 'vidstack/player/styles/default/theme.css';
-
 const props = defineProps({
   uid: String,
 });
