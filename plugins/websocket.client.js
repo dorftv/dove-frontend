@@ -4,6 +4,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   let reconnectDelay = 1000;
   let lastMessage = 0;
   let healthInterval = null;
+  let lastFetchEntities = 0;
 
   const authHeaders = () => {
     const token = localStorage.getItem('dove-api-token');
@@ -126,6 +127,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       error.value = null;
       reconnectDelay = 1000;
       lastMessage = Date.now();
+      lastFetchEntities = 0;
       fetchEntities();
     };
 
@@ -218,17 +220,22 @@ export default defineNuxtPlugin((nuxtApp) => {
       const stale = Date.now() - lastMessage > 10000;
 
       if (!wsAlive || stale) {
-        // Always poll to keep data fresh regardless of WS state
-        await fetchEntities();
-        // Reconnect WS
+        // Throttled poll to keep data fresh regardless of WS state
+        if (Date.now() - lastFetchEntities > 30000) {
+          lastFetchEntities = Date.now();
+          await fetchEntities();
+        }
+        // Respect exponential backoff from scheduleReconnect()
         if (!wsAlive) {
-          reconnectDelay = 1000;
-          connect();
+          if (!reconnectTimer) {
+            scheduleReconnect();
+          }
         } else if (stale) {
           // Socket looks open but no messages — force reconnect
           console.log('WebSocket stale, reconnecting');
-          reconnectDelay = 1000;
-          connect();
+          if (!reconnectTimer) {
+            scheduleReconnect();
+          }
         }
       }
     }, 5000);
