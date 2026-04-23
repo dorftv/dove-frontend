@@ -10,6 +10,8 @@ export function useAudioOnlyPlayer(props) {
 
   let pc = null;
   let resourceUrl = null;
+  let failCount = 0;
+  const MAX_RETRIES = 3;
 
   const toggleMute = () => {
     setMutedState(props.uid, !isMuted.value);
@@ -42,9 +44,19 @@ export function useAudioOnlyPlayer(props) {
       if (videoEl.value) videoEl.value.srcObject = stream;
     };
 
+    const currentPc = pc; // stale-pc guard
     pc.oniceconnectionstatechange = () => {
-      if (pc?.iceConnectionState === 'failed') {
-        setTimeout(initPlayer, 500);
+      if (pc !== currentPc) return;
+      const state = pc?.iceConnectionState;
+      if (state === 'connected' || state === 'completed') {
+        failCount = 0;
+      } else if (state === 'failed') {
+        failCount++;
+        if (failCount < MAX_RETRIES) {
+          setTimeout(initPlayer, 2000);
+        } else {
+          console.warn('AudioOnlyPlayer: max retries reached, stopping');
+        }
       }
     };
 
