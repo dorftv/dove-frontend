@@ -91,6 +91,14 @@ export function useWhepPlayer(props, { onError } = {}) {
         videoPlayer.value.srcObject = stream;
         mediaReceived = true;
         if (mediaTimeout) { clearTimeout(mediaTimeout); mediaTimeout = null; }
+        // Re-attach volumechange listener — cleanup() removes it each init cycle
+        volumeHandler = () => {
+          const isMuted = videoPlayer.value?.muted;
+          if (isMuted !== mutedState.value[props.uid]) {
+            setMutedState(props.uid, isMuted);
+          }
+        };
+        videoPlayer.value.addEventListener('volumechange', volumeHandler);
       }
     };
 
@@ -113,6 +121,10 @@ export function useWhepPlayer(props, { onError } = {}) {
         if (failCount >= MAX_RETRIES && onError) {
           onError();
         } else {
+          if (failCount >= MAX_RETRIES) {
+            console.warn('WHEP: max retries reached');
+            return;
+          }
           setTimeout(initializePlayer, 500);
         }
       } else if (state === 'disconnected') {
@@ -210,13 +222,6 @@ export function useWhepPlayer(props, { onError } = {}) {
   };
 
   onMounted(() => {
-    volumeHandler = () => {
-      const isMuted = videoPlayer.value?.muted;
-      if (isMuted !== mutedState.value[props.uid]) {
-        setMutedState(props.uid, isMuted);
-      }
-    };
-    videoPlayer.value?.addEventListener('volumechange', volumeHandler);
     initializePlayer();
   });
 
