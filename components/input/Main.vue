@@ -5,7 +5,7 @@
         <div class="flex items-center gap-2">
           <CreateInputPane />
         </div>
-        <USlider v-model="inputSize" :min="160" :max="500" :step="10" class="w-20" size="xs" />
+        <USlider v-model="inputSize" :min="160" :max="800" :step="10" class="w-20" size="xs" />
       </div>
       <div ref="inputGridRef" class="input-grid gap-3" :style="{ '--input-size': inputSize + 'px' }">
         <div v-for="input in orderedInputs" :key="input.uid" class="flex flex-col rounded-lg overflow-hidden h-full">
@@ -32,7 +32,7 @@ import Sortable from 'sortablejs';
 import { useLocalStorage } from '@vueuse/core';
 
 const { inputsPreview } = useEntities();
-const inputSize = useLocalStorage('dove-input-size', 280);
+const inputSize = useLocalStorage('dove-input-size', 320);
 const {
   isInputEnabled,
   toggleInputEnabled,
@@ -65,7 +65,7 @@ onUnmounted(() => { if (sortableInstance) { sortableInstance.destroy(); sortable
 <style scoped>
 .input-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--input-size, 280px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--input-size, 320px), 1fr));
 }
 
 .input-drag-ghost {
