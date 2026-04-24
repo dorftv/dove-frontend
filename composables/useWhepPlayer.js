@@ -7,6 +7,7 @@ export function useWhepPlayer(props, { onError } = {}) {
   const videoPlayer = ref(null);
   const { mutedState, setMutedState } = useMutedState();
   const { handleAutoplayBlocked } = useAutoplayToast();
+  const { resolveEntity } = useEntities();
 
   let pc = null;           // RTCPeerConnection
   let resourceUrl = null;  // WHEP resource URL (from POST Location header)
@@ -15,6 +16,7 @@ export function useWhepPlayer(props, { onError } = {}) {
   let statsInterval = null;
   let lastBytesReceived = 0;
   let stalledSince = 0;
+  let readyStopHandle = null; // watcher that gates initial POST on PLAYING state
   const MAX_RETRIES = 3;
   const STALL_THRESHOLD = 8000; // ms with no new bytes → reconnect
 
@@ -221,18 +223,40 @@ export function useWhepPlayer(props, { onError } = {}) {
     }
   };
 
-  onMounted(() => {
-    initializePlayer();
+  // defer first POST until backend entity is PLAYING — avoids webrtcbin orphans during warm-up
+  const gateOnReady = () => {
+    if (readyStopHandle) { readyStopHandle(); readyStopHandle = null; }
+    const entity = resolveEntity(props.uid);
+    if (!entity) return;
+    if (entity.state === 'PLAYING') {
+      initializePlayer();
+      return;
+    }
+    readyStopHandle = watch(
+      () => resolveEntity(props.uid)?.state,
+      (state) => {
+        if (state === 'PLAYING') {
+          readyStopHandle?.();
+          readyStopHandle = null;
+          initializePlayer();
+        }
+      }
+    );
+  };
+
+  onMounted(gateOnReady);
+
+  onUnmounted(() => {
+    if (readyStopHandle) { readyStopHandle(); readyStopHandle = null; }
+    cleanup();
   });
 
-  onUnmounted(cleanup);
-
-  // On uid change: try seamless switch, fallback to reconnect
+  // On uid change: try seamless switch, fallback to reconnect (gated on readiness)
   watch(() => props.uid, (newUid, oldUid) => {
     if (oldUid && resourceUrl && pc?.connectionState === 'connected') {
       switchSource(newUid);
     } else {
-      initializePlayer();
+      gateOnReady();
     }
   });
 

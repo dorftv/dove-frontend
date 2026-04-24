@@ -6,11 +6,13 @@
 export function useAudioOnlyPlayer(props) {
   const videoEl = ref(null);
   const { mutedState, setMutedState } = useMutedState();
+  const { resolveEntity } = useEntities();
   const isMuted = computed(() => mutedState.value[props.uid] ?? true);
 
   let pc = null;
   let resourceUrl = null;
   let failCount = 0;
+  let readyStopHandle = null; // watcher that gates initial POST on PLAYING state
   const MAX_RETRIES = 3;
 
   const toggleMute = () => {
@@ -100,8 +102,32 @@ export function useAudioOnlyPlayer(props) {
   // Forward sync only: mutedState → video.muted
   watch(isMuted, applyMuted);
 
-  onMounted(initPlayer);
-  onUnmounted(cleanup);
+  // defer first POST until backend entity is PLAYING — avoids webrtcbin orphans during warm-up
+  const gateOnReady = () => {
+    if (readyStopHandle) { readyStopHandle(); readyStopHandle = null; }
+    const entity = resolveEntity(props.uid);
+    if (!entity) return;
+    if (entity.state === 'PLAYING') {
+      initPlayer();
+      return;
+    }
+    readyStopHandle = watch(
+      () => resolveEntity(props.uid)?.state,
+      (state) => {
+        if (state === 'PLAYING') {
+          readyStopHandle?.();
+          readyStopHandle = null;
+          initPlayer();
+        }
+      }
+    );
+  };
+
+  onMounted(gateOnReady);
+  onUnmounted(() => {
+    if (readyStopHandle) { readyStopHandle(); readyStopHandle = null; }
+    cleanup();
+  });
   watch(() => props.uid, async (newUid) => {
     if (resourceUrl && pc?.connectionState === 'connected') {
       try {
@@ -113,7 +139,7 @@ export function useAudioOnlyPlayer(props) {
         if (resp.ok) return;
       } catch {}
     }
-    initPlayer();
+    gateOnReady();
   });
 
   return { videoEl, isMuted, toggleMute };
