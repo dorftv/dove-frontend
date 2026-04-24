@@ -102,7 +102,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     status.value = 'reconnecting';
     reconnectTimer = setTimeout(() => {
       reconnectTimer = null;
-      reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+      reconnectDelay = Math.min(reconnectDelay * 2, 10000);
       connect();
     }, reconnectDelay);
   };
