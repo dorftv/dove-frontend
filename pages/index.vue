@@ -12,7 +12,8 @@
 
   <div v-else class="relative">
     <!-- Mobile tabbed layout (< sm) -->
-    <div class="sm:hidden pb-14">
+    <!-- v-if (not v-show) so mobile tabs don't mount on desktop — each mount spawns WHEP connections -->
+    <div v-if="!isDesktop" class="sm:hidden pb-14">
       <!-- Tab: Live -->
       <div v-show="mobileTab === 'live'" class="px-2 py-2 space-y-2">
         <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-hidden">
@@ -107,12 +108,12 @@
         </div>
 
         <div class="hidden lg:block lg:col-span-2 sm:order-2">
-          <ProgramSwitch />
+          <ProgramSwitch v-if="isLgPlus" />
         </div>
 
         <div class="col-span-12 sm:col-span-5 lg:col-span-5 sm:order-3 flex flex-col gap-2 min-w-0" ref="programRef">
           <ProgramMain class="shrink-0" />
-          <ProgramSwitch class="lg:hidden flex-grow" />
+          <ProgramSwitch v-if="!isLgPlus" class="lg:hidden flex-grow" />
         </div>
 
         <!-- NodeCG toggle -->
@@ -233,8 +234,15 @@
 </template>
 
 <script setup>
+import { useMediaQuery } from '@vueuse/core';
+
 const { isLoading, error, outputs, inputsNodeCG, inputsNoPreview } = useEntities();
 const { $ws } = useNuxtApp();
+
+// matches sm: breakpoint — mobile block below uses v-if to avoid mounting on desktop
+const isDesktop = useMediaQuery('(min-width: 640px)');
+// matches lg: breakpoint — gates duplicate ProgramSwitch so only one mounts at a time
+const isLgPlus = useMediaQuery('(min-width: 1024px)');
 
 const retry = async () => {
   error.value = null;
