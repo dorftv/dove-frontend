@@ -28,7 +28,7 @@
           </button>
         </div>
       </div>
-      <div class="flex-grow min-w-0 overflow-y-auto max-h-[50vh] 2xl:max-h-[70vh]">
+      <div class="flex-grow min-w-0">
         <SceneScenes v-if="selectedScene" :scene="selectedScene" :active="true" />
       </div>
     </div>
@@ -69,7 +69,7 @@
       </div>
 
       <!-- Selected scene expanded below (no preview — already in grid) -->
-      <div v-if="selectedScene" class="border-t border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[50vh] 2xl:max-h-[70vh]">
+      <div v-if="selectedScene" class="border-t border-gray-200 dark:border-gray-700">
         <SceneScenes :scene="selectedScene" :active="true" :hidePreview="true" />
       </div>
     </div>
