@@ -11,7 +11,7 @@
       <div ref="slotsContainer">
         <div
           v-for="(source, i) in reversedSources"
-          :key="source.index"
+          :key="`${scene.uid}:${source.index}`"
           :data-index="source.index"
           :class="i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-100 dark:bg-gray-800'"
           class="border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex items-center"
