@@ -47,6 +47,8 @@
                 :model-value="filter.params[paramName] ?? spec.default"
                 @update:model-value="(val) => updateFilterParam(index, paramName, val)"
                 :items="spec.options"
+                value-key="value"
+                label-key="label"
                 class="flex-grow"
                 size="xs"
               />
