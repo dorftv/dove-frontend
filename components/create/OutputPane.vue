@@ -7,11 +7,9 @@
       icon="i-ph-plus-circle"
       @click="isOpen = true"
     />
-    <UModal v-model:open="isOpen">
+    <UModal v-model:open="isOpen" title="Add Output" description="Create a new output destination">
       <template #content>
         <div class="p-4 w-full max-w-lg mx-auto">
-          <div class="text-sm font-medium mb-3">Add Output</div>
-
           <div class="hidden sm:inline-flex flex-wrap mb-3">
             <UButton
               v-for="opt in typeOptions"

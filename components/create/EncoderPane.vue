@@ -7,11 +7,9 @@
       icon="i-ph-plus-circle"
       @click="isOpen = true"
     />
-    <UModal v-model:open="isOpen">
+    <UModal v-model:open="isOpen" title="Add Encoder" description="Create a new encoder">
       <template #content>
         <div class="p-4 w-full max-w-lg mx-auto">
-          <div class="text-sm font-medium mb-3">Add Encoder</div>
-
           <form @submit.prevent="submitCreate()" class="space-y-2">
             <div>
               <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Type</label>

@@ -9,10 +9,9 @@
       Add Scene
       <kbd class="ml-1 text-[11px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono hidden md:inline">S</kbd>
     </UButton>
-    <UModal v-model:open="isOpen">
+    <UModal v-model:open="isOpen" title="Add Scene" description="Create a new scene mixer">
       <template #content>
         <div class="p-4 w-full max-w-sm mx-auto">
-          <div class="text-sm font-medium mb-3">Add Scene</div>
           <form @submit.prevent="submitCreate('scene')" class="space-y-2">
             <div>
               <label for="name" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>

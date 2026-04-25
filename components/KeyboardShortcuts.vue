@@ -1,8 +1,7 @@
 <template>
-  <UModal v-model:open="open">
+  <UModal v-model:open="open" title="Keyboard Shortcuts" description="Available keyboard shortcuts">
     <template #content>
       <div class="p-5 max-w-md">
-        <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">Keyboard Shortcuts</h2>
         <div class="space-y-3 text-sm">
           <div v-for="group in groups" :key="group.label">
             <div class="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 font-medium">{{ group.label }}</div>

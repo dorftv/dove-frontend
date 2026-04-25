@@ -9,11 +9,9 @@
       Add Input
       <kbd class="ml-1 text-[11px] bg-gray-200 dark:bg-gray-600 px-1 rounded font-mono hidden md:inline">I</kbd>
     </UButton>
-    <UModal v-model:open="isOpen">
+    <UModal v-model:open="isOpen" title="Add Input" description="Create a new input source">
       <template #content>
         <div class="p-4 w-full max-w-lg mx-auto">
-          <div class="text-sm font-medium mb-3">Add Input</div>
-
           <div class="hidden sm:inline-flex flex-wrap mb-3">
             <UButton
               v-for="opt in typeOptions"

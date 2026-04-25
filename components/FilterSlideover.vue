@@ -1,15 +1,5 @@
 <template>
-  <USlideover v-model:open="open" side="right" :overlay="false">
-    <template #title>
-      <div class="flex items-center gap-2">
-        <Icon :name="icon" size="16px" :class="iconColorClass" />
-        <span class="font-medium text-sm">{{ title }}</span>
-        <span class="text-xs text-gray-500 truncate">{{ headerLabel }}</span>
-      </div>
-    </template>
-    <template #description>
-      <span class="sr-only">Filter chain for {{ headerLabel }}</span>
-    </template>
+  <USlideover v-model:open="open" side="right" :overlay="false" :title="headerLabel ? `${title} — ${headerLabel}` : title" :description="title" :ui="{ description: 'sr-only' }">
     <template #body>
       <FilterPanel
         ref="panelRef"

@@ -1,11 +1,5 @@
 <template>
-  <USlideover v-model:open="open" side="right" :overlay="false" :ui="{ width: 'max-w-xl' }">
-    <template #title>
-      <div class="flex items-center gap-2">
-        <Icon name="ph:download-simple" size="16px" class="text-emerald-400" />
-        <span class="font-medium text-sm">Export Config</span>
-      </div>
-    </template>
+  <USlideover v-model:open="open" side="right" :overlay="false" :ui="{ width: 'max-w-xl' }" title="Export Config" description="Select what to include, preview, then download configuration as TOML">
     <template #body>
       <div class="space-y-4 text-sm">
         <p class="text-xs text-gray-500 dark:text-gray-400">

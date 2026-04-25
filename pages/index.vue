@@ -205,10 +205,7 @@
     </div>
 
     <!-- Large screens: output drawer -->
-    <USlideover v-model:open="outputOpen" side="right" :overlay="false">
-      <template #header>
-        <span class="font-medium text-sm">Outputs & Encoders</span>
-      </template>
+    <USlideover v-model:open="outputOpen" side="right" :overlay="false" title="Outputs & Encoders" description="Manage outputs and encoders">
       <template #body>
         <OutputMain />
       </template>
