@@ -33,7 +33,7 @@ const AUDIO_FILTER_TYPES = {
       attack: { min: 1, max: 200, step: 1, default: 10, unit: 'ms', label: 'Attack' },
       release: { min: 10, max: 1000, step: 5, default: 100, unit: 'ms', label: 'Release' },
       hold_time: { min: 0, max: 500, step: 1, default: 50, unit: 'ms', label: 'Hold' },
-      reduction: { min: 0, max: 1, step: 0.01, default: 0, label: 'Reduction' },
+      reduction: { min: 0.001, max: 1, step: 0.01, default: 0.001, label: 'Reduction' },
       makeup_gain: { min: 0, max: 4, step: 0.01, default: 1.0, label: 'Makeup Gain' },
     },
   },
