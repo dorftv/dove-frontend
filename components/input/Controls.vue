@@ -3,8 +3,12 @@
 
     <!-- Progress bar (always reserve space for consistent card height) -->
     <div class="h-3">
+      <span v-if="input.is_live" class="flex items-center gap-1 text-red-500 text-[11px] font-mono tabular-nums leading-none">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+        LIVE &middot; {{ positionFormatted }}
+      </span>
       <USlider
-        v-if="input.duration && input.show_controls"
+        v-else-if="input.duration && input.show_controls"
         :model-value="position"
         @update:model-value="handlePositionChange"
         :step="1" :min="0" :max="input.duration"
@@ -27,7 +31,7 @@
       </button>
 
       <!-- Timecode -->
-      <span v-if="input.duration && input.show_controls" class="font-mono text-[10px] text-gray-500 dark:text-gray-400 tabular-nums">
+      <span v-if="!input.is_live && input.duration && input.show_controls" class="font-mono text-[10px] text-gray-500 dark:text-gray-400 tabular-nums">
         {{ positionFormatted }}<span class="text-gray-400 dark:text-gray-600">{{ durationFormatted }}</span>
       </span>
 
