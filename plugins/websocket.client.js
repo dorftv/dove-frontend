@@ -184,6 +184,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (index !== -1) {
           entities.value.splice(index, 1);
         }
+        // prune per-uid level state so map doesn't grow unbounded over long sessions
+        delete audioLevels.value[message.data.uid];
       }
     };
 

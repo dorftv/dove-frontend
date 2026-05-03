@@ -46,7 +46,7 @@ export function useMutedState() {
     }
   };
 
-  // Watch uid list (not deep entity changes) to register new entities
+  // Watch uid list (not deep entity changes) to register new entities and prune deleted ones
   watch(entityUids, (uids) => {
     let hasNew = false;
     for (const uid of uids) {
@@ -54,6 +54,14 @@ export function useMutedState() {
         initialized.value[uid] = true;
         mutedState.value[uid] = true;
         hasNew = true;
+      }
+    }
+    // prune entries for entities that no longer exist so maps don't grow unbounded
+    const set = new Set(uids);
+    for (const k of Object.keys(mutedState.value)) {
+      if (!set.has(k)) {
+        delete mutedState.value[k];
+        delete initialized.value[k];
       }
     }
     // Auto-unmute program on first load if nothing else is unmuted

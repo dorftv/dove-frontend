@@ -129,6 +129,7 @@ const { getFilterLabel, getCategoryLabel, getFilterParams, hasParams, isEq10, ge
 
 const filterListRef = ref(null);
 let sortableInstance = null;
+let cancelled = false; // gate dynamic import callback after unmount
 
 const initSortable = () => {
   if (sortableInstance) {
@@ -138,6 +139,7 @@ const initSortable = () => {
   const el = filterListRef.value;
   if (!el) return;
   import('sortablejs').then(({ default: Sortable }) => {
+    if (cancelled || !filterListRef.value) return;
     sortableInstance = new Sortable(el, {
       handle: '.filter-drag-handle',
       animation: 150,
@@ -158,6 +160,7 @@ onMounted(() => {
   if (props.autoInit) nextTick(initSortable);
 });
 onUnmounted(() => {
+  cancelled = true;
   if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
 });
 </script>

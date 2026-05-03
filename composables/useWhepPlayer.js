@@ -151,10 +151,15 @@ export function useWhepPlayer(props, { onError } = {}) {
         if (pc.iceGatheringState === 'complete') {
           resolve();
         } else {
+          // clear timeout + handler when candidate-null fires so closure doesn't leak
+          const timer = setTimeout(resolve, 5000);
           pc.onicecandidate = (event) => {
-            if (event.candidate === null) resolve();
+            if (event.candidate === null) {
+              clearTimeout(timer);
+              pc.onicecandidate = null;
+              resolve();
+            }
           };
-          setTimeout(resolve, 5000);
         }
       });
 

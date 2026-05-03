@@ -70,10 +70,15 @@ export function useWhipPublisher(inputUid) {
         if (peerConnection.iceGatheringState === 'complete') {
           resolve();
         } else {
+          // clear timeout + handler when candidate-null fires so closure doesn't leak
+          const timer = setTimeout(resolve, ICE_GATHER_TIMEOUT_MS);
           peerConnection.onicecandidate = (event) => {
-            if (event.candidate === null) resolve();
+            if (event.candidate === null) {
+              clearTimeout(timer);
+              peerConnection.onicecandidate = null;
+              resolve();
+            }
           };
-          setTimeout(resolve, ICE_GATHER_TIMEOUT_MS);
         }
       });
 
