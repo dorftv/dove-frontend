@@ -152,6 +152,7 @@ const navSections = [
     ],
   },
   { slug: 'previews', title: 'Previews' },
+  { slug: 'proxies', title: 'Input Pickers (Proxies)' },
   { slug: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
   { slug: 'auth', title: 'Authentication' },
   { slug: 'connection-status', title: 'Connection Status' },
