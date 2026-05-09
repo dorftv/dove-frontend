@@ -34,6 +34,18 @@
           <span class="text-gray-500 dark:text-gray-400">File descriptors</span>
           <span>{{ load.fds }}</span>
         </div>
+        <div v-if="canAdmin && localFps != null" class="flex justify-between items-center gap-2 pt-1">
+          <span class="text-gray-500 dark:text-gray-400 shrink-0">Preview FPS</span>
+          <input
+            type="range"
+            min="1"
+            max="60"
+            v-model.number="localFps"
+            @change="setPreviewFps(localFps)"
+            class="flex-1 min-w-[80px]"
+          >
+          <span class="w-6 text-right">{{ localFps }}</span>
+        </div>
         <div class="pt-1 border-t border-gray-200 dark:border-gray-600 text-[10px] text-gray-400 dark:text-gray-500">
           CPU: {{ load.load1 }} / {{ load.load5 }} / {{ load.load15 }} ({{ load.cpu_count }} cores)
         </div>
@@ -43,7 +55,12 @@
 </template>
 
 <script setup>
-const { load, uptime, memory, memoryPercent, viewers, status } = useServerLoad();
+const { load, uptime, memory, memoryPercent, viewers, status, previewFps, setPreviewFps } = useServerLoad();
+const { canAdmin } = useAuth();
+
+// Local copy so the slider feels responsive while dragging; commits on @change.
+const localFps = ref(previewFps.value);
+watch(previewFps, v => { if (v != null) localFps.value = v });
 
 const statusColor = (percent) => ({
   'text-red-500': percent > 80,

@@ -27,6 +27,14 @@ export function useServerLoad() {
 
   const viewers = computed(() => load.value?.viewers ?? 0);
 
+  const previewFps = computed(() => load.value?.preview_fps ?? null);
+
+  // PUT new preview fps; backend broadcasts updated value via /api/load poll.
+  const setPreviewFps = (n) => useApiFetch('/api/load/preview_fps', {
+    method: 'PUT',
+    body: { fps: n },
+  });
+
   // worst-case status across all metrics
   const status = computed(() => {
     if (!load.value) return 'unknown';
@@ -37,5 +45,5 @@ export function useServerLoad() {
     return 'ok';
   });
 
-  return { load, uptime, memory, memoryPercent, viewers, status };
+  return { load, uptime, memory, memoryPercent, viewers, status, previewFps, setPreviewFps };
 }
