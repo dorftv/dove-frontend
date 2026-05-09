@@ -142,6 +142,7 @@ const navSections = [
       { slug: 'inputs-ytdlp', title: 'yt-dlp' },
       { slug: 'inputs-nodecg', title: 'NodeCG' },
       { slug: 'inputs-testsrc', title: 'Test Source' },
+      { slug: 'screencast', title: 'Screencast (WHIP)' },
     ],
   },
   {
