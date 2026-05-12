@@ -41,9 +41,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       // In production, WS goes through the same host (reverse proxy handles it)
       url = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
     }
-
-    const token = localStorage.getItem('dove-api-token');
-    if (token) url += `${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
     return url;
   };
 
