@@ -1,10 +1,13 @@
 <template>
   <div class="container mx-auto px-4 py-8 max-w-3xl">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">About</h1>
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">About</h1>
+    </div>
 
     <section class="flex flex-col sm:flex-row items-center gap-6 mb-8">
       <img :src="'/branding/logo.png'" alt="DOVE" class="w-40 sm:w-48 md:w-56 shrink-0" />
       <div class="flex flex-col justify-center">
+        <span v-if="version" class="inline-block self-start mb-3 px-3.5 py-1 rounded-full text-sm font-mono bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">Version {{ version }}</span>
         <p class="text-gray-700 dark:text-gray-300 mb-3">
           <strong>DOVE</strong> (Dove Online Video Editor) is an API-driven live video mixing application.
           It combines multiple video and audio sources into scenes, mixes them into a live program output,
@@ -50,4 +53,5 @@
 </template>
 
 <script setup>
+const { version } = useDoveConfig()
 </script>

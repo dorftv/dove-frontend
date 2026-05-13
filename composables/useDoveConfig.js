@@ -8,6 +8,7 @@ export default function useDoveConfig() {
   const addInput = computed(() => config.value?.ui?.add_input ?? true);
   const addOutput = computed(() => config.value?.ui?.add_output ?? true);
   const addScene = computed(() => config.value?.ui?.add_scene ?? true);
+  const version = computed(() => config.value?.version ?? null);
 
   let configPromise = null;
 
@@ -75,5 +76,6 @@ export default function useDoveConfig() {
     addInput,
     addOutput,
     addScene,
+    version,
   };
 }
