@@ -3,7 +3,6 @@
  * Mirror of useWhepPlayer (which receives). Uses the same ICE/SDP patterns.
  */
 
-const ICE_GATHER_TIMEOUT_MS = 5000;
 const DISCONNECT_GRACE_MS = 5000;
 
 export function useWhipPublisher(inputUid) {
@@ -23,7 +22,7 @@ export function useWhipPublisher(inputUid) {
       peerConnection = null;
     }
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE' }).catch((e) => console.warn('WHIP DELETE failed:', e));
+      deleteWebRTCResource(resourceUrl);
       resourceUrl = null;
     }
     publishState.value = targetState;
@@ -62,44 +61,7 @@ export function useWhipPublisher(inputUid) {
     }
 
     try {
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-
-      // Wait for ICE candidates to be gathered
-      await new Promise((resolve) => {
-        if (peerConnection.iceGatheringState === 'complete') {
-          resolve();
-        } else {
-          // clear timeout + handler when candidate-null fires so closure doesn't leak
-          const timer = setTimeout(resolve, ICE_GATHER_TIMEOUT_MS);
-          peerConnection.onicecandidate = (event) => {
-            if (event.candidate === null) {
-              clearTimeout(timer);
-              peerConnection.onicecandidate = null;
-              resolve();
-            }
-          };
-        }
-      });
-
-      const uid = unref(inputUid);
-      const response = await fetch(`/whip/ingest/${uid}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/sdp' },
-        body: peerConnection.localDescription.sdp,
-      });
-
-      if (!response.ok) {
-        throw new Error(`WHIP POST failed: ${response.status}`);
-      }
-
-      const location = response.headers.get('Location');
-      if (location) {
-        resourceUrl = location.startsWith('/') ? location : new URL(location).pathname;
-      }
-
-      const answerSdp = await response.text();
-      await peerConnection.setRemoteDescription({ type: 'answer', sdp: answerSdp });
+      resourceUrl = await negotiateWebRTC(peerConnection, `/whip/ingest/${unref(inputUid)}`);
 
       if (peerConnection.iceConnectionState === 'connected' || peerConnection.iceConnectionState === 'completed') {
         publishState.value = 'publishing';

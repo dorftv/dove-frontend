@@ -60,9 +60,9 @@ export function useWhepPlayer(props, { onError } = {}) {
       pc.close();
       pc = null;
     }
-    // DELETE the WHEP resource so the server cleans up (keepalive: survives page unload)
+    // DELETE the WHEP resource so the server cleans up
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE', keepalive: true }).catch(() => {});
+      deleteWebRTCResource(resourceUrl);
       resourceUrl = null;
     }
     if (videoPlayer.value) {
@@ -142,47 +142,7 @@ export function useWhepPlayer(props, { onError } = {}) {
     };
 
     try {
-      // Create offer
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-
-      // Wait for ICE gathering — null candidate = all candidates gathered
-      await new Promise((resolve) => {
-        if (pc.iceGatheringState === 'complete') {
-          resolve();
-        } else {
-          // clear timeout + handler when candidate-null fires so closure doesn't leak
-          const timer = setTimeout(resolve, 5000);
-          pc.onicecandidate = (event) => {
-            if (event.candidate === null) {
-              clearTimeout(timer);
-              pc.onicecandidate = null;
-              resolve();
-            }
-          };
-        }
-      });
-
-      // POST offer to WHEP endpoint
-      const resp = await fetch(`/whep/${props.uid}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/sdp' },
-        body: pc.localDescription.sdp,
-      });
-
-      if (!resp.ok) {
-        throw new Error(`WHEP POST failed: ${resp.status}`);
-      }
-
-      // Extract resource URL from Location header
-      const location = resp.headers.get('Location');
-      if (location) {
-        resourceUrl = location.startsWith('/') ? location : new URL(location).pathname;
-      }
-
-      // Set remote answer
-      const answerSdp = await resp.text();
-      await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp });
+      resourceUrl = await negotiateWebRTC(pc, `/whep/${props.uid}`);
 
       failCount = 0;
       startStatsMonitor();
@@ -214,16 +174,8 @@ export function useWhepPlayer(props, { onError } = {}) {
       return;
     }
 
-    try {
-      const resp = await fetch(resourceUrl, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: newUid }),
-      });
-      if (!resp.ok) throw new Error(`Switch failed: ${resp.status}`);
-      // Stream switches on backend — same connection, new frames arrive
-    } catch {
-      // Fallback: full reconnect
+    // Stream switches on backend — same connection, new frames arrive; fallback: full reconnect
+    if (!(await switchWebRTCSource(resourceUrl, newUid))) {
       await initializePlayer();
     }
   };

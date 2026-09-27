@@ -26,7 +26,7 @@ export function useAudioOnlyPlayer(props) {
   const cleanup = () => {
     if (pc) { pc.close(); pc = null; }
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE', keepalive: true }).catch(() => {});
+      deleteWebRTCResource(resourceUrl);
       resourceUrl = null;
     }
     if (videoEl.value) videoEl.value.srcObject = null;
@@ -63,38 +63,7 @@ export function useAudioOnlyPlayer(props) {
     };
 
     try {
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-
-      await new Promise((resolve) => {
-        if (pc.iceGatheringState === 'complete') resolve();
-        else {
-          // clear timeout + handler when candidate-null fires so closure doesn't leak
-          const timer = setTimeout(resolve, 5000);
-          pc.onicecandidate = (event) => {
-            if (event.candidate === null) {
-              clearTimeout(timer);
-              pc.onicecandidate = null;
-              resolve();
-            }
-          };
-        }
-      });
-
-      const resp = await fetch(`/whep/${props.uid}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/sdp' },
-        body: pc.localDescription.sdp,
-      });
-
-      if (!resp.ok) throw new Error(`WHEP POST failed: ${resp.status}`);
-
-      const location = resp.headers.get('Location');
-      if (location) {
-        resourceUrl = location.startsWith('/') ? location : new URL(location).pathname;
-      }
-
-      await pc.setRemoteDescription({ type: 'answer', sdp: await resp.text() });
+      resourceUrl = await negotiateWebRTC(pc, `/whep/${props.uid}`);
 
       videoEl.value.muted = true;
       try { await videoEl.value.play(); } catch {}
@@ -139,15 +108,8 @@ export function useAudioOnlyPlayer(props) {
     cleanup();
   });
   watch(() => props.uid, async (newUid) => {
-    if (resourceUrl && pc?.connectionState === 'connected') {
-      try {
-        const resp = await fetch(resourceUrl, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ source: newUid }),
-        });
-        if (resp.ok) return;
-      } catch {}
+    if (resourceUrl && pc?.connectionState === 'connected' && await switchWebRTCSource(resourceUrl, newUid)) {
+      return;
     }
     gateOnReady();
   });
