@@ -60,9 +60,9 @@ export function useWhepPlayer(props, { onError } = {}) {
       pc.close();
       pc = null;
     }
-    // DELETE the WHEP resource so the server cleans up
+    // DELETE the WHEP resource so the server cleans up (keepalive: survives page unload)
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE', headers: useAuthHeaders() }).catch(() => {});
+      fetch(resourceUrl, { method: 'DELETE', headers: useAuthHeaders(), keepalive: true }).catch(() => {});
       resourceUrl = null;
     }
     if (videoPlayer.value) {
@@ -249,9 +249,14 @@ export function useWhepPlayer(props, { onError } = {}) {
     );
   };
 
-  onMounted(gateOnReady);
+  onMounted(() => {
+    // onUnmounted doesn't run on reload/tab close — end the WHEP session there too
+    window.addEventListener('pagehide', cleanup);
+    gateOnReady();
+  });
 
   onUnmounted(() => {
+    window.removeEventListener('pagehide', cleanup);
     if (readyStopHandle) { readyStopHandle(); readyStopHandle = null; }
     cleanup();
   });

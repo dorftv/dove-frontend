@@ -26,7 +26,7 @@ export function useAudioOnlyPlayer(props) {
   const cleanup = () => {
     if (pc) { pc.close(); pc = null; }
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE', headers: useAuthHeaders() }).catch(() => {});
+      fetch(resourceUrl, { method: 'DELETE', headers: useAuthHeaders(), keepalive: true }).catch(() => {});
       resourceUrl = null;
     }
     if (videoEl.value) videoEl.value.srcObject = null;
@@ -128,8 +128,13 @@ export function useAudioOnlyPlayer(props) {
     );
   };
 
-  onMounted(gateOnReady);
+  onMounted(() => {
+    // onUnmounted doesn't run on reload/tab close — end the WHEP session there too
+    window.addEventListener('pagehide', cleanup);
+    gateOnReady();
+  });
   onUnmounted(() => {
+    window.removeEventListener('pagehide', cleanup);
     if (readyStopHandle) { readyStopHandle(); readyStopHandle = null; }
     cleanup();
   });
