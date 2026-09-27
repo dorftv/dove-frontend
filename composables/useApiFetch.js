@@ -1,14 +1,4 @@
-/** Wrapper around $fetch that injects the API token auth header. */
+/** $fetch wrapper for DOVE API calls — auth rides on the session cookie. */
 export function useApiFetch(url, opts = {}) {
-  const token = localStorage.getItem('dove-api-token')
-  if (token) {
-    opts.headers = { ...opts.headers, Authorization: `Bearer ${token}` }
-  }
   return $fetch(url, opts)
-}
-
-/** Returns auth headers object for native fetch() calls (WHEP/WHIP). */
-export function useAuthHeaders() {
-  const token = localStorage.getItem('dove-api-token')
-  return token ? { Authorization: `Bearer ${token}` } : {}
 }

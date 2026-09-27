@@ -24,35 +24,20 @@ export function useAuth() {
   })
 
   const checkAuth = async () => {
+    // API tokens are for API clients only (the UI can't use them for the WebSocket) —
+    // drop a login-link token left over from older versions
+    localStorage.removeItem('dove-api-token')
     try {
-      const token = localStorage.getItem('dove-api-token')
-      const headers = token ? { Authorization: `Bearer ${token}` } : {}
-      const data = await $fetch('/auth/me', { headers })
+      const data = await $fetch('/auth/me')
       authEnabled.value = data.auth_enabled
-      if (data.authenticated) {
-        user.value = data
-      } else {
-        user.value = null
-        // Clear invalid stored token so OIDC can take over
-        if (localStorage.getItem('dove-api-token')) {
-          localStorage.removeItem('dove-api-token')
-        }
-      }
+      user.value = data.authenticated ? data : null
     } catch {
       user.value = null
-      // Clear stored token on auth failure
-      if (localStorage.getItem('dove-api-token')) {
-        localStorage.removeItem('dove-api-token')
-      }
     }
     authChecked.value = true
   }
 
   const login = () => {
-    if (localStorage.getItem('dove-api-token')) {
-      console.error('API token auth failed')
-      return
-    }
     const origin = window.location.origin
     window.location.href = `/auth/login?redirect_base=${encodeURIComponent(origin)}`
   }

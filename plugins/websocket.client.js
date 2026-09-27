@@ -6,11 +6,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   let healthInterval = null;
   let lastFetchEntities = 0;
 
-  const authHeaders = () => {
-    const token = localStorage.getItem('dove-api-token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const status = useState('ws-status', () => 'disconnected');
   const error = useState('entities-error', () => null);
 
@@ -48,14 +43,13 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const fetchEntities = async () => {
     try {
-      const headers = authHeaders();
       const [inputsData, mixersData, outputsData, encodersData, configData, loadData] = await Promise.all([
-        $fetch('/api/inputs', { headers }),
-        $fetch('/api/mixers', { headers }),
-        $fetch('/api/outputs', { headers }),
-        $fetch('/api/encoders', { headers }),
-        $fetch('/api/config', { headers }),
-        $fetch('/api/load', { headers }),
+        $fetch('/api/inputs'),
+        $fetch('/api/mixers'),
+        $fetch('/api/outputs'),
+        $fetch('/api/encoders'),
+        $fetch('/api/config'),
+        $fetch('/api/load'),
       ]);
       inputs.value = inputsData;
       mixers.value = mixersData;

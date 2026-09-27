@@ -26,7 +26,7 @@ export function useAudioOnlyPlayer(props) {
   const cleanup = () => {
     if (pc) { pc.close(); pc = null; }
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE', headers: useAuthHeaders(), keepalive: true }).catch(() => {});
+      fetch(resourceUrl, { method: 'DELETE', keepalive: true }).catch(() => {});
       resourceUrl = null;
     }
     if (videoEl.value) videoEl.value.srcObject = null;
@@ -83,7 +83,7 @@ export function useAudioOnlyPlayer(props) {
 
       const resp = await fetch(`/whep/${props.uid}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/sdp', ...useAuthHeaders() },
+        headers: { 'Content-Type': 'application/sdp' },
         body: pc.localDescription.sdp,
       });
 
@@ -143,7 +143,7 @@ export function useAudioOnlyPlayer(props) {
       try {
         const resp = await fetch(resourceUrl, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', ...useAuthHeaders() },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ source: newUid }),
         });
         if (resp.ok) return;

@@ -23,7 +23,7 @@ export function useWhipPublisher(inputUid) {
       peerConnection = null;
     }
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE', headers: useAuthHeaders() }).catch((e) => console.warn('WHIP DELETE failed:', e));
+      fetch(resourceUrl, { method: 'DELETE' }).catch((e) => console.warn('WHIP DELETE failed:', e));
       resourceUrl = null;
     }
     publishState.value = targetState;
@@ -85,7 +85,7 @@ export function useWhipPublisher(inputUid) {
       const uid = unref(inputUid);
       const response = await fetch(`/whip/ingest/${uid}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/sdp', ...useAuthHeaders() },
+        headers: { 'Content-Type': 'application/sdp' },
         body: peerConnection.localDescription.sdp,
       });
 

@@ -62,7 +62,7 @@ export function useWhepPlayer(props, { onError } = {}) {
     }
     // DELETE the WHEP resource so the server cleans up (keepalive: survives page unload)
     if (resourceUrl) {
-      fetch(resourceUrl, { method: 'DELETE', headers: useAuthHeaders(), keepalive: true }).catch(() => {});
+      fetch(resourceUrl, { method: 'DELETE', keepalive: true }).catch(() => {});
       resourceUrl = null;
     }
     if (videoPlayer.value) {
@@ -166,7 +166,7 @@ export function useWhepPlayer(props, { onError } = {}) {
       // POST offer to WHEP endpoint
       const resp = await fetch(`/whep/${props.uid}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/sdp', ...useAuthHeaders() },
+        headers: { 'Content-Type': 'application/sdp' },
         body: pc.localDescription.sdp,
       });
 
@@ -217,7 +217,7 @@ export function useWhepPlayer(props, { onError } = {}) {
     try {
       const resp = await fetch(resourceUrl, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', ...useAuthHeaders() },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source: newUid }),
       });
       if (!resp.ok) throw new Error(`Switch failed: ${resp.status}`);
