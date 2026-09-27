@@ -88,7 +88,8 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
     }
   };
 
-  const sendParamUpdate = useThrottleFn(_send, 150);
+  // trailing: always send the final slider value (VueUse default drops it)
+  const sendParamUpdate = useThrottleFn(_send, 150, true);
 
   const updateFilterParam = (index, paramName, value) => {
     const current = [...filters.value];
