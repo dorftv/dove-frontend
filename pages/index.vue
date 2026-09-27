@@ -41,8 +41,8 @@
         <ProgramOverlays />
       </div>
 
-      <!-- Tab: Inputs -->
-      <div v-show="mobileTab === 'inputs'" class="px-2 py-2">
+      <!-- Tab: Inputs — v-if so hidden tabs don't hold WHEP sessions (Live stays v-show: keeps program audio) -->
+      <div v-if="mobileTab === 'inputs'" class="px-2 py-2">
         <InputMain />
         <!-- Inputs without preview -->
         <div v-if="inputsNoPreview.length > 0" class="mt-2">
@@ -67,7 +67,7 @@
       </div>
 
       <!-- Tab: Scenes (details + slots) -->
-      <div v-show="mobileTab === 'scenes'" class="px-2 py-2">
+      <div v-if="mobileTab === 'scenes'" class="px-2 py-2">
         <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Scenes</div>
         <SceneMain />
       </div>

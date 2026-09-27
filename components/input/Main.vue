@@ -14,7 +14,8 @@
             :inputEnabled="isInputEnabled(input.uid)"
             @enablePreview="toggleInputEnabled(input.uid)"
           />
-          <div v-show="shouldShowPreview(input.uid) && input.preview" class="flex">
+          <!-- v-if (not v-show): a hidden preview must not keep a WHEP session open -->
+          <div v-if="shouldShowPreview(input.uid) && input.preview" class="flex">
             <VideoPlayerMain v-if="input.has_video !== false" :uid="input.uid" class="flex-grow min-w-0" />
             <AudioOnlyPlayer v-else :uid="input.uid" class="flex-grow min-w-0" />
             <AudioMeter v-if="audioMeters && input.has_audio !== false" :uid="input.uid" />
