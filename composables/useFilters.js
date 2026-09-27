@@ -54,13 +54,12 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
   const filters = ref(readFromStore());
   let sendInFlight = false;
 
-  const entitySource = getInput ? allInputs : getMixer ? allMixers : getEncoder ? allEncoders : null;
-  if (entitySource) {
-    watch(entitySource, () => {
-      if (sendInFlight) return;
-      filters.value = readFromStore();
-    }, { deep: true, immediate: false });
-  }
+  // Watch only this chain's filter list — a deep watch on the whole store re-ran for every
+  // entity update (e.g. per-second position ticks) in every filter instance.
+  watch(readFromStore, (stored) => {
+    if (sendInFlight) return;
+    filters.value = stored;
+  }, { deep: true });
 
   const filterCount = computed(() => filters.value.length);
 
