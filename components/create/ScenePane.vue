@@ -39,7 +39,7 @@
 
             <div class="flex justify-end space-x-2 pt-2">
               <UButton type="button" label="Cancel" variant="outline" size="sm" @click="isOpen = false" />
-              <UButton type="submit" label="Create Scene" color="primary" size="sm" />
+              <UButton type="submit" label="Create Scene" color="primary" size="sm" :loading="isSubmitting" />
             </div>
           </form>
         </div>
@@ -53,6 +53,7 @@ const { canSupervisor, canBypassLock } = useAuth()
 
 const {
   isOpen,
+  isSubmitting,
   toggle,
   formData,
   submitCreate,

@@ -161,7 +161,7 @@
 
               <div class="flex justify-end space-x-2 pt-2">
                 <UButton type="button" label="Cancel" variant="outline" size="sm" @click="isOpen = false" />
-                <UButton type="submit" label="Create Input" color="primary" size="sm" />
+                <UButton type="submit" label="Create Input" color="primary" size="sm" :loading="isSubmitting" />
               </div>
             </form>
           </template>
@@ -176,6 +176,7 @@ const { canUser, canBypassLock } = useAuth()
 
 const {
   isOpen,
+  isSubmitting,
   toggle,
   formData,
   types,

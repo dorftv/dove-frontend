@@ -1,5 +1,6 @@
 export const useCreateEncoder = () => {
   const isOpen = ref(false);
+  const isSubmitting = ref(false);
   const notify = useNotify();
   const { mixers } = useEntities();
   const doveConfig = useDoveConfig();
@@ -88,12 +89,17 @@ export const useCreateEncoder = () => {
       body.name = formData.name;
     }
 
-    isOpen.value = false;
+    isSubmitting.value = true;
     try {
-      return await useApiFetch('/api/encoders', { method: 'PUT', body });
+      const result = await useApiFetch('/api/encoders', { method: 'PUT', body });
+      isOpen.value = false; // close (and reset) only on success
+      return result;
     } catch (error) {
+      // keep the dialog open with the user's input so it can be corrected
       const detail = error?.data?.detail;
       notify.error(typeof detail === 'string' ? detail : 'Failed to create encoder');
+    } finally {
+      isSubmitting.value = false;
     }
   };
 
@@ -133,6 +139,7 @@ export const useCreateEncoder = () => {
 
   return {
     isOpen,
+    isSubmitting,
     toggle,
     encoderType,
     formData,

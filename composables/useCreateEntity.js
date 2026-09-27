@@ -1,6 +1,7 @@
 export const useCreateEntity = (entityType) => {
   const isOpen = ref(false);
   const isLoading = ref(false);
+  const isSubmitting = ref(false);
   const fetchError = ref(null);
   const formData = reactive({});
   const availSrc = ref([]);
@@ -104,12 +105,17 @@ export const useCreateEntity = (entityType) => {
       body.type = 'scene';
     }
     const submitPath = entityType === 'mixers' ? '/api/mixers' : `${path}/${itemType}`;
-    isOpen.value = false;
+    isSubmitting.value = true;
     try {
-      return await useApiFetch(submitPath, { method: 'PUT', body });
+      const result = await useApiFetch(submitPath, { method: 'PUT', body });
+      isOpen.value = false; // close (and reset) only on success
+      return result;
     } catch (error) {
+      // keep the dialog open with the user's input so it can be corrected
       const detail = error?.data?.detail;
       notify.error(typeof detail === 'string' ? detail : `Failed to create ${entityType === 'mixers' ? 'scene' : entityType.slice(0, -1)}`);
+    } finally {
+      isSubmitting.value = false;
     }
   };
 
@@ -163,6 +169,7 @@ export const useCreateEntity = (entityType) => {
     isOpen,
     toggle,
     isLoading,
+    isSubmitting,
     fetchError,
     formData,
     availSrc,

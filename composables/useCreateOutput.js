@@ -77,11 +77,14 @@ export const useCreateOutput = () => {
   const submitCreate = async (itemType) => {
     const body = { ...baseCreate.formData[itemType] };
 
+    baseCreate.isSubmitting.value = true;
     for (const fieldName of ['video_encoder', 'audio_encoder']) {
       if (body[fieldName] === '__new__') {
         const uid = await inlineEncoder.createEncoderInline(itemType, fieldName);
-        if (!uid) return;
+        if (!uid) { baseCreate.isSubmitting.value = false; return; }
         body[fieldName] = uid;
+        // a retry after a failed output create reuses this encoder instead of creating another
+        baseCreate.formData[itemType][fieldName] = uid;
       } else if (!body[fieldName]) {
         delete body[fieldName];
       }
@@ -89,12 +92,16 @@ export const useCreateOutput = () => {
     }
 
     const path = `/api/outputs/${itemType}`;
-    baseCreate.isOpen.value = false;
     try {
-      return await useApiFetch(path, { method: 'PUT', body });
+      const result = await useApiFetch(path, { method: 'PUT', body });
+      baseCreate.isOpen.value = false; // close (and reset) only on success
+      return result;
     } catch (error) {
+      // keep the dialog open with the user's input so it can be corrected
       const detail = error?.data?.detail;
       notify.error(typeof detail === 'string' ? detail : 'Failed to create output');
+    } finally {
+      baseCreate.isSubmitting.value = false;
     }
   };
 
