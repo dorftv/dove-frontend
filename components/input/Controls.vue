@@ -11,6 +11,7 @@
         v-else-if="input.duration && input.show_controls"
         :model-value="position"
         @update:model-value="handlePositionChange"
+        :disabled="!canEditInput"
         :step="1" :min="0" :max="input.duration"
         class="w-full" size="xs"
         aria-label="Playback position"
@@ -21,12 +22,12 @@
     <div class="flex items-center gap-1 h-6">
       <!-- Play/Pause -->
       <div class="flex items-center" :class="{ 'invisible': !input.show_controls }">
-        <button v-if="input.type === 'playlist'" @click="submitSkip('previous')" class="transport-btn" title="Previous clip"><Icon name="ph:skip-back-fill" size="13px" /></button>
-        <button @click="submitPlay" class="transport-btn" :class="{ 'text-green-400': input.state === 'PLAYING' }" title="Play"><Icon name="ph:play-fill" size="13px" /></button>
-        <button @click="submitPause" class="transport-btn" :class="{ 'text-orange-400': input.state === 'PAUSED' }" title="Pause"><Icon name="ph:pause-fill" size="13px" /></button>
-        <button v-if="input.type === 'playlist'" @click="submitSkip('next')" class="transport-btn" title="Next clip"><Icon name="ph:skip-forward-fill" size="13px" /></button>
+        <button v-if="input.type === 'playlist'" :disabled="!canEditInput" @click="submitSkip('previous')" class="transport-btn" title="Previous clip"><Icon name="ph:skip-back-fill" size="13px" /></button>
+        <button :disabled="!canEditInput" @click="submitPlay" class="transport-btn" :class="{ 'text-green-400': input.state === 'PLAYING' }" title="Play"><Icon name="ph:play-fill" size="13px" /></button>
+        <button :disabled="!canEditInput" @click="submitPause" class="transport-btn" :class="{ 'text-orange-400': input.state === 'PAUSED' }" title="Pause"><Icon name="ph:pause-fill" size="13px" /></button>
+        <button v-if="input.type === 'playlist'" :disabled="!canEditInput" @click="submitSkip('next')" class="transport-btn" title="Next clip"><Icon name="ph:skip-forward-fill" size="13px" /></button>
       </div>
-      <button v-if="input.hasOwnProperty('loop')" @click="submitLoop(!input.loop)" class="transport-btn" :class="input.loop ? 'text-emerald-400' : 'text-gray-500'" title="Loop">
+      <button v-if="input.hasOwnProperty('loop')" :disabled="!canEditInput" @click="submitLoop(!input.loop)" class="transport-btn" :class="input.loop ? 'text-emerald-400' : 'text-gray-500'" title="Loop">
         <Icon name="ph:repeat" size="13px" />
       </button>
 
@@ -38,7 +39,7 @@
       <div class="flex-grow" />
 
       <!-- Volume indicator -->
-      <button @click="toggleMute" class="transport-btn" :class="{ 'text-orange-400': volume === 0 }" :title="volume === 0 ? 'Unmute' : 'Mute (' + volume + '%)'">
+      <button :disabled="!canEditInput" @click="toggleMute" class="transport-btn" :class="{ 'text-orange-400': volume === 0 }" :title="volume === 0 ? 'Unmute' : 'Mute (' + volume + '%)'">
         <Icon :name="volumeIcon(volume)" size="13px" />
       </button>
 
@@ -62,12 +63,13 @@
     <div v-if="settingsOpen" class="mt-1 space-y-1">
       <!-- Volume -->
       <div class="flex items-center gap-1">
-        <button @click="toggleMute" class="transport-btn" :title="volume === 0 ? 'Unmute' : 'Mute'">
+        <button :disabled="!canEditInput" @click="toggleMute" class="transport-btn" :title="volume === 0 ? 'Unmute' : 'Mute'">
           <Icon :name="volumeIcon(volume)" size="14px" />
         </button>
         <USlider
           :model-value="volume"
           @update:model-value="handleVolumeChange"
+          :disabled="!canEditInput"
           :min="0" :max="100"
           class="flex-grow" size="xs"
           aria-label="Volume"
@@ -168,7 +170,8 @@ const {
   @apply flex items-center justify-center w-6 h-6 rounded
          hover:bg-gray-300 dark:hover:bg-gray-700
          hover:text-gray-900 dark:hover:text-white
-         transition-colors duration-100 cursor-pointer;
+         transition-colors duration-100 cursor-pointer
+         disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-inherit;
 }
 
 @media (pointer: coarse) {

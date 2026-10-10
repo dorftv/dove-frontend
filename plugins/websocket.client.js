@@ -6,6 +6,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   let healthInterval = null;
   let lastFetchEntities = 0;
 
+  // Toasts from WS callbacks run outside the Nuxt context
+  const notifyError = (msg) => nuxtApp.runWithContext(() => useNotify().error(msg));
+
   const status = useState('ws-status', () => 'disconnected');
   const error = useState('entities-error', () => null);
 
@@ -137,6 +140,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         for (const l of levels) {
           audioLevels.value[l.uid] = l;
         }
+        return;
+      }
+
+      // Server rejected or failed one of our updates (REST calls get an HTTP error instead)
+      if (message.channel === 'ERROR') {
+        notifyError(message.data?.message || 'Update failed');
         return;
       }
 
