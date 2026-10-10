@@ -14,10 +14,7 @@ const props = defineProps({
   uid: String,
 });
 
-const audioLevels = useState('audio-levels', () => ({}));
-
-const left = computed(() => audioLevels.value[props.uid]?.left ?? 0);
-const right = computed(() => audioLevels.value[props.uid]?.right ?? 0);
+const { left, right } = useAudioLevels(() => props.uid);
 </script>
 
 <style scoped>
