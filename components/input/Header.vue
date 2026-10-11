@@ -62,10 +62,10 @@ defineEmits(['enablePreview']);
 const { inputPreview } = useUserState();
 
 const { deleting, submitRemove } = useDeleteEntity('input', () => props.input);
-const { updateEntity } = useEntities();
+const { patchEntity } = useEntities();
 
 const updateName = (newName) => {
-  updateEntity('input', { uid: props.input.uid, name: newName });
+  patchEntity('input', props.input.uid, { name: newName });
 };
 
 const onDragStart = (event) => {

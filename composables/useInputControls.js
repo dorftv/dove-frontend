@@ -14,7 +14,7 @@ import { useDebounceFn } from '@vueuse/core';
  */
 export function useInputControls(props) {
   const volume = ref(props.input.volume * 100);
-  const { inputs, updateEntity } = useEntities();
+  const { inputs, patchEntity } = useEntities();
   const notify = useNotify();
   const previousVolume = ref(80);
 
@@ -57,10 +57,7 @@ export function useInputControls(props) {
   });
 
   const sendVolumeUpdate = useDebounceFn((val) => {
-    updateEntity('input', {
-      uid: props.input.uid,
-      volume: val / 100,
-    });
+    patchEntity('input', props.input.uid, { volume: val / 100 });
   }, 80);
 
   const handleVolumeChange = (newVolume) => {
@@ -72,29 +69,26 @@ export function useInputControls(props) {
   const handlePositionChange = (newPosition) => {
     const val = Array.isArray(newPosition) ? newPosition[0] : newPosition;
     position.value = val;
-    updateEntity('input', {
-      uid: props.input.uid,
-      position: val,
-    });
+    command('seek', { position: val }, 'Failed to seek');
   };
 
-  const submitInputUpdate = async (fields, errorMsg) => {
+  const request = async (method, path, body, errorMsg) => {
     try {
-      await useApiFetch('/api/inputs', {
-        method: 'PUT',
-        body: { uid: props.input.uid, type: 'update', ...fields },
-      });
+      await useApiFetch(`/api/v2/inputs/${props.input.uid}${path}`, { method, body });
     } catch (error) {
       const detail = error?.data?.detail;
       notify.error(typeof detail === 'string' ? detail : errorMsg);
     }
   };
 
-  const submitPlay = () => submitInputUpdate({ state: 'PLAYING' }, 'Failed to play input');
-  const submitPause = () => submitInputUpdate({ state: 'PAUSED' }, 'Failed to pause input');
-  const submitStop = () => submitInputUpdate({ state: 'NULL' }, 'Failed to stop input');
-  const submitLoop = (loopState) => submitInputUpdate({ loop: loopState }, 'Failed to toggle loop');
-  const submitSkip = (direction) => submitInputUpdate({ skip: direction }, 'Failed to skip');
+  // Playback is commanded: `state` is what the pipeline reports
+  const command = (name, body, errorMsg) => request('POST', `/${name}`, body, errorMsg);
+
+  const submitPlay = () => command('play', undefined, 'Failed to play input');
+  const submitPause = () => command('pause', undefined, 'Failed to pause input');
+  const submitStop = () => command('stop', undefined, 'Failed to stop input');
+  const submitLoop = (loopState) => request('PATCH', '', { loop: loopState }, 'Failed to toggle loop');
+  const submitSkip = (direction) => command('skip', { to: direction }, 'Failed to skip');
 
   // --- Scene/source context (only meaningful when props.scene & props.source exist) ---
 
@@ -104,32 +98,24 @@ export function useInputControls(props) {
   });
 
   const isInSceneSources = computed(() => {
-    return props.scene?.sources?.some(
-      source => source.src === props.input?.uid && source.sink === props.source?.sink
+    return props.scene?.slots?.some(
+      slot => slot.src === props.input?.uid && slot.id === props.source?.id
     ) ?? false;
   });
 
   const submitAddInputToScene = async () => {
     if (!props.scene || !props.source) return;
-    await useApiFetch('/api/mixer/add_source', {
-      method: 'POST',
-      body: {
-        src: props.input.uid,
-        target: props.scene.uid,
-        index: props.source.index
-      }
+    await useApiFetch(`/api/v2/scenes/${props.scene.uid}/slots/${props.source.id}`, {
+      method: 'PATCH',
+      body: { src: props.input.uid },
     });
   };
 
   const submitRemoveInputFromScene = async () => {
     if (!props.scene || !props.source) return;
-    await useApiFetch('/api/mixer/remove_source', {
-      method: 'POST',
-      body: {
-        src: "None",
-        target: props.scene.uid,
-        index: props.source.index
-      }
+    await useApiFetch(`/api/v2/scenes/${props.scene.uid}/slots/${props.source.id}`, {
+      method: 'PATCH',
+      body: { src: null },
     });
   };
 

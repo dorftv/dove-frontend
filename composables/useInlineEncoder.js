@@ -134,7 +134,7 @@ export function useInlineEncoder(encoderOptions, formData, types) {
     }
 
     try {
-      const result = await useApiFetch('/api/encoders', { method: 'PUT', body });
+      const result = await useApiFetch('/api/v2/encoders', { method: 'POST', body });
       return result.uid;
     } catch (error) {
       const detail = error?.data?.detail;

@@ -9,11 +9,11 @@ export const useCreateEntity = (entityType) => {
   const activeTabIndex = ref(0);
   const selectedResolution = ref(null);
 
-  const { mixers } = useEntities();
+  const { scenes, program } = useEntities();
   const doveConfig = useDoveConfig();
   const notify = useNotify();
 
-  const path = entityType === 'outputs' ? '/api/outputs' : '/api/inputs';
+  const path = `/api/v2/${entityType}`;
 
   const resolutionOptions = computed(() => doveConfig.resolutionOptions.value);
   const defaultResolution = computed(() => doveConfig.defaultResolution.value);
@@ -35,7 +35,7 @@ export const useCreateEntity = (entityType) => {
   const fetchTypes = async () => {
     isLoading.value = true;
     try {
-      if (entityType === 'mixers') {
+      if (entityType === 'scenes') {
         types.value = [{
           key: 'scene',
           label: 'Scene',
@@ -101,19 +101,19 @@ export const useCreateEntity = (entityType) => {
 
   const submitCreate = async (itemType) => {
     const body = { ...formData[itemType] };
-    if (entityType === 'mixers') {
-      body.type = 'scene';
+    // Inputs and outputs have types; the type goes in the body
+    if (entityType !== 'scenes') {
+      body.type = itemType;
     }
-    const submitPath = entityType === 'mixers' ? '/api/mixers' : `${path}/${itemType}`;
     isSubmitting.value = true;
     try {
-      const result = await useApiFetch(submitPath, { method: 'PUT', body });
+      const result = await useApiFetch(path, { method: 'POST', body });
       isOpen.value = false; // close (and reset) only on success
       return result;
     } catch (error) {
       // keep the dialog open with the user's input so it can be corrected
       const detail = error?.data?.detail;
-      notify.error(typeof detail === 'string' ? detail : `Failed to create ${entityType === 'mixers' ? 'scene' : entityType.slice(0, -1)}`);
+      notify.error(typeof detail === 'string' ? detail : `Failed to create ${entityType.slice(0, -1)}`);
     } finally {
       isSubmitting.value = false;
     }
@@ -141,8 +141,10 @@ export const useCreateEntity = (entityType) => {
   });
 
   watchEffect(() => {
-    if (mixers.value && mixers.value.length > 0) {
-      availSrc.value = mixers.value.map(item => ({
+    // What an output can take its picture from: the program, or a scene
+    const sources = [program.value, ...scenes.value].filter(Boolean);
+    if (sources.length > 0) {
+      availSrc.value = sources.map(item => ({
         name: item.name,
         value: item.uid,
       }));

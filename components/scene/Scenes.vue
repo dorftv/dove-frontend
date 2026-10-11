@@ -11,8 +11,8 @@
       <div ref="slotsContainer">
         <div
           v-for="(source, i) in reversedSources"
-          :key="`${scene.uid}:${source.index}`"
-          :data-index="source.index"
+          :key="`${scene.uid}:${source.id}`"
+          :data-index="source.id"
           :class="i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-100 dark:bg-gray-800'"
           class="border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex items-center"
         >
@@ -58,7 +58,7 @@ const props = defineProps({
 });
 
 const { audioMeters } = useUserState();
-const { updateEntity } = useEntities();
+const { patchSlot } = useEntities();
 const { addingSlot, dropOver, dragCount, addSlot, onDropAdd } = useSceneSlots(() => props.scene);
 
 const canReorderSlots = computed(() =>
@@ -67,7 +67,7 @@ const canReorderSlots = computed(() =>
 
 // Sorted by z-order descending: highest z-order first (visual top = highest layer)
 const reversedSources = computed(() =>
-  [...(props.scene?.sources || [])].sort((a, b) => (b.zorder ?? 0) - (a.zorder ?? 0))
+  [...(props.scene?.slots || [])].sort((a, b) => (b.zorder ?? 0) - (a.zorder ?? 0))
 );
 
 const slotsContainer = ref(null);
@@ -81,7 +81,7 @@ useSortable(slotsContainer, [], {
     if (evt.oldIndex === evt.newIndex) return;
     // reversedSources is displayed highest-zorder-first.
     // After drag, recalculate zorder so that visual position 0 = highest zorder.
-    const displayOrder = [...(props.scene?.sources || [])].sort((a, b) => (b.zorder ?? 0) - (a.zorder ?? 0));
+    const displayOrder = [...(props.scene?.slots || [])].sort((a, b) => (b.zorder ?? 0) - (a.zorder ?? 0));
     const [moved] = displayOrder.splice(evt.oldIndex, 1);
     displayOrder.splice(evt.newIndex, 0, moved);
     // Assign zorder: first in display = highest zorder, last = lowest
@@ -89,11 +89,7 @@ useSortable(slotsContainer, [], {
     displayOrder.forEach((source, displayIdx) => {
       const newZorder = count - displayIdx + 1; // +1 to keep zorder >= 2
       if (source.zorder !== newZorder) {
-        updateEntity('mixer', {
-          uid: props.scene.uid,
-          index: source.index,
-          zorder: newZorder,
-        });
+        patchSlot(props.scene.uid, source.id, { zorder: newZorder });
       }
     });
   },

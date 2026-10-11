@@ -15,7 +15,7 @@ export const useCreateOutput = () => {
 
   const fetchEncoderOptions = async () => {
     try {
-      const data = await useApiFetch('/api/config/encoder');
+      const data = await useApiFetch('/api/v2/config/encoder');
       encoderOptions.audio_encoder = data.audio || [];
       encoderOptions.video_encoder = data.video || [];
       encoderOptions.mux = data.mux || [];
@@ -91,9 +91,9 @@ export const useCreateOutput = () => {
       delete body[`_new_${fieldName}`];
     }
 
-    const path = `/api/outputs/${itemType}`;
+    body.type = itemType;
     try {
-      const result = await useApiFetch(path, { method: 'PUT', body });
+      const result = await useApiFetch('/api/v2/outputs', { method: 'POST', body });
       baseCreate.isOpen.value = false; // close (and reset) only on success
       return result;
     } catch (error) {

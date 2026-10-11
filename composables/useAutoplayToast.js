@@ -4,7 +4,7 @@
  */
 export function useAutoplayToast() {
   const toast = useToast();
-  const { programMixer } = useEntities();
+  const { program } = useEntities();
   const { setMutedState } = useMutedState();
 
   const shown = useState('autoplay-toast-shown', () => false);
@@ -15,7 +15,7 @@ export function useAutoplayToast() {
     if (shown.value) return;
     shown.value = true;
 
-    const pmUid = programMixer.value?.uid;
+    const pmUid = program.value?.uid;
     const t = toast.add({
       title: 'Audio blocked by browser',
       description: 'Click anywhere to enable audio',

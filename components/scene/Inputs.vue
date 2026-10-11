@@ -56,8 +56,8 @@
             <Icon name="ph:camera" size="11px" />
             <span v-if="slotVfCount > 0" class="absolute -top-1 -right-1 min-w-[10px] h-[10px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[6px] font-bold leading-none px-0.5">{{ slotVfCount }}</span>
           </button>
-          <AudioFilters v-model:open="slotFiltersOpen" :mixer="scene" :slotIndex="source.index" :ctx="slotAf" />
-          <VideoFilters v-model:open="slotVfOpen" :mixer="scene" :slotIndex="source.index" :ctx="slotVf" />
+          <AudioFilters v-model:open="slotFiltersOpen" :mixer="scene" :slotIndex="source.id" :ctx="slotAf" />
+          <VideoFilters v-model:open="slotVfOpen" :mixer="scene" :slotIndex="source.id" :ctx="slotVf" />
         </template>
         <button v-if="canEditSlot" @click="open = !open" class="icon-btn w-6 h-6" :class="{ 'text-blue-500 dark:text-blue-400': open }" title="Position & sizing">
           <Icon name="ph:sliders-horizontal" size="11px" />
@@ -149,21 +149,21 @@ const updateSlotName = (newName) => handleChange('name', newName);
 
 const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
 const srcOptions = computed(() => [
-  { name: '— Empty —', uid: 'None' },
+  { name: '— Empty —', uid: null },
   ...inputs.value.map(i => ({ name: i.name, uid: i.uid })),
 ]);
 
 const onSourceSelect = (val) => {
   const uid = typeof val === 'object' ? val?.uid : val;
-  changeSource(uid || 'None');
+  changeSource(uid || null);
 };
 const open = ref(false);
 const dragOver = ref(false);
 const dragCount = ref(0);
 const slotFiltersOpen = ref(false);
 const slotVfOpen = ref(false);
-const slotAf = useAudioFilters({ mixer: () => props.scene, slotIndex: () => props.source.index });
-const slotVf = useVideoFilters({ mixer: () => props.scene, slotIndex: () => props.source.index });
+const slotAf = useAudioFilters({ mixer: () => props.scene, slotIndex: () => props.source.id });
+const slotVf = useVideoFilters({ mixer: () => props.scene, slotIndex: () => props.source.id });
 const slotFilterCount = slotAf.filterCount;
 const slotVfCount = slotVf.filterCount;
 

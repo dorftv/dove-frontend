@@ -11,7 +11,7 @@ import { useThrottleFn } from '@vueuse/core';
  *   Legacy call signature: a plain function is treated as { input: fn }
  */
 export function useFilters(fieldName, filterTypes, filterCategories, opts) {
-  const { updateEntity } = useEntities();
+  const { patchEntity, patchSlot } = useEntities();
   const options = typeof opts === 'function' ? { input: opts } : opts;
 
   const getInput = options.input;
@@ -19,7 +19,9 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
   const getSlotIndex = options.slotIndex;
   const getEncoder = options.encoder;
 
-  const { inputs: allInputs, mixers: allMixers, encoders: allEncoders } = useEntities();
+  const { inputs: allInputs, scenes: allScenes, program, encoders: allEncoders } = useEntities();
+  // A "mixer" here is a scene or the program
+  const findMixer = (uid) => (program.value?.uid === uid ? program.value : allScenes.value.find(m => m.uid === uid));
 
   // --- Read filters from entity store ---
   const readFromStore = () => {
@@ -30,11 +32,11 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
     }
     if (getMixer) {
       const mixerRef = toValue(getMixer);
-      const mixer = mixerRef?.uid ? allMixers.value.find(m => m.uid === mixerRef.uid) : null;
+      const mixer = mixerRef?.uid ? findMixer(mixerRef.uid) : null;
       if (!mixer) return [];
       if (getSlotIndex) {
         const idx = toValue(getSlotIndex);
-        const source = mixer.sources?.find(s => s.index === idx);
+        const source = mixer.slots?.find(s => s.id === idx);
         return source?.[fieldName] || [];
       }
       return mixer[fieldName] || [];
@@ -73,17 +75,18 @@ export function useFilters(fieldName, filterTypes, filterCategories, opts) {
     if (getInput) {
       const inp = toValue(getInput);
       if (!inp) return;
-      updateEntity('input', { uid: inp.uid, [fieldName]: updatedFilters });
+      patchEntity('input', inp.uid, { [fieldName]: updatedFilters });
     } else if (getMixer && getSlotIndex) {
       const mixer = toValue(getMixer);
-      updateEntity('mixer', { uid: mixer.uid, index: toValue(getSlotIndex), [fieldName]: updatedFilters });
+      patchSlot(mixer.uid, toValue(getSlotIndex), { [fieldName]: updatedFilters });
     } else if (getMixer) {
       const mixer = toValue(getMixer);
-      updateEntity('mixer', { uid: mixer.uid, [fieldName]: updatedFilters });
+      const kind = program.value?.uid === mixer.uid ? 'program' : 'scene';
+      patchEntity(kind, mixer.uid, { [fieldName]: updatedFilters });
     } else if (getEncoder) {
       const enc = toValue(getEncoder);
       if (!enc) return;
-      updateEntity('encoder', { uid: enc.uid, [fieldName]: updatedFilters });
+      patchEntity('encoder', enc.uid, { [fieldName]: updatedFilters });
     }
   };
 

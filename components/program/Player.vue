@@ -1,11 +1,11 @@
 <template>
-  <div v-if="programMixer" class="flex">
-    <VideoPlayerMain :uid="programMixer.uid" class="flex-grow min-w-0" />
-    <AudioMeter v-if="audioMeters" :uid="programMixer.uid" />
+  <div v-if="program" class="flex">
+    <VideoPlayerMain :uid="program.uid" class="flex-grow min-w-0" />
+    <AudioMeter v-if="audioMeters" :uid="program.uid" />
   </div>
 </template>
 
 <script setup>
-const { programMixer } = useEntities();
+const { program } = useEntities();
 const { audioMeters } = useUserState();
 </script>

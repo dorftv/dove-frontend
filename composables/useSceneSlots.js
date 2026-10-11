@@ -1,6 +1,5 @@
 export function useSceneSlots(getScene) {
   const notify = useNotify();
-  const { updateEntity } = useEntities();
 
   const addingSlot = ref(false);
   const dropOver = ref(false);
@@ -10,16 +9,11 @@ export function useSceneSlots(getScene) {
     const scene = toValue(getScene);
     addingSlot.value = true;
     try {
-      const result = await useApiFetch('/api/mixer/add_slot', {
+      // A new slot may come with its source
+      await useApiFetch(`/api/v2/scenes/${scene.uid}/slots`, {
         method: 'POST',
-        body: { uid: scene.uid },
+        body: src ? { src } : {},
       });
-      if (src && result?.index !== undefined) {
-        await useApiFetch('/api/mixer/add_source', {
-          method: 'POST',
-          body: { src, target: scene.uid, index: result.index },
-        });
-      }
     } catch (error) {
       notify.error('Failed to add slot');
     } finally {

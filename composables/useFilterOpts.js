@@ -15,8 +15,8 @@ export function useFilterOpts(props) {
   const headerLabel = computed(() => {
     if (props.input) return props.input.name;
     if (props.mixer && props.slotIndex !== undefined) {
-      const source = props.mixer.sources?.find(s => s.index === props.slotIndex);
-      return `${props.mixer.name} / ${source?.name || `Slot ${props.slotIndex + 1}`}`;
+      const source = props.mixer.slots?.find(s => s.id === props.slotIndex);
+      return `${props.mixer.name} / ${source?.name || `Slot ${props.slotIndex}`}`;
     }
     if (props.mixer) return props.mixer.name;
     if (props.encoder) return props.encoder.name || 'Encoder';

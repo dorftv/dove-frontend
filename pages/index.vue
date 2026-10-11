@@ -244,7 +244,8 @@ const isLgPlus = useMediaQuery('(min-width: 1024px)');
 const retry = async () => {
   error.value = null;
   isLoading.value = true;
-  await $ws.fetchEntities();
+  // A new connection starts with a snapshot of everything
+  $ws.connect();
 };
 const showNoPreview = ref(false);
 const { stateColor } = useStateClass();

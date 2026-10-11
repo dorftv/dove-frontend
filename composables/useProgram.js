@@ -1,5 +1,5 @@
 export function useProgram() {
-  const { programMixer, inputs } = useEntities();
+  const { program, inputs } = useEntities();
 
   const getInputInfo = (uid) => {
     const matchingInput = inputs.value.find(input => input.uid === uid);
@@ -7,7 +7,7 @@ export function useProgram() {
   };
 
   return {
-    programMixer,
+    program,
     getInputInfo,
   };
 }

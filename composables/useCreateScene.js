@@ -1,6 +1,6 @@
 
 export const useCreateScene = () => {
-    const baseCreate = useCreateEntity('mixers');
+    const baseCreate = useCreateEntity('scenes');
     const { addScene } = useDoveConfig();
 
     return {

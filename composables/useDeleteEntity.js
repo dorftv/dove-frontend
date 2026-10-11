@@ -1,35 +1,14 @@
 export function useDeleteEntity(entityType, getEntity) {
-  const { sceneMixers, programMixer, outputs } = useEntities();
+  const { scenes, program, outputs } = useEntities();
   const confirm = useConfirmDialog();
   const notify = useNotify();
   const deleting = ref(false);
 
+  // Deleting an input or scene also empties every slot that shows it
   const doDelete = async (entity) => {
     deleting.value = true;
     try {
-      if (entityType === 'encoder') {
-        await useApiFetch(`/api/encoders/${entity.uid}`, { method: 'DELETE' });
-      } else {
-        const path = { input: '/api/inputs', output: '/api/outputs', scene: '/api/mixers' }[entityType];
-        await useApiFetch(path, { method: 'DELETE', body: { uid: entity.uid } });
-      }
-    } catch (error) {
-      notify.error(`Failed to remove ${entityType}`);
-    } finally {
-      deleting.value = false;
-    }
-  };
-
-  const unlinkAndDelete = async (entity, sceneSlots) => {
-    deleting.value = true;
-    try {
-      for (const { sceneUid, index } of sceneSlots) {
-        await useApiFetch('/api/mixer/remove_source', {
-          method: 'POST',
-          body: { src: 'None', target: sceneUid, index },
-        });
-      }
-      await doDelete(entity);
+      await useApiFetch(`/api/v2/${entityType}s/${entity.uid}`, { method: 'DELETE' });
     } catch (error) {
       notify.error(`Failed to remove ${entityType}`);
     } finally {
@@ -39,10 +18,10 @@ export function useDeleteEntity(entityType, getEntity) {
 
   const getInputSceneSlots = (uid) => {
     const slots = [];
-    for (const mixer of sceneMixers.value) {
-      for (const source of mixer.sources) {
-        if (source.src === uid) {
-          slots.push({ sceneUid: mixer.uid, sceneName: mixer.name, index: source.index });
+    for (const scene of scenes.value) {
+      for (const slot of scene.slots) {
+        if (slot.src === uid) {
+          slots.push({ sceneUid: scene.uid, sceneName: scene.name, id: slot.id });
         }
       }
     }
@@ -59,10 +38,8 @@ export function useDeleteEntity(entityType, getEntity) {
   };
 
   const needsConfirmScene = (entity) => {
-    const hasInputs = entity.sources?.some(s => s.src && s.src !== 'None');
-    const pm = programMixer.value;
-    const activeSource = pm?.sources?.[pm?.active];
-    const isLive = activeSource?.src && activeSource.src !== 'None' && activeSource.src === entity.uid;
+    const hasInputs = entity.slots?.some(s => s.src);
+    const isLive = program.value?.on_air === entity.uid;
     if (isLive) return { message: `Delete scene "${entity.name}"? It is live on program.` };
     if (hasInputs) return { message: `Delete scene "${entity.name}"? It has inputs assigned.` };
     return null;
@@ -99,7 +76,7 @@ export function useDeleteEntity(entityType, getEntity) {
         confirm.require({
           message: confirmation.message,
           header: 'Confirm',
-            accept: () => unlinkAndDelete(entity, confirmation.slots),
+            accept: () => doDelete(entity),
         });
         return;
       }

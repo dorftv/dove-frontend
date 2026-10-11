@@ -1,31 +1,35 @@
 export function useEntities() {
   const inputs = useState('entities-inputs', () => []);
-  const mixers = useState('entities-mixers', () => []);
+  const scenes = useState('entities-scenes', () => []);
+  const program = useState('entities-program', () => null);
   const outputs = useState('entities-outputs', () => []);
   const encoders = useState('entities-encoders', () => []);
   const error = useState('entities-error', () => null);
   const wsStatus = useState('ws-status', () => 'disconnected');
   const isLoading = useState('entities-loading', () => true);
 
-  const updateEntity = (type, updatedEntity) => {
+  // Changes sent over the WebSocket instead of a PATCH with the same body,
+  // for controls that move fast (faders, dragging)
+  const patchEntity = (kind, uid, patch) => {
     const { $ws } = useNuxtApp();
-    $ws.sendMessage({
-      type: type,
-      action: 'UPDATE',
-      data: updatedEntity
-    });
+    $ws.sendMessage({ kind, uid, patch });
+  };
+
+  const patchSlot = (sceneUid, id, patch) => {
+    const { $ws } = useNuxtApp();
+    $ws.sendMessage({ kind: 'slot', scene: sceneUid, id, patch });
   };
 
   const sceneInputs = computed(() => {
     return (inputUid) => {
       const result = [];
-      sceneMixers.value.forEach(mixer => {
-        mixer.sources.forEach(source => {
-          const input = inputs.value.find(input => input.uid === source.src);
+      scenes.value.forEach(scene => {
+        scene.slots.forEach(slot => {
+          const input = inputs.value.find(input => input.uid === slot.src);
           if (input && input.uid === inputUid) {
             result.push({
               ...input,
-              mixer
+              scene
             });
           }
         });
@@ -34,24 +38,15 @@ export function useEntities() {
     };
   });
 
-  const sceneMixerSource = (uid) => {
-    const mixer = sceneMixers.value.find(mixer => mixer.uid === uid);
-    if (!mixer) return [];
-
-    return Object.values(mixer.sources || {}).map(source => ({
-      name: source.name,
-      index: source.index,
-      src_locked: source.src_locked
+  const sceneSlots = (uid) => {
+    const scene = scenes.value.find(scene => scene.uid === uid);
+    if (!scene) return [];
+    return (scene.slots || []).map(slot => ({
+      name: slot.name,
+      id: slot.id,
+      src_locked: slot.src_locked
     }));
   };
-
-  const sceneMixers = computed(() => {
-    return mixers.value.filter(mixer => mixer.type === 'scene');
-  });
-
-  const programMixer = computed(() => {
-    return mixers.value.find(mixer => mixer.type === 'program');
-  });
 
   const inputsPreview = computed(() => {
     return inputs.value.filter(input => input.preview === true && input.type !== 'nodecg');
@@ -67,9 +62,10 @@ export function useEntities() {
 
   const entityMap = computed(() => {
     const map = new Map();
-    for (const list of [inputs.value, mixers.value, outputs.value, encoders.value]) {
+    for (const list of [inputs.value, scenes.value, outputs.value, encoders.value]) {
       for (const e of list) map.set(e.uid, e);
     }
+    if (program.value) map.set(program.value.uid, program.value);
     return map;
   });
 
@@ -89,8 +85,8 @@ export function useEntities() {
     for (const [field, keys] of Object.entries(linkFields)) {
       if (data[field]) data[field] = resolveField(data[field], keys);
     }
-    if (data.sources) {
-      data.sources = data.sources.map(s => ({
+    if (data.slots) {
+      data.slots = data.slots.map(s => ({
         ...s,
         src: s.src ? resolveField(s.src, ['name', 'type']) : s.src,
       }));
@@ -117,17 +113,17 @@ export function useEntities() {
     inputsNoPreview,
     inputsNodeCG,
     previewOutputs,
-    mixers,
+    scenes,
+    program,
     outputs,
     encoders,
     entityMap,
     resolveEntity,
     enrichEntity,
     sceneInputs,
-    sceneMixerSource,
-    sceneMixers,
-    programMixer,
-    updateEntity,
+    sceneSlots,
+    patchEntity,
+    patchSlot,
     error,
     wsStatus,
     isLoading

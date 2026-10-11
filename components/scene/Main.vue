@@ -80,15 +80,15 @@
 import Sortable from 'sortablejs';
 import { useLocalStorage } from '@vueuse/core';
 
-const { sceneMixers } = useEntities();
+const { scenes } = useEntities();
 const { activeScene, handleSceneClick, selectedScene } = useActiveScene();
-const { ordered: orderedScenes, saveOrder } = useEntityOrder('dove-scene-order', sceneMixers);
+const { ordered: orderedScenes, saveOrder } = useEntityOrder('dove-scene-order', scenes);
 
 const viewMode = useLocalStorage('dove-scene-view', 'tabs');
 const previewSize = useLocalStorage('dove-scene-preview-size', 180);
 
 const selectScene = (scene) => {
-  const realIndex = sceneMixers.value.findIndex(s => s.uid === scene.uid);
+  const realIndex = scenes.value.findIndex(s => s.uid === scene.uid);
   if (realIndex >= 0) handleSceneClick(realIndex);
 };
 

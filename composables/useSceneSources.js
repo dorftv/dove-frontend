@@ -1,5 +1,5 @@
 export function useSceneSources(getScene, getSource) {
-  const { inputs, updateEntity: updateEntityInEntities } = useEntities();
+  const { inputs, patchSlot } = useEntities();
   const { volumeIcon: volumeIconFn } = useStateClass();
   const notify = useNotify();
 
@@ -33,11 +33,7 @@ export function useSceneSources(getScene, getSource) {
     sendInFlight = true;
     setTimeout(() => { sendInFlight = false; }, 1000);
     const apiValue = toApi[prop] ? toApi[prop](newValue) : newValue;
-    updateEntityInEntities('mixer', {
-      uid: scene().uid,
-      index: source().index,
-      [prop]: apiValue
-    });
+    patchSlot(scene().uid, source().id, { [prop]: apiValue });
   };
 
   const getMax = (type) => {
@@ -87,13 +83,7 @@ export function useSceneSources(getScene, getSource) {
 
   const removeSlot = async () => {
     try {
-      await useApiFetch('/api/mixer/remove_slot', {
-        method: 'POST',
-        body: {
-          uid: scene().uid,
-          index: source().index
-        }
-      });
+      await useApiFetch(`/api/v2/scenes/${scene().uid}/slots/${source().id}`, { method: 'DELETE' });
     } catch (error) {
       notify.error('Failed to remove slot');
     }
@@ -114,18 +104,14 @@ export function useSceneSources(getScene, getSource) {
 
   const volumeIcon = computed(() => volumeIconFn(state.volume, state.mute));
 
+  // Link an input to the slot, or empty it with nothing
   const changeSource = async (raw) => {
-    const uid = typeof raw === 'object' ? raw?.uid : raw;
-    const isRemove = !uid || uid === 'None';
-    if (!isRemove && !inputs.value.some(i => i.uid === uid)) return;
+    const uid = (typeof raw === 'object' ? raw?.uid : raw) || null;
+    if (uid && !inputs.value.some(i => i.uid === uid)) return;
     try {
-      await useApiFetch(isRemove ? '/api/mixer/remove_source' : '/api/mixer/add_source', {
-        method: 'POST',
-        body: {
-          src: isRemove ? 'None' : uid,
-          target: scene().uid,
-          index: source().index,
-        },
+      await useApiFetch(`/api/v2/scenes/${scene().uid}/slots/${source().id}`, {
+        method: 'PATCH',
+        body: { src: uid },
       });
     } catch {
       notify.error('Failed to change source');

@@ -54,10 +54,10 @@
           <ServerStatus />
 
           <!-- Desktop-only icons -->
-          <NuxtLink v-if="canAdmin" to="/api/debug/graphviz" external target="_blank" class="hidden md:flex icon-btn" title="Pipelines" aria-label="Pipelines">
+          <NuxtLink v-if="canAdmin" to="/api/v2/debug/graphviz" external target="_blank" class="hidden md:flex icon-btn" title="Pipelines" aria-label="Pipelines">
             <Icon name="ph:graph" size="16px" />
           </NuxtLink>
-          <NuxtLink v-if="canAdmin" to="/api/debug/docs" external target="_blank" class="hidden md:flex icon-btn" title="API Docs" aria-label="API Docs">
+          <NuxtLink v-if="canAdmin" to="/api/v2/debug/docs" external target="_blank" class="hidden md:flex icon-btn" title="API Docs" aria-label="API Docs">
             <Icon name="ph:code" size="16px" />
           </NuxtLink>
           <NuxtLink to="/help" class="hidden md:flex icon-btn" title="Help" aria-label="Help">
@@ -109,10 +109,10 @@
           <NuxtLink to="/websockets" @click="mobileMenuOpen = false" class="mobile-link">
             <Icon name="ph:plugs-connected" size="16px" /> WebSocket
           </NuxtLink>
-          <NuxtLink to="/api/debug/graphviz" external target="_blank" class="mobile-link">
+          <NuxtLink to="/api/v2/debug/graphviz" external target="_blank" class="mobile-link">
             <Icon name="ph:graph" size="16px" /> Pipelines
           </NuxtLink>
-          <NuxtLink to="/api/debug/docs" external target="_blank" class="mobile-link">
+          <NuxtLink to="/api/v2/debug/docs" external target="_blank" class="mobile-link">
             <Icon name="ph:code" size="16px" /> API Docs
           </NuxtLink>
         </template>

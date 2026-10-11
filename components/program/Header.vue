@@ -1,17 +1,17 @@
 <template>
-  <div v-if="programMixer" class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-3 py-1.5 flex items-center gap-1.5 text-xs">
-    <UTooltip :text="String(programMixer.uid)">
+  <div v-if="program" class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-3 py-1.5 flex items-center gap-1.5 text-xs">
+    <UTooltip :text="String(program.uid)">
       <span class="text-sm text-gray-800 dark:text-gray-200 font-medium truncate cursor-help">
-        {{ programMixer.name || 'Program' }}
+        {{ program.name || 'Program' }}
       </span>
     </UTooltip>
     <span
       class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide leading-none"
-      :class="programMixer.state === 'PLAYING'
+      :class="program.state === 'PLAYING'
         ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-400'
         : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
     >
-      {{ programMixer.state === 'PLAYING' ? 'LIVE' : programMixer.state }}
+      {{ program.state === 'PLAYING' ? 'LIVE' : program.state }}
     </span>
     <div class="flex-grow" />
     <template v-if="canSupervisor">
@@ -26,7 +26,7 @@
           class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-blue-500 text-white text-[7px] font-bold leading-none px-0.5"
         >{{ programFilterCount }}</span>
       </button>
-      <AudioFilters v-model:open="filtersOpen" :mixer="programMixer" :ctx="afCtx" />
+      <AudioFilters v-model:open="filtersOpen" :mixer="program" :ctx="afCtx" />
       <button
         @click="vfOpen = true"
         class="flex items-center justify-center w-6 h-6 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors cursor-pointer relative"
@@ -38,19 +38,19 @@
           class="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[7px] font-bold leading-none px-0.5"
         >{{ programVfCount }}</span>
       </button>
-      <VideoFilters v-model:open="vfOpen" :mixer="programMixer" :ctx="vfCtx" />
+      <VideoFilters v-model:open="vfOpen" :mixer="program" :ctx="vfCtx" />
     </template>
-    <DetailPopover :entity="programMixer" />
+    <DetailPopover :entity="program" />
   </div>
 </template>
 
 <script setup>
-const { programMixer } = useEntities();
+const { program } = useEntities();
 const { canSupervisor } = useAuth();
 const filtersOpen = ref(false);
 const vfOpen = ref(false);
-const afCtx = useAudioFilters({ mixer: () => programMixer.value });
-const vfCtx = useVideoFilters({ mixer: () => programMixer.value });
+const afCtx = useAudioFilters({ mixer: () => program.value });
+const vfCtx = useVideoFilters({ mixer: () => program.value });
 const programFilterCount = afCtx.filterCount;
 const programVfCount = vfCtx.filterCount;
 </script>

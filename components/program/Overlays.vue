@@ -1,8 +1,7 @@
 <template>
-  <div v-if="programMixer" class="border-t border-gray-200 dark:border-gray-700">
-    <template v-for="(overlay, i) in programMixer.sources" :key="overlay.src">
+  <div v-if="program" class="border-t border-gray-200 dark:border-gray-700">
+    <template v-for="(overlay, i) in program.overlays" :key="overlay.id">
       <div
-        v-if="overlay.index >= 2"
         class="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700/50 last:border-b-0"
         :class="i % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/60' : 'bg-white dark:bg-gray-800/30'"
       >
@@ -25,7 +24,7 @@
 </template>
 
 <script setup>
-const { programMixer, getInputInfo } = useProgram();
+const { program, getInputInfo } = useProgram();
 const { inputs } = useEntities();
 const { stateIcon, stateBadgeClass } = useStateClass();
 

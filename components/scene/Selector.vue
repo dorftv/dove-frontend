@@ -32,12 +32,12 @@
 </template>
 
 <script setup>
-const { sceneMixers } = useEntities();
+const { scenes } = useEntities();
 const { activeScene, handleSceneClick, selectedScene } = useActiveScene();
-const { ordered: orderedScenes } = useEntityOrder('dove-scene-order', sceneMixers);
+const { ordered: orderedScenes } = useEntityOrder('dove-scene-order', scenes);
 
 const selectScene = (scene) => {
-  const realIndex = sceneMixers.value.findIndex(s => s.uid === scene.uid);
+  const realIndex = scenes.value.findIndex(s => s.uid === scene.uid);
   if (realIndex >= 0) handleSceneClick(realIndex);
 };
 </script>

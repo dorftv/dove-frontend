@@ -2,7 +2,7 @@ export const useCreateEncoder = () => {
   const isOpen = ref(false);
   const isSubmitting = ref(false);
   const notify = useNotify();
-  const { mixers } = useEntities();
+  const { scenes, program } = useEntities();
   const doveConfig = useDoveConfig();
 
   const encoderType = ref('video');
@@ -20,13 +20,14 @@ export const useCreateEncoder = () => {
   const resolutionOptions = computed(() => doveConfig.resolutionOptions.value);
   const defaultResolution = computed(() => doveConfig.defaultResolution.value);
 
+  // What an encoder can encode: the program, or a scene
   const availSrc = computed(() =>
-    (mixers.value || []).map(m => ({ name: m.name, value: m.uid }))
+    [program.value, ...scenes.value].filter(Boolean).map(m => ({ name: m.name, value: m.uid }))
   );
 
   const fetchEncoderConfigs = async () => {
     try {
-      const data = await useApiFetch('/api/config/encoder');
+      const data = await useApiFetch('/api/v2/config/encoder');
       encoderConfigs.video = data.video || [];
       encoderConfigs.audio = data.audio || [];
     } catch (error) {
@@ -91,7 +92,7 @@ export const useCreateEncoder = () => {
 
     isSubmitting.value = true;
     try {
-      const result = await useApiFetch('/api/encoders', { method: 'PUT', body });
+      const result = await useApiFetch('/api/v2/encoders', { method: 'POST', body });
       isOpen.value = false; // close (and reset) only on success
       return result;
     } catch (error) {

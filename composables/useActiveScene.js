@@ -5,26 +5,18 @@ export function useActiveScene() {
   const selectedScene = useState('active-scene-selected', () => null);
   const notify = useNotify();
 
-  const { sceneMixers, programMixer } = useEntities();
+  const { scenes, program } = useEntities();
 
+  // The scene that is on air, if what is on air is a scene
   const activeScene = computed(() => {
-    if (programMixer.value &&
-        programMixer.value.active !== undefined &&
-        programMixer.value.sources &&
-        sceneMixers.value) {
-      const activeSourceIndex = programMixer.value.active;
-      const activeSource = programMixer.value.sources[activeSourceIndex];
-      if (activeSource && activeSource.src) {
-        return sceneMixers.value.find(sceneMixer => sceneMixer.uid === activeSource.src);
-      }
-    }
-    return null;
+    const onAir = program.value?.on_air;
+    return (onAir && scenes.value.find(scene => scene.uid === onAir)) || null;
   });
 
   const handleSceneClick = (index) => {
-    if (index >= 0 && index < sceneMixers.value.length) {
+    if (index >= 0 && index < scenes.value.length) {
       activeIndex.value = index;
-      selectedScene.value = sceneMixers.value[index];
+      selectedScene.value = scenes.value[index];
     }
   };
 
@@ -44,7 +36,7 @@ export function useActiveScene() {
         body.transition = 'fade';
         body.duration = transitionDuration.value;
       }
-      await useApiFetch('/api/mixer/cut_program', {
+      await useApiFetch('/api/v2/program/cut', {
         method: 'POST',
         body,
       });
@@ -56,9 +48,9 @@ export function useActiveScene() {
   };
 
   // When a scene is added, select it automatically
-  watch(sceneMixers, (newSceneMixers, oldSceneMixers) => {
-    if (newSceneMixers && oldSceneMixers && newSceneMixers.length > oldSceneMixers.length) {
-      activeIndex.value = newSceneMixers.length - 1;
+  watch(scenes, (newScenes, oldScenes) => {
+    if (newScenes && oldScenes && newScenes.length > oldScenes.length) {
+      activeIndex.value = newScenes.length - 1;
     }
   });
 
@@ -82,21 +74,21 @@ export function useActiveScene() {
 
   // Keep selectedScene in sync with activeIndex
   let restored = false;
-  watch([activeIndex, sceneMixers], ([newIndex, newSceneMixers]) => {
-    if (!newSceneMixers || newSceneMixers.length === 0) {
+  watch([activeIndex, scenes], ([newIndex, newScenes]) => {
+    if (!newScenes || newScenes.length === 0) {
       selectedScene.value = null;
       return;
     }
     if (!restored) {
       restored = true;
-      restoreSelection(newSceneMixers);
+      restoreSelection(newScenes);
       return;
     }
-    if (newSceneMixers.length > newIndex) {
-      selectedScene.value = newSceneMixers[newIndex];
+    if (newScenes.length > newIndex) {
+      selectedScene.value = newScenes[newIndex];
     } else {
-      activeIndex.value = newSceneMixers.length - 1;
-      selectedScene.value = newSceneMixers[activeIndex.value];
+      activeIndex.value = newScenes.length - 1;
+      selectedScene.value = newScenes[activeIndex.value];
     }
   }, { immediate: true });
 

@@ -2,22 +2,21 @@ export function useMutedState() {
   const mutedState = useState('muted-state', () => ({}));
   const initialized = useState('muted-initialized', () => ({}));
 
-  const { sceneMixers, inputs, programMixer } = useEntities();
+  const { scenes, inputs, program } = useEntities();
 
   const hasV4l2Audio = (uid) => {
     const input = inputs.value.find(i => i.uid === uid);
     if (input?.type === 'v4l2src' && input.has_audio !== false) return true;
 
-    const scene = sceneMixers.value.find(s => s.uid === uid);
+    const scene = scenes.value.find(s => s.uid === uid);
     if (scene) {
-      return scene.sources?.some(src =>
-        inputs.value.find(i => i.uid === src.src && i.type === 'v4l2src' && i.has_audio !== false)
+      return scene.slots?.some(slot =>
+        inputs.value.find(i => i.uid === slot.src && i.type === 'v4l2src' && i.has_audio !== false)
       );
     }
 
-    if (programMixer.value?.uid === uid) {
-      const activeSource = programMixer.value.sources?.[programMixer.value.active];
-      if (activeSource?.src) return hasV4l2Audio(activeSource.src);
+    if (program.value?.uid === uid && program.value.on_air) {
+      return hasV4l2Audio(program.value.on_air);
     }
 
     return false;
@@ -26,9 +25,9 @@ export function useMutedState() {
   const entityUids = computed(() => {
     const uids = [
       ...inputs.value.map(i => i.uid),
-      ...sceneMixers.value.map(s => s.uid),
+      ...scenes.value.map(s => s.uid),
     ];
-    if (programMixer.value) uids.push(programMixer.value.uid);
+    if (program.value) uids.push(program.value.uid);
     return uids;
   });
 
@@ -65,8 +64,8 @@ export function useMutedState() {
       }
     }
     // Auto-unmute program on first load if nothing else is unmuted
-    if (hasNew && programMixer.value) {
-      const pmUid = programMixer.value.uid;
+    if (hasNew && program.value) {
+      const pmUid = program.value.uid;
       const anyUnmuted = Object.keys(mutedState.value).some(k => !mutedState.value[k]);
       if (!anyUnmuted && !hasV4l2Audio(pmUid)) {
         mutedState.value[pmUid] = false;

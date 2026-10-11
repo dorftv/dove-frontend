@@ -1,6 +1,6 @@
 export const useCreateInput = () => {
   const baseCreate = useCreateEntity('inputs');
-  const { sceneMixerSource, sceneMixers } = useEntities();
+  const { sceneSlots, scenes } = useEntities();
   const { addInput, proxyTypes } = useDoveConfig();
   const { proxyItems, fetchItems, handleProxyName } = useProxyItems();
   const notify = useNotify();
@@ -15,7 +15,7 @@ export const useCreateInput = () => {
   const submitCutProgram = async () => {
     if (selectedSceneProgram.value) {
       try {
-        await useApiFetch('/api/mixer/cut_program', {
+        await useApiFetch('/api/v2/program/cut', {
           method: 'POST',
           body: { src: selectedScene.uid },
         });
@@ -29,13 +29,9 @@ export const useCreateInput = () => {
   const submitAddToScene = async (responseJson) => {
     if (selectedScene.uid && selectedScene.slot !== null) {
       try {
-        await useApiFetch('/api/mixer/add_source', {
-          method: 'POST',
-          body: {
-            src: responseJson.uid,
-            target: selectedScene.uid,
-            index: selectedScene.slot
-          },
+        await useApiFetch(`/api/v2/scenes/${selectedScene.uid}/slots/${selectedScene.slot}`, {
+          method: 'PATCH',
+          body: { src: responseJson.uid },
         });
         await submitCutProgram();
       } catch (error) {
@@ -51,7 +47,7 @@ export const useCreateInput = () => {
 
   const currentSources = computed(() => {
     if (!selectedScene.uid) return [];
-    return sceneMixerSource(selectedScene.uid);
+    return sceneSlots(selectedScene.uid);
   });
 
   const filteredSources = computed(() => {
@@ -60,10 +56,9 @@ export const useCreateInput = () => {
 
   watch(() => selectedScene.uid, (newUid) => {
     if (newUid) {
-      const sources = sceneMixerSource(newUid);
-      const firstAvailableSlot = sources.find(source => !source.id);
+      const firstAvailableSlot = sceneSlots(newUid).find(slot => !slot.src_locked);
       if (firstAvailableSlot) {
-        selectedScene.slot = firstAvailableSlot.index;
+        selectedScene.slot = firstAvailableSlot.id;
       }
     } else {
       selectedScene.slot = null;
@@ -113,6 +108,6 @@ export const useCreateInput = () => {
     fetchItems,
     addInput,
     proxyTypes,
-    sceneMixers,
+    scenes,
   };
 };

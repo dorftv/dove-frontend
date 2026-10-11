@@ -4,7 +4,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   let reconnectDelay = 1000;
   let lastMessage = 0;
   let healthInterval = null;
-  let lastFetchEntities = 0;
 
   // Toasts from WS callbacks run outside the Nuxt context
   const notifyError = (msg) => nuxtApp.runWithContext(() => useNotify().error(msg));
@@ -13,18 +12,19 @@ export default defineNuxtPlugin((nuxtApp) => {
   const error = useState('entities-error', () => null);
 
   const inputs = useState('entities-inputs', () => []);
-  const mixers = useState('entities-mixers', () => []);
+  const scenes = useState('entities-scenes', () => []);
+  const program = useState('entities-program', () => null);
   const outputs = useState('entities-outputs', () => []);
   const encoders = useState('entities-encoders', () => []);
   const audioLevels = useState('audio-levels', () => ({}));
   const serverLoad = useState('server-load', () => null);
   const isLoading = useState('entities-loading', () => true);
 
-  const getEntitiesArray = (type) => {
-    if (type === 'input') return inputs;
-    if (type === 'mixer') return mixers;
-    if (type === 'output') return outputs;
-    if (type === 'encoder') return encoders;
+  const getEntitiesArray = (kind) => {
+    if (kind === 'input') return inputs;
+    if (kind === 'scene') return scenes;
+    if (kind === 'output') return outputs;
+    if (kind === 'encoder') return encoders;
   };
 
   const getWsUrl = () => {
@@ -34,30 +34,23 @@ export default defineNuxtPlugin((nuxtApp) => {
       url = config.public.wsUrl;
     } else if (process.dev) {
       // In dev, connect directly to backend on port 5000 using same hostname
-      url = `ws://${window.location.hostname}:5000/ws`;
+      url = `ws://${window.location.hostname}:5000/api/v2/ws`;
     } else {
       // In production, WS goes through the same host (reverse proxy handles it)
-      url = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
+      url = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/api/v2/ws`;
     }
     return url;
   };
 
   const config = useState('dove-config');
 
-  const fetchEntities = async () => {
+  // Config and load figures. The entities themselves arrive as the first WebSocket message.
+  const fetchStatic = async () => {
     try {
-      const [inputsData, mixersData, outputsData, encodersData, configData, loadData] = await Promise.all([
-        $fetch('/api/inputs'),
-        $fetch('/api/mixers'),
-        $fetch('/api/outputs'),
-        $fetch('/api/encoders'),
-        $fetch('/api/config'),
-        $fetch('/api/load'),
+      const [configData, loadData] = await Promise.all([
+        $fetch('/api/v2/config'),
+        $fetch('/api/v2/load'),
       ]);
-      inputs.value = inputsData;
-      mixers.value = mixersData;
-      outputs.value = outputsData;
-      encoders.value = encodersData;
       config.value = configData;
       serverLoad.value = loadData;
       error.value = null;
@@ -67,10 +60,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         login();
         return;
       }
-      error.value = 'Failed to load entities: ' + e.message;
-      console.error('Failed to load entities:', e);
-    } finally {
-      isLoading.value = false;
+      error.value = 'Failed to load config: ' + e.message;
+      console.error('Failed to load config:', e);
     }
   };
 
@@ -121,8 +112,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       error.value = null;
       reconnectDelay = 1000;
       lastMessage = Date.now();
-      lastFetchEntities = 0;
-      fetchEntities();
     };
 
     ws.onmessage = (event) => {
@@ -135,21 +124,44 @@ export default defineNuxtPlugin((nuxtApp) => {
         return;
       }
 
-      if (message.channel === 'LEVEL') {
-        const levels = Array.isArray(message.data) ? message.data : [message.data];
-        for (const l of levels) {
+      const type = message.event;
+
+      // Everything there is, sent on connect and again whenever the server had to drop messages
+      if (type === 'snapshot') {
+        inputs.value = message.inputs;
+        scenes.value = message.scenes;
+        program.value = message.program;
+        encoders.value = message.encoders;
+        outputs.value = message.outputs;
+        error.value = null;
+        isLoading.value = false;
+        return;
+      }
+
+      if (type === 'level') {
+        for (const l of message.data) {
           audioLevels.value[l.uid] = l;
         }
         return;
       }
 
-      // Server rejected or failed one of our updates (REST calls get an HTTP error instead)
-      if (message.channel === 'ERROR') {
-        notifyError(message.data?.message || 'Update failed');
+      if (type === 'position') {
+        for (const p of message.data) {
+          const index = inputs.value.findIndex(e => e.uid === p.uid);
+          if (index !== -1) {
+            inputs.value.splice(index, 1, { ...inputs.value[index], position: p.position, duration: p.duration });
+          }
+        }
         return;
       }
 
-      if (message.channel === 'TICK') {
+      // Server rejected or failed one of our changes (REST calls get an HTTP error instead)
+      if (type === 'error') {
+        notifyError(message.message || 'Update failed');
+        return;
+      }
+
+      if (type === 'tick') {
         if (serverLoad.value) {
           const updates = { uptime: message.data.uptime };
           if (message.data.load1 != null) updates.load1 = message.data.load1;
@@ -164,28 +176,33 @@ export default defineNuxtPlugin((nuxtApp) => {
         return;
       }
 
-      const entities = getEntitiesArray(message.type);
-      if (!entities) {
-        console.warn('Unknown type:', message.type);
+      // There is one program, and it is never created or deleted
+      if (message.kind === 'program') {
+        program.value = message.data;
         return;
       }
 
-      if (message.channel === 'CREATE') {
-        if (!entities.value.some(e => e.uid === message.data.uid)) {
+      const entities = getEntitiesArray(message.kind);
+      if (!entities) {
+        console.warn('Unknown kind:', message.kind);
+        return;
+      }
+
+      // created and updated carry the whole entity
+      if (type === 'created' || type === 'updated') {
+        const index = entities.value.findIndex(e => e.uid === message.data.uid);
+        if (index === -1) {
           entities.value.push(message.data);
+        } else {
+          entities.value.splice(index, 1, message.data);
         }
-      } else if (message.channel === 'UPDATE') {
-        const index = entities.value.findIndex(e => e.uid === message.data.uid);
-        if (index !== -1) {
-          entities.value.splice(index, 1, { ...entities.value[index], ...message.data });
-        }
-      } else if (message.channel === 'DELETE') {
-        const index = entities.value.findIndex(e => e.uid === message.data.uid);
+      } else if (type === 'deleted') {
+        const index = entities.value.findIndex(e => e.uid === message.uid);
         if (index !== -1) {
           entities.value.splice(index, 1);
         }
         // prune per-uid level state so map doesn't grow unbounded over long sessions
-        delete audioLevels.value[message.data.uid];
+        delete audioLevels.value[message.uid];
       }
     };
 
@@ -213,32 +230,18 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   };
 
-  // Health check: poll entities and reconnect WS if stale.
+  // Health check: reconnect the WebSocket if it is closed or silent. A new connection starts
+  // with a snapshot, so nothing has to be fetched again.
   // Works regardless of visibility API / timer throttling reliability.
   const startHealthCheck = () => {
     if (healthInterval) return;
-    healthInterval = setInterval(async () => {
+    healthInterval = setInterval(() => {
       const wsAlive = ws && ws.readyState === WebSocket.OPEN;
       const stale = Date.now() - lastMessage > 10000;
-
-      if (!wsAlive || stale) {
-        // Throttled poll to keep data fresh regardless of WS state
-        if (Date.now() - lastFetchEntities > 30000) {
-          lastFetchEntities = Date.now();
-          await fetchEntities();
-        }
-        // Respect exponential backoff from scheduleReconnect()
-        if (!wsAlive) {
-          if (!reconnectTimer) {
-            scheduleReconnect();
-          }
-        } else if (stale) {
-          // Socket looks open but no messages — force reconnect
-          console.log('WebSocket stale, reconnecting');
-          if (!reconnectTimer) {
-            scheduleReconnect();
-          }
-        }
+      if ((!wsAlive || stale) && !reconnectTimer) {
+        if (wsAlive) console.log('WebSocket stale, reconnecting');
+        // Respects the exponential backoff
+        scheduleReconnect();
       }
     }, 5000);
   };
@@ -258,14 +261,14 @@ export default defineNuxtPlugin((nuxtApp) => {
       login();
       return;
     }
-    await fetchEntities();
+    await fetchStatic();
     connect();
     startHealthCheck();
   });
 
   return {
     provide: {
-      ws: { sendMessage, status, connect, disconnect, fetchEntities },
+      ws: { sendMessage, status, connect, disconnect },
     },
   };
 });

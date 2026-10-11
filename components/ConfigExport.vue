@@ -58,7 +58,7 @@
 <script setup>
 const open = defineModel('open', { type: Boolean, default: false });
 
-const { inputs, sceneMixers, outputs } = useEntities();
+const { inputs, scenes, outputs } = useEntities();
 const { canAdmin } = useAuth();
 const toast = useToast();
 
@@ -70,7 +70,7 @@ const loading = ref(false);
 const preview = ref(null);
 
 const inputCount = computed(() => inputs.value.length);
-const sceneCount = computed(() => sceneMixers.value.length);
+const sceneCount = computed(() => scenes.value.length);
 const outputCount = computed(() => outputs.value.filter(o => !o.is_preview).length);
 
 // Clear preview when toggles change
@@ -84,7 +84,7 @@ const buildUrl = () => {
   params.set('scenes', includeScenes.value);
   params.set('outputs', includeOutputs.value);
   params.set('settings', includeSettings.value);
-  return `/api/config/export?${params}`;
+  return `/api/v2/config/export?${params}`;
 };
 
 const loadPreview = async () => {

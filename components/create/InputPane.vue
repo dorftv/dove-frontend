@@ -135,7 +135,7 @@
                 <label class="block text-sm text-gray-700 dark:text-gray-300">Scene</label>
                 <USelect
                   v-model="selectedScene.uid"
-                  :items="sceneMixers"
+                  :items="scenes"
                   label-key="name"
                   value-key="uid"
                   placeholder="Add Input to Scene"
@@ -147,7 +147,7 @@
                     v-model="selectedScene.slot"
                     :items="currentSources"
                     label-key="name"
-                    value-key="index"
+                    value-key="id"
                     placeholder="Select a Slot"
                     class="w-full mb-1"
                     size="sm"
@@ -193,7 +193,7 @@ const {
   fetchItems,
   addInput,
   proxyTypes,
-  sceneMixers,
+  scenes,
 } = useCreateInput();
 
 const typeOptions = computed(() =>

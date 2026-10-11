@@ -29,8 +29,8 @@ export function useServerLoad() {
 
   const previewFps = computed(() => load.value?.preview_fps ?? null);
 
-  // PUT new preview fps; backend broadcasts updated value via /api/load poll.
-  const setPreviewFps = (n) => useApiFetch('/api/load/preview_fps', {
+  // PUT new preview fps; backend broadcasts updated value via /api/v2/load.
+  const setPreviewFps = (n) => useApiFetch('/api/v2/load/preview_fps', {
     method: 'PUT',
     body: { fps: n },
   });

@@ -42,9 +42,9 @@ const props = defineProps({
 });
 
 const { deleting, submitRemove } = useDeleteEntity('scene', () => props.scene);
-const { updateEntity } = useEntities();
+const { patchEntity } = useEntities();
 
 const updateName = (newName) => {
-  updateEntity('mixer', { uid: props.scene.uid, name: newName });
+  patchEntity('scene', props.scene.uid, { name: newName });
 };
 </script>
