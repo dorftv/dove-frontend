@@ -18,7 +18,7 @@
       />
       <label class="flex items-center gap-1.5 text-gray-400 cursor-pointer select-none hover:text-gray-200">
         <input type="checkbox" v-model="showLevels" class="accent-yellow-400" />
-        Audio Levels
+        Levels, positions, ticks
       </label>
       <div class="flex-grow" />
       <span class="text-gray-500">{{ filteredMessages.length }} messages</span>
@@ -41,7 +41,7 @@
         class="flex gap-2 px-2 py-1 rounded hover:bg-gray-800 group"
       >
         <span class="text-gray-600 shrink-0">{{ msg.time }}</span>
-        <span :class="channelColor(msg.channel)" class="shrink-0 w-14">{{ msg.channel }}</span>
+        <span :class="channelColor(msg.channel)" class="shrink-0 w-16">{{ msg.channel }}</span>
         <span class="text-gray-400 shrink-0 w-14">{{ msg.type }}</span>
         <span class="text-gray-300 truncate cursor-pointer" @click="msg.expanded = !msg.expanded">
           <template v-if="msg.expanded">
