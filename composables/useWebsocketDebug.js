@@ -7,6 +7,8 @@ export function useWebsocketDebug() {
   const MAX_MESSAGES = 500;
 
   let socket = null;
+  let reconnectTimer = null;
+  let leaving = false;
 
   // API v2: every message has an `event`; entity events also say which `kind`
   const channelOptions = ['snapshot', 'created', 'updated', 'deleted', 'position', 'level', 'tick', 'error'];
@@ -101,6 +103,11 @@ export function useWebsocketDebug() {
     socket.onerror = (error) => {
       console.error('WebSocket Error:', error);
     };
+
+    // The backend was restarted, or the connection was lost: connect again
+    socket.onclose = () => {
+      if (!leaving) reconnectTimer = setTimeout(setupWebSocket, 1000);
+    };
   };
 
   onMounted(() => {
@@ -108,6 +115,8 @@ export function useWebsocketDebug() {
   });
 
   onUnmounted(() => {
+    leaving = true;
+    clearTimeout(reconnectTimer);
     if (socket) {
       socket.close();
     }
