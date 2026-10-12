@@ -25,7 +25,7 @@
       <dl class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
         <div class="flex gap-2">
           <dt class="font-medium w-28 shrink-0">Backend</dt>
-          <dd class="text-gray-500 dark:text-gray-400">Python, FastAPI, GStreamer</dd>
+          <dd class="text-gray-500 dark:text-gray-400">Rust, axum, GStreamer</dd>
         </div>
         <div class="flex gap-2">
           <dt class="font-medium w-28 shrink-0">Frontend</dt>
@@ -33,7 +33,7 @@
         </div>
         <div class="flex gap-2">
           <dt class="font-medium w-28 shrink-0">Streaming</dt>
-          <dd class="text-gray-500 dark:text-gray-400">SRT, RTMP, HLS, WebRTC (WHEP), Decklink</dd>
+          <dd class="text-gray-500 dark:text-gray-400">SRT, RTMP, RTSP, HLS, Icecast, WebRTC (WHIP, WHEP)</dd>
         </div>
       </dl>
     </section>
