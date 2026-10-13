@@ -149,7 +149,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         for (const p of message.data) {
           const index = inputs.value.findIndex(e => e.uid === p.uid);
           if (index !== -1) {
-            inputs.value.splice(index, 1, { ...inputs.value[index], position: p.position, duration: p.duration });
+            const moved = { ...inputs.value[index], position: p.position, duration: p.duration };
+            // A playlist also says how far it is through all of its clips
+            if (p.total_position != null) moved.total_position = p.total_position;
+            inputs.value.splice(index, 1, moved);
           }
         }
         return;
