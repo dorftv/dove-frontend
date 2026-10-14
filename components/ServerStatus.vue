@@ -22,6 +22,14 @@
           <span class="text-gray-500 dark:text-gray-400">Memory</span>
           <span :class="statusColor(memoryPercent)">{{ memory }}</span>
         </div>
+        <div v-if="load.net_in_kbps != null" class="flex justify-between">
+          <span class="text-gray-500 dark:text-gray-400">Network in</span>
+          <span>{{ rate(load.net_in_kbps) }}</span>
+        </div>
+        <div v-if="load.net_out_kbps != null" class="flex justify-between">
+          <span class="text-gray-500 dark:text-gray-400">Network out</span>
+          <span>{{ rate(load.net_out_kbps) }}</span>
+        </div>
         <div class="flex justify-between">
           <span class="text-gray-500 dark:text-gray-400">Users</span>
           <span>{{ viewers }}</span>
@@ -61,6 +69,9 @@ const { canAdmin } = useAuth();
 // Local copy so the slider feels responsive while dragging; commits on @change.
 const localFps = ref(previewFps.value);
 watch(previewFps, v => { if (v != null) localFps.value = v });
+
+// kbit/s from the server, shown as kbit/s or Mbit/s
+const rate = (kbps) => (kbps >= 1000 ? `${(kbps / 1000).toFixed(1)} Mbit/s` : `${kbps} kbit/s`);
 
 const statusColor = (percent) => ({
   'text-red-500': percent > 80,

@@ -174,6 +174,8 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
           if (message.data.viewers != null) updates.viewers = message.data.viewers;
           if (message.data.fds != null) updates.fds = message.data.fds;
+          if (message.data.net_in_kbps != null) updates.net_in_kbps = message.data.net_in_kbps;
+          if (message.data.net_out_kbps != null) updates.net_out_kbps = message.data.net_out_kbps;
           serverLoad.value = { ...serverLoad.value, ...updates };
         }
         return;
