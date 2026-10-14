@@ -22,6 +22,18 @@
           <span class="text-gray-500 dark:text-gray-400">Memory</span>
           <span :class="statusColor(memoryPercent)">{{ memory }}</span>
         </div>
+        <div v-if="load.video" class="flex justify-between">
+          <span class="text-gray-500 dark:text-gray-400">Video</span>
+          <span :title="load.gpu || ''">{{ load.video === 'gl' ? 'GPU' : 'CPU' }}</span>
+        </div>
+        <div v-if="load.gpu_usage" class="flex justify-between">
+          <span class="text-gray-500 dark:text-gray-400">GPU</span>
+          <span :class="statusColor(load.gpu_usage.percent)" :title="gpuEngines">{{ load.gpu_usage.percent }}%</span>
+        </div>
+        <div v-if="load.gpu_usage" class="flex justify-between">
+          <span class="text-gray-500 dark:text-gray-400">GPU memory</span>
+          <span>{{ load.gpu_usage.vram_mb }}MB</span>
+        </div>
         <div v-if="load.net_in_kbps != null" class="flex justify-between">
           <span class="text-gray-500 dark:text-gray-400">Network in</span>
           <span>{{ rate(load.net_in_kbps) }}</span>
@@ -69,6 +81,10 @@ const { canAdmin } = useAuth();
 // Local copy so the slider feels responsive while dragging; commits on @change.
 const localFps = ref(previewFps.value);
 watch(previewFps, v => { if (v != null) localFps.value = v });
+
+// Each GPU engine this backend uses (graphics, video decode/encode, ...), for the tooltip
+const gpuEngines = computed(() => Object.entries(load.value?.gpu_usage?.engines || {})
+  .map(([name, percent]) => `${name}: ${percent}%`).join('\n'));
 
 // kbit/s from the server, shown as kbit/s or Mbit/s
 const rate = (kbps) => (kbps >= 1000 ? `${(kbps / 1000).toFixed(1)} Mbit/s` : `${kbps} kbit/s`);

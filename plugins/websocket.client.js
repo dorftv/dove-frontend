@@ -176,6 +176,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (message.data.fds != null) updates.fds = message.data.fds;
           if (message.data.net_in_kbps != null) updates.net_in_kbps = message.data.net_in_kbps;
           if (message.data.net_out_kbps != null) updates.net_out_kbps = message.data.net_out_kbps;
+          if ('gpu_usage' in message.data) updates.gpu_usage = message.data.gpu_usage;
           serverLoad.value = { ...serverLoad.value, ...updates };
         }
         return;
