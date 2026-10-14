@@ -7,7 +7,7 @@
     <!-- State indicator -->
     <span
       class="w-2.5 h-2.5 rounded-full shrink-0"
-      :class="{ 'animate-pulse': input.state === 'BUFFERING' || input.state === 'ERROR' }"
+      :class="{ 'animate-pulse': ['BUFFERING', 'CONNECTING', 'ERROR'].includes(input.state) }"
       :style="{ backgroundColor: stateColor(input.state) }"
       :title="input.state"
     />

@@ -16,9 +16,14 @@
           />
           <!-- v-if (not v-show): a hidden preview must not keep a WHEP session open -->
           <div v-if="shouldShowPreview(input.uid) && input.preview" class="flex">
-            <VideoPlayerMain v-if="input.has_video !== false" :uid="input.uid" class="flex-grow min-w-0" />
+            <!-- A live input whose stream is away: say so, instead of an empty picture or meters -->
+            <div v-if="input.is_live && input.state === 'CONNECTING'" class="stream-away flex-grow min-w-0">
+              <Icon name="ph:plugs" size="22px" class="text-orange-400 animate-pulse" />
+              <span class="text-orange-400 text-xs font-medium animate-pulse">{{ input.stats?.dropouts ? 'Stream lost, reconnecting…' : 'Waiting for the stream…' }}</span>
+            </div>
+            <VideoPlayerMain v-else-if="input.has_video !== false" :uid="input.uid" class="flex-grow min-w-0" />
             <AudioOnlyPlayer v-else :uid="input.uid" class="flex-grow min-w-0" />
-            <AudioMeter v-if="audioMeters && input.has_audio !== false" :uid="input.uid" />
+            <AudioMeter v-if="audioMeters && input.has_audio !== false && !(input.is_live && input.state === 'CONNECTING')" :uid="input.uid" />
           </div>
           <InputControls :input="input" :state="input.state" :uid="input.uid" />
           <InputScenes :input="input" />
@@ -71,5 +76,15 @@ onUnmounted(() => { if (sortableInstance) { sortableInstance.destroy(); sortable
 
 .input-drag-ghost {
   opacity: 0.4;
+}
+
+.stream-away {
+  aspect-ratio: 16/9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgb(17 24 39 / 0.8);
 }
 </style>

@@ -47,10 +47,11 @@ export function useActiveScene() {
     }
   };
 
-  // When a scene is added, select it automatically
-  watch(scenes, (newScenes, oldScenes) => {
-    if (newScenes && oldScenes && newScenes.length > oldScenes.length) {
-      activeIndex.value = newScenes.length - 1;
+  // When a scene is added, select it automatically. A new scene is pushed onto the list: its
+  // length changes, the list itself does not
+  watch(() => scenes.value.length, (count, before) => {
+    if (count > before) {
+      activeIndex.value = count - 1;
     }
   });
 
@@ -72,9 +73,11 @@ export function useActiveScene() {
     if (s?.uid) savedSceneUid.value = s.uid;
   });
 
-  // Keep selectedScene in sync with activeIndex
+  // Keep selectedScene in sync with activeIndex, and with the scene itself: an update replaces
+  // the scene in the list, and the selection must not keep the old copy. Watched as a copy of
+  // the list, which reads every element: replacing one is a change, not only a new list
   let restored = false;
-  watch([activeIndex, scenes], ([newIndex, newScenes]) => {
+  watch([activeIndex, () => [...scenes.value]], ([newIndex, newScenes]) => {
     if (!newScenes || newScenes.length === 0) {
       selectedScene.value = null;
       return;

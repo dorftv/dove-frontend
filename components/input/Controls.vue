@@ -3,9 +3,16 @@
 
     <!-- Progress bar (always reserve space for consistent card height) -->
     <div class="h-3">
-      <span v-if="input.is_live" class="flex items-center gap-1 text-red-500 text-[11px] font-mono tabular-nums leading-none">
-        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-        LIVE &middot; {{ positionFormatted }}
+      <span v-if="input.is_live" class="flex items-center gap-1 text-[11px] font-mono tabular-nums leading-none">
+        <template v-if="input.state === 'CONNECTING'">
+          <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+          <span class="text-orange-400 animate-pulse">{{ input.stats?.dropouts ? 'RECONNECTING…' : 'WAITING FOR STREAM…' }}</span>
+        </template>
+        <template v-else>
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span class="text-red-500">LIVE &middot; {{ positionFormatted }}</span>
+        </template>
+        <InputLiveStats :input="input" />
       </span>
       <USlider
         v-else-if="input.duration && input.show_controls"
@@ -27,7 +34,7 @@
         <button :disabled="!canEditInput" @click="submitPause" class="transport-btn" :class="{ 'text-orange-400': input.state === 'PAUSED' }" title="Pause"><Icon name="ph:pause-fill" size="13px" /></button>
         <button v-if="input.type === 'playlist'" :disabled="!canEditInput" @click="submitSkip('next')" class="transport-btn" title="Next clip"><Icon name="ph:skip-forward-fill" size="13px" /></button>
       </div>
-      <button v-if="input.hasOwnProperty('loop')" :disabled="!canEditInput" @click="submitLoop(!input.loop)" class="transport-btn" :class="input.loop ? 'text-emerald-400' : 'text-gray-500'" title="Loop">
+      <button v-if="input.hasOwnProperty('loop') && !input.is_live" :disabled="!canEditInput" @click="submitLoop(!input.loop)" class="transport-btn" :class="input.loop ? 'text-emerald-400' : 'text-gray-500'" title="Loop">
         <Icon name="ph:repeat" size="13px" />
       </button>
 
@@ -122,7 +129,7 @@
       <span v-if="input.details" class="truncate min-w-0">{{ input.details }}</span>
       <div class="flex-grow" />
       <span v-if="input.total_duration" class="whitespace-nowrap font-mono tabular-nums shrink-0 ml-1">{{ totalPositionFormatted }}/{{ totalDurationFormatted }}</span>
-      <span v-if="input.playlist?.length" class="whitespace-nowrap shrink-0 ml-1">({{ (input.index ?? 0) + 1 }}/{{ input.playlist.length }})</span>
+      <span v-if="input.playlist?.length" class="whitespace-nowrap shrink-0 ml-1">({{ Math.min((input.index ?? 0) + 1, input.playlist.length) }}/{{ input.playlist.length }})</span>
     </div>
   </div>
 </template>

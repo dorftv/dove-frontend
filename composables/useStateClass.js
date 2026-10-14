@@ -13,6 +13,7 @@ export function useStateClass() {
       EOS: 'ph:stop',
       ERROR: 'ph:warning-circle',
       BUFFERING: 'ph:spinner',
+      CONNECTING: 'ph:plugs',
     };
     return icons[state] || 'ph:circle';
   };
@@ -26,6 +27,7 @@ export function useStateClass() {
       EOS: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
       ERROR: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-400',
       BUFFERING: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400',
+      CONNECTING: 'bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-400 animate-pulse',
     };
     return classes[state] || 'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
   };
@@ -46,6 +48,7 @@ export function useStateClass() {
       EOS: '#ef4444',
       ERROR: '#ef4444',
       BUFFERING: '#f59e0b',
+      CONNECTING: '#f97316',
     };
     return colors[state] || '#6b7280';
   };
