@@ -213,6 +213,15 @@ export function useWhepPlayer(props, { onError } = {}) {
     cleanup();
   });
 
+  // The backend is back (after a restart): a preview that had a connection and lost it starts
+  // again, instead of waiting for the browser to give the old one up
+  watch(useState('ws-status'), (status, before) => {
+    if (status === 'connected' && before !== 'connected' && pc && pc.connectionState !== 'connected') {
+      failCount = 0;
+      gateOnReady();
+    }
+  });
+
   // On uid change: try seamless switch, fallback to reconnect (gated on readiness)
   watch(() => props.uid, (newUid, oldUid) => {
     if (oldUid && resourceUrl && pc?.connectionState === 'connected') {

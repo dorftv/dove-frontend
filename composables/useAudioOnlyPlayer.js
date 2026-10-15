@@ -73,6 +73,15 @@ export function useAudioOnlyPlayer(props) {
     }
   };
 
+  // The backend is back (after a restart): a preview that had a connection and lost it starts
+  // again, instead of waiting for the browser to give the old one up
+  watch(useState('ws-status'), (status, before) => {
+    if (status === 'connected' && before !== 'connected' && pc && pc.connectionState !== 'connected') {
+      failCount = 0;
+      gateOnReady();
+    }
+  });
+
   // Forward sync only: mutedState → video.muted
   watch(isMuted, applyMuted);
 

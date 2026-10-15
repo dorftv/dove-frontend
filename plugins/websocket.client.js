@@ -87,7 +87,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     status.value = 'reconnecting';
     reconnectTimer = setTimeout(() => {
       reconnectTimer = null;
-      reconnectDelay = Math.min(reconnectDelay * 2, 10000);
+      // At most 3 s apart: after a backend restart the UI is back within seconds
+      reconnectDelay = Math.min(reconnectDelay * 2, 3000);
       connect();
     }, reconnectDelay);
   };
