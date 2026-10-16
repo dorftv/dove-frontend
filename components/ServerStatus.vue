@@ -14,17 +14,17 @@
     </button>
     <template #content>
       <div class="p-3 text-xs font-mono tabular-nums space-y-1.5 min-w-[180px]">
-        <div class="flex justify-between">
-          <span class="text-gray-500 dark:text-gray-400">Load</span>
+        <div class="flex justify-between" title="How busy the whole machine is (1-minute average over all its cores); other programs on it count too">
+          <span class="text-gray-500 dark:text-gray-400">Machine load</span>
           <span :class="statusColor(load.load_percent)">{{ load.load_percent }}%</span>
         </div>
         <div class="flex justify-between">
           <span class="text-gray-500 dark:text-gray-400">Memory</span>
           <span :class="statusColor(memoryPercent)">{{ memory }}</span>
         </div>
-        <div v-if="load.video" class="flex justify-between">
-          <span class="text-gray-500 dark:text-gray-400">Video</span>
-          <span :title="load.gpu || ''">{{ load.video === 'gl' ? 'GPU' : 'CPU' }}</span>
+        <div v-if="load.video" class="flex justify-between" :title="load.video === 'gl' ? `Pictures are scaled and mixed on the graphics card${load.gpu ? ` (${load.gpu})` : ''}` : 'Pictures are scaled and mixed on the processor; [main] gl moves this to the graphics card'">
+          <span class="text-gray-500 dark:text-gray-400">Mixing on</span>
+          <span>{{ load.video === 'gl' ? 'Graphics card' : 'Processor' }}</span>
         </div>
         <div v-if="load.gpu_usage" class="flex justify-between">
           <span class="text-gray-500 dark:text-gray-400">GPU</span>
