@@ -3,7 +3,7 @@
 
     <!-- ── Tab view ── -->
     <div v-if="viewMode === 'tabs'" class="flex flex-col md:flex-row">
-      <div class="md:order-first md:w-28 lg:w-48 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
+      <div class="md:order-first md:w-28 lg:w-36 md:shrink-0 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between px-2 py-1">
           <CreateScenePane />
           <button @click="viewMode = 'grid'" class="view-toggle-btn" title="Grid view">
@@ -28,7 +28,9 @@
           </button>
         </div>
       </div>
-      <div class="flex-grow min-w-0">
+      <!-- Its width is what the tabs leave, whatever it shows: a video that is still loading
+           must not change the size of the player -->
+      <div class="flex-1 min-w-0">
         <SceneScenes v-if="selectedScene" :scene="selectedScene" :active="true" />
       </div>
     </div>
