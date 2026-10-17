@@ -18,13 +18,13 @@
           <span class="text-gray-500 dark:text-gray-400">Machine load</span>
           <span :class="statusColor(load.load_percent)">{{ load.load_percent }}%</span>
         </div>
-        <div class="flex justify-between">
+        <div class="flex justify-between" :title="memoryParts">
           <span class="text-gray-500 dark:text-gray-400">Memory</span>
           <span :class="statusColor(memoryPercent)">{{ memory }}</span>
         </div>
-        <div v-if="load.video" class="flex justify-between" :title="load.video === 'gl' ? `Pictures are scaled and mixed on the graphics card${load.gpu ? ` (${load.gpu})` : ''}` : 'Pictures are scaled and mixed on the processor; [main] gl moves this to the graphics card'">
+        <div v-if="load.video" class="flex justify-between" :title="load.video === 'gl' ? `Pictures are scaled and mixed on the GPU${load.gpu ? ` (${load.gpu})` : ''}` : 'Pictures are scaled and mixed on the CPU; [main] gl moves this to the GPU'">
           <span class="text-gray-500 dark:text-gray-400">Mixing on</span>
-          <span>{{ load.video === 'gl' ? 'Graphics card' : 'Processor' }}</span>
+          <span>{{ load.video === 'gl' ? 'GPU' : 'CPU' }}</span>
         </div>
         <div v-if="load.gpu_usage" class="flex justify-between">
           <span class="text-gray-500 dark:text-gray-400">GPU</span>
@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-const { load, uptime, memory, memoryPercent, viewers, status, previewFps, setPreviewFps } = useServerLoad();
+const { load, uptime, memory, memoryPercent, memoryParts, viewers, status, previewFps, setPreviewFps } = useServerLoad();
 const { canAdmin } = useAuth();
 
 // Local copy so the slider feels responsive while dragging; commits on @change.

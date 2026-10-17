@@ -12,17 +12,27 @@ export function useServerLoad() {
     return `${m}m`;
   });
 
+  // What the backend uses with the processes it started (the web pages' WebKit), against the
+  // machine's memory; older backends only say what the backend itself uses
+  const memoryUsed = computed(() => load.value?.memory?.used_mb ?? load.value?.memory?.rss_mb);
+
   const memory = computed(() => {
     const m = load.value?.memory;
-    if (!m?.rss_mb) return '';
-    if (m.total_mb) return `${m.rss_mb}/${m.total_mb}MB`;
-    return `${m.rss_mb}MB`;
+    if (!memoryUsed.value) return '';
+    if (m.total_mb) return `${memoryUsed.value}/${m.total_mb}MB`;
+    return `${memoryUsed.value}MB`;
   });
 
   const memoryPercent = computed(() => {
     const m = load.value?.memory;
-    if (!m?.rss_mb || !m?.total_mb) return 0;
-    return Math.round(m.rss_mb / m.total_mb * 100);
+    if (!memoryUsed.value || !m?.total_mb) return 0;
+    return Math.round(memoryUsed.value / m.total_mb * 100);
+  });
+
+  const memoryParts = computed(() => {
+    const m = load.value?.memory;
+    if (m?.pages_mb == null) return '';
+    return `Backend ${m.used_mb - m.pages_mb} MB (GStreamer included), web pages ${m.pages_mb} MB; program code not counted`;
   });
 
   const viewers = computed(() => load.value?.viewers ?? 0);
@@ -45,5 +55,5 @@ export function useServerLoad() {
     return 'ok';
   });
 
-  return { load, uptime, memory, memoryPercent, viewers, status, previewFps, setPreviewFps };
+  return { load, uptime, memory, memoryPercent, memoryParts, viewers, status, previewFps, setPreviewFps };
 }
