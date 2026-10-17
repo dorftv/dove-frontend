@@ -171,6 +171,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (message.data.load1 != null) updates.load1 = message.data.load1;
           if (message.data.load_percent != null) updates.load_percent = message.data.load_percent;
           if (message.data.memory) updates.memory = message.data.memory;
+          if (message.data.cpu_percent != null) updates.cpu_percent = message.data.cpu_percent;
           if (message.data.viewers != null) updates.viewers = message.data.viewers;
           if (message.data.fds != null) updates.fds = message.data.fds;
           if (message.data.net_in_kbps != null) updates.net_in_kbps = message.data.net_in_kbps;

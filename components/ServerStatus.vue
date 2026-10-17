@@ -26,6 +26,10 @@
           <span class="text-gray-500 dark:text-gray-400">Mixing on</span>
           <span>{{ load.video === 'gl' ? 'GPU' : 'CPU' }}</span>
         </div>
+        <div v-if="load.cpu_percent != null" class="flex justify-between" :title="`CPU time of the backend and its web pages; 100% is one core, this machine has ${load.cpu_count} cores`">
+          <span class="text-gray-500 dark:text-gray-400">CPU</span>
+          <span :class="statusColor(load.cpu_percent / (load.cpu_count || 1))">{{ load.cpu_percent }}%</span>
+        </div>
         <div v-if="load.gpu_usage" class="flex justify-between">
           <span class="text-gray-500 dark:text-gray-400">GPU</span>
           <span :class="statusColor(load.gpu_usage.percent)" :title="gpuEngines">{{ load.gpu_usage.percent }}%</span>
@@ -67,7 +71,7 @@
           <span class="w-6 text-right">{{ localFps }}</span>
         </div>
         <div class="pt-1 border-t border-gray-200 dark:border-gray-600 text-[10px] text-gray-400 dark:text-gray-500">
-          CPU: {{ load.load1 }} / {{ load.load5 }} / {{ load.load15 }} ({{ load.cpu_count }} cores)
+          Load average: {{ load.load1 }} / {{ load.load5 }} / {{ load.load15 }} ({{ load.cpu_count }} cores)
         </div>
       </div>
     </template>
