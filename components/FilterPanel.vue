@@ -15,9 +15,9 @@
         :class="{ 'filter-disabled': !filter.enabled }"
       >
         <!-- Filter header bar (entire header is drag handle) -->
-        <div class="filter-header filter-drag-handle cursor-grab">
+        <div class="filter-header" :class="{ 'filter-drag-handle cursor-grab': !readonly }">
           <div class="flex items-center gap-1.5 min-w-0">
-            <Icon name="ph:dots-six-vertical" size="12px" class="text-gray-600 hover:text-gray-300 shrink-0" />
+            <Icon v-if="!readonly" name="ph:dots-six-vertical" size="12px" class="text-gray-600 hover:text-gray-300 shrink-0" />
             <span class="filter-index">{{ index + 1 }}</span>
             <span class="filter-type-label">{{ getFilterLabel(filter.type) }}</span>
             <span class="filter-category-badge">{{ getCategoryLabel(filter.type) }}</span>
@@ -25,11 +25,13 @@
           <div class="flex items-center gap-1">
             <button
               @click="toggleFilter(index)"
+              :disabled="readonly"
               class="bypass-btn"
               :class="filter.enabled ? 'bypass-active' : 'bypass-bypassed'"
               :title="filter.enabled ? 'Bypass' : 'Enable'"
             >{{ filter.enabled ? 'ON' : 'BYP' }}</button>
             <button
+              v-if="!readonly"
               @click="removeFilter(index)"
               class="remove-btn"
               title="Remove"
@@ -49,6 +51,7 @@
                 :items="spec.options"
                 value-key="value"
                 label-key="label"
+                :disabled="readonly"
                 class="flex-grow"
                 size="xs"
               />
@@ -65,6 +68,7 @@
                 :min="spec.min"
                 :max="spec.max"
                 :step="spec.step || getDefaultStep(spec)"
+                :disabled="readonly"
                 class="flex-grow"
                 size="xs"
               />
@@ -90,7 +94,7 @@
     </div>
 
     <!-- Add filter -->
-    <div class="add-section">
+    <div v-if="!readonly" class="add-section">
       <div class="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5 font-medium">Add Filter</div>
       <div
         v-for="(cat, catKey) in FILTER_CATEGORIES"
@@ -122,6 +126,8 @@ const props = defineProps({
   // When true, init SortableJS immediately on mount (inline usage).
   // When false, caller triggers init via watch on slideover open state.
   autoInit: { type: Boolean, default: true },
+  // Shown, not changed: for roles that may see the chain but not edit it
+  readonly: { type: Boolean, default: false },
 });
 
 const { FILTER_TYPES, FILTER_CATEGORIES, filters, updateFilterParam, toggleFilter, addFilter, removeFilter, moveFilter } = toRaw(props.ctx);
@@ -137,7 +143,7 @@ const initSortable = () => {
     sortableInstance = null;
   }
   const el = filterListRef.value;
-  if (!el) return;
+  if (!el || props.readonly) return;
   import('sortablejs').then(({ default: Sortable }) => {
     if (cancelled || !filterListRef.value) return;
     sortableInstance = new Sortable(el, {

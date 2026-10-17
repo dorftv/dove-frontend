@@ -45,7 +45,7 @@
         v-if="showFilterBadge"
         @click.stop="expanded = true"
         class="relative flex items-center justify-center w-5 h-5 rounded hover:bg-gray-400/30 dark:hover:bg-gray-700 text-cyan-500 dark:text-cyan-400"
-        :title="filterCount > 0 ? `${filterCount} audio filter(s)` : 'Add audio filters'"
+        :title="filterCount > 0 ? `${filterCount} audio filter(s)${canOutputs ? '' : ' (read only)'}` : 'Add audio filters'"
       >
         <Icon name="ph:waveform" size="12px" />
         <span
@@ -80,6 +80,7 @@
     <div v-if="expanded && showFilterBadge" class="border-t border-gray-300 dark:border-gray-700 bg-gray-100/50 dark:bg-gray-900/50 p-2">
       <FilterPanel
         :ctx="audioCtx"
+        :readonly="!canOutputs"
         icon="ph:waveform"
         accent-class="text-cyan-400/80"
       />
@@ -99,9 +100,10 @@ const { deleting, submitRemove } = useDeleteEntity('encoder', () => props.encode
 
 const expanded = ref(false);
 
-// Audio filters are only available on non-preview audio encoders
+// Audio filters are only available on non-preview audio encoders: every role sees the chain,
+// only the outputs role edits it (and adds the first filter)
 const showFilterBadge = computed(() =>
-  props.encoder?.type === 'audio' && !props.encoder?.is_preview && canOutputs.value
+  props.encoder?.type === 'audio' && !props.encoder?.is_preview && (canOutputs.value || filterCount.value > 0)
 );
 const canExpand = computed(() => showFilterBadge.value);
 
