@@ -3,7 +3,16 @@
 
     <!-- ── Tab view ── -->
     <div v-if="viewMode === 'tabs'" class="flex flex-col md:flex-row">
-      <div class="md:order-first md:w-28 lg:w-36 md:shrink-0 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
+      <!-- The tabs' column: its width is dragged at its right edge (md and up) -->
+      <div
+        class="relative md:order-first md:w-[var(--tabs-width)] md:shrink-0 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700"
+        :style="{ '--tabs-width': tabsWidth + 'px' }"
+      >
+        <div
+          class="hidden md:block absolute top-0 -right-1 h-full w-2 z-10 cursor-col-resize hover:bg-blue-400/40 touch-none"
+          title="Drag to resize"
+          @pointerdown.prevent="startResize"
+        />
         <div class="flex items-center justify-between px-2 py-1">
           <CreateScenePane />
           <button @click="viewMode = 'grid'" class="view-toggle-btn" title="Grid view">
@@ -89,6 +98,22 @@ const { ordered: orderedScenes, saveOrder } = useEntityOrder('dove-scene-order',
 
 const viewMode = useLocalStorage('dove-scene-view', 'tabs');
 const previewSize = useLocalStorage('dove-scene-preview-size', 180);
+const tabsWidth = useLocalStorage('dove-scene-tabs-width', 192);
+
+// Tab view: the tabs' column follows the pointer while its edge is dragged
+const startResize = (event) => {
+  const startX = event.clientX;
+  const startWidth = tabsWidth.value;
+  const move = (e) => {
+    tabsWidth.value = Math.min(400, Math.max(80, startWidth + e.clientX - startX));
+  };
+  const stop = () => {
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', stop);
+  };
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', stop);
+};
 
 const selectScene = (scene) => {
   const realIndex = scenes.value.findIndex(s => s.uid === scene.uid);
