@@ -35,12 +35,6 @@ export function useFilterPresentation(FILTER_TYPES, FILTER_CATEGORIES) {
     return Math.max(1, Math.round(range / 100));
   };
 
-  const formatValue = (value, spec) => {
-    const v = typeof value === 'number' ? value : parseFloat(value) || 0;
-    const display = spec.step && spec.step < 1 ? v.toFixed(2) : Math.round(v);
-    return spec.unit ? `${display}${spec.unit}` : display;
-  };
-
   return {
     getFilterLabel,
     getCategoryLabel,
@@ -50,6 +44,5 @@ export function useFilterPresentation(FILTER_TYPES, FILTER_CATEGORIES) {
     getFiltersForCategory,
     getEq10BandLabel,
     getDefaultStep,
-    formatValue,
   };
 }

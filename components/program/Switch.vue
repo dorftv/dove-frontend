@@ -26,7 +26,14 @@
       <div class="w-full max-w-48" :class="{ 'opacity-30 pointer-events-none': transition !== 'fade' }">
         <div class="flex items-center justify-between mb-1.5">
           <span class="text-xs text-gray-500 dark:text-gray-400">Duration</span>
-          <span class="text-xs font-medium text-gray-700 dark:text-gray-300 tabular-nums">{{ (transitionDuration / 1000).toFixed(1) }}s</span>
+          <span class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <NumberField
+              :value="transitionDuration / 1000"
+              :min="0.1" :max="5" :step="0.1"
+              @set="(seconds) => transitionDuration = Math.round(seconds * 1000)"
+              class="w-12"
+            />s
+          </span>
         </div>
         <USlider v-model="transitionDuration" :min="100" :max="5000" :step="100" class="w-full" size="xs" aria-label="Crossfade duration" />
       </div>

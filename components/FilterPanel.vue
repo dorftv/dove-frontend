@@ -72,9 +72,16 @@
                 class="flex-grow"
                 size="xs"
               />
-              <span class="param-value" :class="accentClass">
-                {{ formatValue(filter.params[paramName] ?? spec.default, spec) }}
-              </span>
+              <NumberField
+                :value="filter.params[paramName] ?? spec.default"
+                :min="spec.min"
+                :max="spec.max"
+                :step="spec.step || getDefaultStep(spec)"
+                :disabled="readonly"
+                @set="(val) => updateFilterParam(index, paramName, val)"
+                class="w-14 !text-[10px] font-mono"
+              />
+              <span v-if="spec.unit" class="text-[10px] font-mono" :class="accentClass">{{ spec.unit }}</span>
             </div>
           </template>
         </div>
@@ -131,7 +138,7 @@ const props = defineProps({
 });
 
 const { FILTER_TYPES, FILTER_CATEGORIES, filters, updateFilterParam, toggleFilter, addFilter, removeFilter, moveFilter } = toRaw(props.ctx);
-const { getFilterLabel, getCategoryLabel, getFilterParams, hasParams, isEq10, getFiltersForCategory, getEq10BandLabel, getDefaultStep, formatValue } = useFilterPresentation(FILTER_TYPES, FILTER_CATEGORIES);
+const { getFilterLabel, getCategoryLabel, getFilterParams, hasParams, isEq10, getFiltersForCategory, getEq10BandLabel, getDefaultStep } = useFilterPresentation(FILTER_TYPES, FILTER_CATEGORIES);
 
 const filterListRef = ref(null);
 let sortableInstance = null;
@@ -201,9 +208,6 @@ onUnmounted(() => {
 }
 .param-label {
   @apply text-[11px] text-gray-400 w-12 sm:w-16 shrink-0 text-right font-mono;
-}
-.param-value {
-  @apply text-[10px] w-14 text-right tabular-nums font-mono;
 }
 .bypass-btn {
   @apply text-[9px] font-bold px-1.5 py-0.5 rounded font-mono tracking-wider

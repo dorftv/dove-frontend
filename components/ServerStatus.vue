@@ -68,7 +68,7 @@
             @change="setPreviewFps(localFps)"
             class="flex-1 min-w-[80px]"
           >
-          <span class="w-6 text-right">{{ localFps }}</span>
+          <NumberField :value="localFps" :min="1" :max="60" @set="(fps) => { localFps = fps; setPreviewFps(fps) }" class="w-12" />
         </div>
         <div class="pt-1 border-t border-gray-200 dark:border-gray-600 text-[10px] text-gray-400 dark:text-gray-500">
           Load average: {{ load.load1 }} / {{ load.load5 }} / {{ load.load15 }} ({{ load.cpu_count }} cores)

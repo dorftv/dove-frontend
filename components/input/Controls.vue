@@ -82,6 +82,7 @@
           aria-label="Volume"
           :title="volume + '%'"
         />
+        <NumberField :value="volume" :min="0" :max="100" :disabled="!canEditInput" @set="handleVolumeChange" class="w-12" />
       </div>
       <!-- Filters -->
       <div v-if="canEditInput" class="flex items-center gap-1">

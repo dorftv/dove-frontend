@@ -48,6 +48,7 @@
             class="w-24 md:w-16"
             size="xs"
           />
+          <NumberField :value="volume" :min="0" :max="150" @set="handleChange('volume', $event)" class="w-11" />
           <!-- Filter buttons: inline on large screens, moved to settings panel on small -->
           <button @click="slotFiltersOpen = true" class="icon-btn w-6 h-6 relative hidden lg:flex" title="Audio filters">
             <Icon name="ph:waveform" size="11px" />
@@ -119,7 +120,7 @@
             :step="1" :min="getMin(key)" :max="getMax(key)"
             size="xs"
           />
-          <span class="w-12 text-right text-xs text-gray-600 dark:text-gray-400">{{ value }}</span>
+          <NumberField :value="value" :min="getMin(key)" :max="getMax(key)" @set="handleChange(key, $event)" class="w-16" />
           <button
             v-if="value !== getDefault(key)"
             @click="handleChange(key, getDefault(key))"

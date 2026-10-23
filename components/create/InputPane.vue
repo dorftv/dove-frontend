@@ -96,7 +96,13 @@
               <div class="flex items-center gap-2">
                 <label class="text-sm text-gray-700 dark:text-gray-300 shrink-0">Volume</label>
                 <USlider v-model="formData[selectedType.label]['volume']" :min="0" :max="1" :step="0.05" class="flex-1" />
-                <span class="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">{{ Math.round(formData[selectedType.label].volume * 100) }}%</span>
+                <NumberField
+                  :value="Math.round(formData[selectedType.label].volume * 100)"
+                  :min="0" :max="100"
+                  @set="(percent) => formData[selectedType.label].volume = percent / 100"
+                  class="w-12"
+                />
+                <span class="text-xs text-gray-500 dark:text-gray-400">%</span>
               </div>
 
               <!-- Resolution + Name row -->
