@@ -149,10 +149,16 @@ const { inputs, removeSlot, changeSource, handleChange, getMax, getMin, getDefau
 
 const updateSlotName = (newName) => handleChange('name', newName);
 
-const inputMatch = computed(() => inputs.value.find(input => input.uid === src.value));
+// A slot shows an input or another scene; the backend refuses a scene that would show itself
+const { scenes } = useEntities();
+const otherScenes = computed(() => scenes.value.filter(scene => scene.uid !== props.scene.uid));
+const inputMatch = computed(() =>
+  inputs.value.find(input => input.uid === src.value) || otherScenes.value.find(scene => scene.uid === src.value)
+);
 const srcOptions = computed(() => [
   { name: '— Empty —', uid: null },
   ...inputs.value.map(i => ({ name: i.name, uid: i.uid })),
+  ...otherScenes.value.map(s => ({ name: `${s.name} (scene)`, uid: s.uid })),
 ]);
 
 const onSourceSelect = (val) => {
