@@ -18,7 +18,7 @@
       />
 
       <!-- Source selector (pointer-events disabled during drag to let drop through) -->
-      <div v-if="canEditSlot" class="flex-grow min-w-0" :class="{ 'pointer-events-none': dragOver }">
+      <div v-if="canChooseSource" class="flex-grow min-w-0" :class="{ 'pointer-events-none': dragOver }">
         <USelect
           class="w-full"
           :items="srcOptions"
@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-const { canSupervisor, canBypassLock } = useAuth()
+const { canUser, canSupervisor, canBypassLock } = useAuth()
 
 const props = defineProps({
   source: Object,
@@ -181,10 +181,15 @@ const canEditSlot = computed(() =>
   canSupervisor.value && ((!props.source.locked && !props.scene.src_locked && !props.scene.locked) || canBypassLock.value)
 );
 
+// What the slot shows: every user (operators too), unless the slot's or the scene's source is locked
+const canChooseSource = computed(() =>
+  canUser.value && ((!props.source.src_locked && !props.scene.src_locked && !props.scene.locked) || canBypassLock.value)
+);
+
 const handleDrop = (event) => {
   dragOver.value = false;
   dragCount.value = 0;
-  if (!canEditSlot.value) return;
+  if (!canChooseSource.value) return;
   onDrop(event);
 };
 </script>
