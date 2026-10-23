@@ -169,6 +169,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (serverLoad.value) {
           const updates = { uptime: message.data.uptime };
           if (message.data.load1 != null) updates.load1 = message.data.load1;
+          if (message.data.load5 != null) updates.load5 = message.data.load5;
+          if (message.data.load15 != null) updates.load15 = message.data.load15;
           if (message.data.load_percent != null) updates.load_percent = message.data.load_percent;
           if (message.data.memory) updates.memory = message.data.memory;
           if (message.data.cpu_percent != null) updates.cpu_percent = message.data.cpu_percent;
