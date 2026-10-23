@@ -19,6 +19,15 @@
     <div class="flex-grow" />
 
     <!-- Actions -->
+    <button
+      @click="slotOverlay = !slotOverlay"
+      class="icon-btn"
+      :class="{ 'text-blue-500 dark:text-blue-400': slotOverlay }"
+      :title="slotOverlay ? 'Hide slot layout' : 'Show slot layout'"
+      aria-label="Toggle slot layout"
+    >
+      <Icon name="ph:frame-corners" size="11px" />
+    </button>
     <DetailPopover :entity="scene" />
     <button
       v-if="canSupervisor && (!scene.locked || canBypassLock)"
@@ -36,6 +45,7 @@
 <script setup>
 const { stateColor } = useStateClass()
 const { canSupervisor, canBypassLock } = useAuth()
+const { slotOverlay } = useUserState()
 
 const props = defineProps({
   scene: Object,

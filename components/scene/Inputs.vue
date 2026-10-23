@@ -1,9 +1,10 @@
 <template>
   <div class="w-full flex flex-col text-sm text-gray-700 dark:text-gray-300">
-    <!-- Slot header row -->
+    <!-- Slot header row; with the slot layout shown, its left edge has the slot's colour -->
     <div
-      class="flex items-center gap-1 px-1.5 py-1 md:py-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+      class="flex items-center gap-1 px-1.5 py-1 md:py-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors border-l-[3px] border-transparent"
       :class="{ 'ring-2 ring-inset ring-blue-400': dragOver, 'bg-blue-50 dark:bg-blue-900/20': open }"
+      :style="slotOverlay ? { borderLeftColor: slotColor(source) } : undefined"
       @dragover.prevent
       @dragenter.prevent="dragCount++; dragOver = true"
       @dragleave="dragCount--; if (dragCount <= 0) { dragOver = false; dragCount = 0 }"
@@ -135,6 +136,7 @@
 
 <script setup>
 const { canUser, canSupervisor, canBypassLock } = useAuth()
+const { slotOverlay } = useUserState()
 
 const props = defineProps({
   source: Object,
@@ -157,7 +159,12 @@ const onSourceSelect = (val) => {
   const uid = typeof val === 'object' ? val?.uid : val;
   changeSource(uid || null);
 };
-const open = ref(false);
+// One slot's panel open per scene; SceneSlotOverlay highlights that slot on the scene's picture
+const editingSlots = useState('slot-editing', () => ({}));
+const open = computed({
+  get: () => editingSlots.value[props.scene.uid] === props.source.id,
+  set: (isOpen) => { editingSlots.value[props.scene.uid] = isOpen ? props.source.id : null; },
+});
 const dragOver = ref(false);
 const dragCount = ref(0);
 const slotFiltersOpen = ref(false);

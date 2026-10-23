@@ -2,8 +2,9 @@
   <div class="flex flex-col p-2" v-if="scene">
     <SceneHeader :scene="scene" />
     <div v-if="!hidePreview" class="flex">
-      <div class="flex-grow min-w-0 aspect-video">
+      <div class="flex-grow min-w-0 aspect-video relative">
         <VideoPlayerMain :uid="scene.uid" class="w-full h-full" />
+        <SceneSlotOverlay :scene="scene" />
       </div>
       <AudioMeter v-if="audioMeters" :uid="scene.uid" />
     </div>

@@ -57,8 +57,9 @@
             scene.uid === selectedScene?.uid ? 'border-blue-400 border-3' : 'border-transparent hover:border-gray-400 dark:hover:border-gray-600'
           ]"
         >
-          <div class="aspect-video bg-black">
+          <div class="aspect-video bg-black relative">
             <VideoPlayerMain :uid="scene.uid" class="w-full h-full" />
+            <SceneSlotOverlay :scene="scene" />
           </div>
           <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5">
             <div class="flex items-center gap-1">
