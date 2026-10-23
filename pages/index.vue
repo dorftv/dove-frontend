@@ -362,7 +362,8 @@ onUnmounted(() => ro?.disconnect());
   right: 0;
   width: 28rem;
   max-width: 80%;
-  max-height: 100%;
+  /* As high as the inputs, but not squeezed when there are few or none */
+  max-height: max(100%, 32rem);
   overflow-y: auto;
   z-index: 50;
   padding: 12px;
