@@ -11,7 +11,7 @@
     </UButton>
     <UModal v-model:open="isOpen" title="Add Scene" description="Create a new scene mixer">
       <template #content>
-        <div class="p-4 w-full max-w-sm mx-auto">
+        <div class="p-4 w-full max-w-sm mx-auto min-h-0 overflow-y-auto">
           <form @submit.prevent="submitCreate('scene')" class="space-y-2">
             <div>
               <label for="name" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>

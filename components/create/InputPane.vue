@@ -11,7 +11,7 @@
     </UButton>
     <UModal v-model:open="isOpen" title="Add Input" description="Create a new input source">
       <template #content>
-        <div class="p-4 w-full max-w-lg mx-auto">
+        <div class="p-4 w-full max-w-lg mx-auto min-h-0 overflow-y-auto">
           <div class="hidden sm:inline-flex flex-wrap mb-3">
             <UButton
               v-for="opt in typeOptions"

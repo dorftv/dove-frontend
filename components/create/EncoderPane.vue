@@ -9,7 +9,7 @@
     />
     <UModal v-model:open="isOpen" title="Add Encoder" description="Create a new encoder">
       <template #content>
-        <div class="p-4 w-full max-w-lg mx-auto">
+        <div class="p-4 w-full max-w-lg mx-auto min-h-0 overflow-y-auto">
           <form @submit.prevent="submitCreate()" class="space-y-2">
             <div>
               <label class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Type</label>
