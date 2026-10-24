@@ -54,7 +54,8 @@ export const useCreateOutput = () => {
     const selected = encoderOptions.mux.find(e => e.name === value);
     if (selected) {
       if (!baseCreate.formData[typeKey]) baseCreate.formData[typeKey] = {};
-      baseCreate.formData[typeKey].mux = { name: value, element: selected.element };
+      // The backend requires the options: the mux's defaults (mp4mux has some)
+      baseCreate.formData[typeKey].mux = { name: value, element: selected.element, options: selected.fields?.options?.default || '' };
     }
   };
 
@@ -118,6 +119,7 @@ export const useCreateOutput = () => {
             baseCreate.formData[type.key].mux = {
               name: opts[0].name,
               element: opts[0].element,
+              options: opts[0].fields?.options?.default || '',
             };
           }
         }

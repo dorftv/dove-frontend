@@ -42,6 +42,8 @@ export function useInlineEncoder(encoderOptions, formData, types) {
       if (enc.type !== encoderType) return false;
       if (allowedElements.size > 0 && !allowedElements.has(enc.element)) return false;
       if (formSrc && enc.src && String(enc.src) !== String(formSrc)) return false;
+      // A preview encoder is shared at its own, smaller size: the form's size is for new encoders
+      if (enc.is_preview) return true;
       if (formWidth && enc.width && Number(enc.width) !== Number(formWidth)) return false;
       if (formHeight && enc.height && Number(enc.height) !== Number(formHeight)) return false;
       return true;
@@ -51,7 +53,7 @@ export function useInlineEncoder(encoderOptions, formData, types) {
   const getEncoderSelectOptions = (typeKey, fieldName) => {
     const compatible = getCompatibleEncoders(typeKey, fieldName);
     const options = compatible.map(enc => ({
-      label: `${enc.element} (${enc.name})`,
+      label: `${enc.element} (${enc.name}${enc.width ? `, ${enc.width}×${enc.height}` : ''})`,
       value: enc.uid,
     }));
     options.push({ label: '+ Create new encoder', value: '__new__' });
