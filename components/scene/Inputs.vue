@@ -23,6 +23,7 @@
         <USelect
           class="w-full"
           :items="srcOptions"
+          :leading-icon="srcIcon"
           label-key="name"
           value-key="uid"
           :model-value="src"
@@ -156,11 +157,18 @@ const otherScenes = computed(() => scenes.value.filter(scene => scene.uid !== pr
 const inputMatch = computed(() =>
   inputs.value.find(input => input.uid === src.value) || otherScenes.value.find(scene => scene.uid === src.value)
 );
-const srcOptions = computed(() => [
-  { name: '— Empty —', uid: null },
-  ...inputs.value.map(i => ({ name: i.name, uid: i.uid })),
-  ...otherScenes.value.map(s => ({ name: `${s.name} (scene)`, uid: s.uid })),
-]);
+// Grouped, with the main tabs' icons: inputs with a preview, inputs without one, then scenes
+const option = (entity, icon) => ({ name: entity.name, uid: entity.uid, icon });
+const srcOptions = computed(() => {
+  const noPreview = inputs.value.filter(i => i.preview === false);
+  return [
+    [{ name: '— Empty —', uid: null }, ...inputs.value.filter(i => i.preview !== false).map(i => option(i, 'ph:monitor-play'))],
+    ...(noPreview.length ? [[{ type: 'label', name: 'Without preview' }, ...noPreview.map(i => option(i, 'ph:eye-slash'))]] : []),
+    ...(otherScenes.value.length ? [[{ type: 'label', name: 'Scenes' }, ...otherScenes.value.map(s => option(s, 'ph:stack'))]] : []),
+  ];
+});
+// The closed picker shows the chosen source's icon, so a scene and an input of the same name differ
+const srcIcon = computed(() => srcOptions.value.flat().find(o => o.uid && o.uid === src.value)?.icon);
 
 const onSourceSelect = (val) => {
   const uid = typeof val === 'object' ? val?.uid : val;
