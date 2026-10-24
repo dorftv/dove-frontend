@@ -6,8 +6,11 @@ export function useHlsPlayer(props) {
   const { handleAutoplayBlocked } = useAutoplayToast();
 
   let hls = null;
+  let retryTimer = null;
 
   const teardown = () => {
+    clearTimeout(retryTimer);
+    retryTimer = null;
     hls?.destroy();
     hls = null;
   };
@@ -18,6 +21,11 @@ export function useHlsPlayer(props) {
     teardown();
     if (Hls.isSupported()) {
       hls = new Hls({ maxMaxBufferLength: 3 });
+      // While the backend is away, or the preview has just started and has no playlist yet,
+      // hls.js stops for good on a fatal error: start over until it plays
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (data.fatal && !retryTimer) retryTimer = setTimeout(loadSource, 2000);
+      });
       hls.loadSource(src);
       hls.attachMedia(mediaPlayer.value);
       mediaPlayer.value.muted = mutedState.value[props.uid] ?? true;

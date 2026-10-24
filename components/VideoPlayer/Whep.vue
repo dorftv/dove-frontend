@@ -34,6 +34,8 @@ const { videoPlayer, mutedState } = useWhepPlayer(props, {
 });
 
 watch(() => props.uid, () => { failed.value = false; });
+// The backend is back and the player starts again (useWhepPlayer)
+watch(useState('ws-status'), (status) => { if (status === 'connected') failed.value = false; });
 
 const { setMutedState } = useMutedState();
 

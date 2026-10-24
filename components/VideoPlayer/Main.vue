@@ -30,4 +30,6 @@ const onWhepError = () => {
 
 watch(() => props.uid, () => { whepFailed.value = false; });
 watch(previewMode, () => { whepFailed.value = false; });
+// The backend is back: WebRTC gets another chance, its failures may have been the outage
+watch(useState('ws-status'), (status) => { if (status === 'connected') whepFailed.value = false; });
 </script>
