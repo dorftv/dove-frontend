@@ -1,5 +1,5 @@
 export function useSceneSources(getScene, getSource) {
-  const { inputs, patchSlot } = useEntities();
+  const { inputs, scenes, patchSlot } = useEntities();
   const { volumeIcon: volumeIconFn } = useStateClass();
   const notify = useNotify();
 
@@ -104,10 +104,10 @@ export function useSceneSources(getScene, getSource) {
 
   const volumeIcon = computed(() => volumeIconFn(state.volume, state.mute));
 
-  // Link an input to the slot, or empty it with nothing
+  // Link an input or another scene to the slot, or empty it with nothing
   const changeSource = async (raw) => {
     const uid = (typeof raw === 'object' ? raw?.uid : raw) || null;
-    if (uid && !inputs.value.some(i => i.uid === uid)) return;
+    if (uid && !inputs.value.some(i => i.uid === uid) && !scenes.value.some(s => s.uid === uid)) return;
     try {
       await useApiFetch(`/api/v2/scenes/${scene().uid}/slots/${source().id}`, {
         method: 'PATCH',
