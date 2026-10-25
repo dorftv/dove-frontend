@@ -31,6 +31,7 @@ const failed = ref(false);
 
 const { videoPlayer, mutedState } = useWhepPlayer(props, {
   onError: () => { failed.value = true; emit('error'); },
+  onRecover: () => { failed.value = false; },
 });
 
 watch(() => props.uid, () => { failed.value = false; });

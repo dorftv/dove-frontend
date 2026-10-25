@@ -3,7 +3,7 @@
  * Direct control over RTCPeerConnection, resource URL, and source switching.
  */
 
-export function useWhepPlayer(props, { onError } = {}) {
+export function useWhepPlayer(props, { onError, onRecover } = {}) {
   const videoPlayer = ref(null);
   const { mutedState, setMutedState } = useMutedState();
   const { handleAutoplayBlocked } = useAutoplayToast();
@@ -11,14 +11,27 @@ export function useWhepPlayer(props, { onError } = {}) {
 
   let pc = null;           // RTCPeerConnection
   let resourceUrl = null;  // WHEP resource URL (from POST Location header)
-  let failCount = 0;
+  let failCount = 0;       // attempts in a row that brought no media
+  let retryTimer = null;
   let volumeHandler = null;
   let statsInterval = null;
   let lastBytesReceived = 0;
   let stalledSince = 0;
   let readyStopHandle = null; // watcher that gates initial POST on PLAYING state
-  const MAX_RETRIES = 3;
-  const STALL_THRESHOLD = 8000; // ms with no new bytes → reconnect
+  const MAX_RETRIES = 3;        // failed attempts before "No signal"; retrying goes on
+  const STALL_THRESHOLD = 8000; // ms with no new bytes, whatever the connection's state → reconnect
+  const MAX_RETRY_DELAY = 10000;
+
+  // A new connection after a wait that grows with each failed attempt, never giving up
+  const reconnect = (reason) => {
+    if (retryTimer) return;
+    stopStatsMonitor();
+    failCount++;
+    if (failCount === MAX_RETRIES && onError) onError();
+    const delay = Math.min(500 * 2 ** (failCount - 1), MAX_RETRY_DELAY);
+    console.warn(`WHEP: ${reason}, reconnecting in ${delay} ms`);
+    retryTimer = setTimeout(() => { retryTimer = null; initializePlayer(); }, delay);
+  };
 
   const stopStatsMonitor = () => {
     if (statsInterval) { clearInterval(statsInterval); statsInterval = null; }
@@ -26,10 +39,13 @@ export function useWhepPlayer(props, { onError } = {}) {
     stalledSince = 0;
   };
 
+  // What arrives over UDP is what counts, not the state the browser reports: a connection can
+  // hang in "disconnected" or "checking" without ever failing
   const startStatsMonitor = () => {
     stopStatsMonitor();
+    stalledSince = Date.now();
     statsInterval = setInterval(async () => {
-      if (!pc || pc.connectionState !== 'connected') return;
+      if (!pc) return;
       try {
         const stats = await pc.getStats();
         let totalBytes = 0;
@@ -39,19 +55,18 @@ export function useWhepPlayer(props, { onError } = {}) {
         if (totalBytes > lastBytesReceived) {
           lastBytesReceived = totalBytes;
           stalledSince = 0;
+          if (failCount >= MAX_RETRIES && onRecover) onRecover();
+          failCount = 0;
         } else {
           if (!stalledSince) stalledSince = Date.now();
-          else if (Date.now() - stalledSince > STALL_THRESHOLD) {
-            console.warn('WHEP: media stalled, reconnecting');
-            stopStatsMonitor();
-            initializePlayer();
-          }
+          else if (Date.now() - stalledSince > STALL_THRESHOLD) reconnect('no media');
         }
       } catch {}
-    }, 3000);
+    }, 2000);
   };
 
   const cleanup = () => {
+    if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
     stopStatsMonitor();
     if (volumeHandler && videoPlayer.value) {
       videoPlayer.value.removeEventListener('volumechange', volumeHandler);
@@ -83,16 +98,12 @@ export function useWhepPlayer(props, { onError } = {}) {
     pc.addTransceiver('audio', { direction: 'recvonly' });
 
     // Attach incoming tracks to video element
-    let mediaReceived = false;
-    let mediaTimeout = null;
     const stream = new MediaStream();
 
     pc.ontrack = (event) => {
       stream.addTrack(event.track);
       if (videoPlayer.value) {
         videoPlayer.value.srcObject = stream;
-        mediaReceived = true;
-        if (mediaTimeout) { clearTimeout(mediaTimeout); mediaTimeout = null; }
         // Re-attach volumechange listener — cleanup() removes it each init cycle
         volumeHandler = () => {
           const isMuted = videoPlayer.value?.muted;
@@ -104,47 +115,14 @@ export function useWhepPlayer(props, { onError } = {}) {
       }
     };
 
-    const currentPc = pc; // capture for stale closure detection in timeouts
+    // A failed connection is not waited out; everything else is left to the stats monitor
+    const currentPc = pc;
     pc.oniceconnectionstatechange = () => {
-      if (pc !== currentPc) return; // stale — connection was replaced
-      const state = pc?.iceConnectionState;
-      if (state === 'connected' || state === 'completed') {
-        if (!mediaReceived) {
-          mediaTimeout = setTimeout(() => {
-            if (pc !== currentPc) return;
-            if (!mediaReceived) {
-              console.warn('WHEP: connected but no media, reconnecting');
-              setTimeout(initializePlayer, 100);
-            }
-          }, 5000);
-        }
-      } else if (state === 'failed') {
-        failCount++;
-        if (failCount >= MAX_RETRIES && onError) {
-          onError();
-        } else {
-          if (failCount >= MAX_RETRIES) {
-            console.warn('WHEP: max retries reached');
-            return;
-          }
-          setTimeout(initializePlayer, 500);
-        }
-      } else if (state === 'disconnected') {
-        setTimeout(() => {
-          if (pc !== currentPc) return;
-          if (pc?.iceConnectionState === 'disconnected') {
-            failCount++;
-            if (failCount < MAX_RETRIES) setTimeout(initializePlayer, 500);
-            else if (onError) onError();
-          }
-        }, 3000);
-      }
+      if (pc === currentPc && pc.iceConnectionState === 'failed') reconnect('connection failed');
     };
 
     try {
       resourceUrl = await negotiateWebRTC(pc, `/whep/${props.uid}`);
-
-      failCount = 0;
       startStatsMonitor();
 
       // Autoplay
@@ -157,10 +135,7 @@ export function useWhepPlayer(props, { onError } = {}) {
       }
     } catch (error) {
       console.error('WHEP player error:', error);
-      failCount++;
-      if (failCount >= MAX_RETRIES && onError) {
-        onError();
-      }
+      reconnect('negotiation failed');
     }
   };
 
