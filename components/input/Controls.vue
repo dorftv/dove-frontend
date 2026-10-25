@@ -137,10 +137,11 @@
     </div>
 
     <!-- Every clip of the playlist, the one on air in green -->
-    <div v-if="clipsOpen && input.playlist?.length" class="mt-1 max-h-48 overflow-y-auto">
+    <div v-if="clipsOpen && input.playlist?.length" ref="clipsBox" class="relative mt-1 max-h-48 overflow-y-auto">
       <table class="w-full text-[11px]">
         <tbody>
-          <tr v-for="(clip, i) in input.playlist" :key="i" :class="i === input.index ? 'text-green-500 font-semibold' : ''">
+          <tr v-for="(clip, i) in input.playlist" :key="i" :data-on-air="i === input.index || null" :class="i === input.index ? 'text-green-500 font-semibold' : ''">
+            <td class="font-mono tabular-nums whitespace-nowrap pr-2">{{ clockTime(clipStarts[i]) }}</td>
             <td class="truncate max-w-0 w-full pr-2" :title="clip.uri">{{ clip.name || clip.uri }}</td>
             <td class="font-mono tabular-nums text-right whitespace-nowrap">{{ clip.duration != null ? clipTime(clip.duration) : '' }}</td>
           </tr>
@@ -165,6 +166,34 @@ const vfOpen = ref(false);
 const settingsOpen = ref(false);
 const clipsOpen = ref(false);
 const clipTime = (seconds) => useTimeFormatter(ref(seconds)).value;
+const clipsBox = ref(null);
+
+// When each clip starts by the clock, counted from the one on air and how far it has played
+const clipStarts = computed(() => {
+  const clips = props.input.playlist || [];
+  const index = props.input.index ?? -1;
+  if (index < 0 || index >= clips.length) return [];
+  const starts = [];
+  starts[index] = Date.now() - (props.input.position || 0) * 1000;
+  for (let i = index + 1; i < clips.length; i++) {
+    const before = clips[i - 1].duration;
+    starts[i] = starts[i - 1] != null && before != null ? starts[i - 1] + before * 1000 : null;
+  }
+  for (let i = index - 1; i >= 0; i--) {
+    const own = clips[i].duration;
+    starts[i] = starts[i + 1] != null && own != null ? starts[i + 1] - own * 1000 : null;
+  }
+  return starts;
+});
+const clockTime = (ms) => (ms == null ? '' : new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }));
+
+// The clip on air in the middle of the table: when it opens and at every clip change
+watch([clipsOpen, () => props.input.index], async () => {
+  if (!clipsOpen.value) return;
+  await nextTick();
+  const row = clipsBox.value?.querySelector('[data-on-air]');
+  if (row) clipsBox.value.scrollTop = row.offsetTop - clipsBox.value.clientHeight / 2;
+});
 
 // WHIP publisher (screencast)
 const inputUid = computed(() => props.input.uid);
