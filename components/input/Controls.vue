@@ -131,6 +131,21 @@
       <div class="flex-grow" />
       <span v-if="input.total_duration" class="whitespace-nowrap font-mono tabular-nums shrink-0 ml-1">{{ totalPositionFormatted }}/{{ totalDurationFormatted }}</span>
       <span v-if="input.playlist?.length" class="whitespace-nowrap shrink-0 ml-1">({{ Math.min((input.index ?? 0) + 1, input.playlist.length) }}/{{ input.playlist.length }})</span>
+      <button v-if="input.playlist?.length" @click="clipsOpen = !clipsOpen" class="transport-btn shrink-0" :class="{ 'text-blue-400': clipsOpen }" title="Playlist">
+        <Icon name="ph:list-bullets" size="13px" />
+      </button>
+    </div>
+
+    <!-- Every clip of the playlist, the one on air in green -->
+    <div v-if="clipsOpen && input.playlist?.length" class="mt-1 max-h-48 overflow-y-auto">
+      <table class="w-full text-[11px]">
+        <tbody>
+          <tr v-for="(clip, i) in input.playlist" :key="i" :class="i === input.index ? 'text-green-500 font-semibold' : ''">
+            <td class="truncate max-w-0 w-full pr-2" :title="clip.uri">{{ clip.name || clip.uri }}</td>
+            <td class="font-mono tabular-nums text-right whitespace-nowrap">{{ clip.duration != null ? clipTime(clip.duration) : '' }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -148,6 +163,8 @@ const { filterCount: vfCount } = useVideoFilters(() => props.input);
 const filtersOpen = ref(false);
 const vfOpen = ref(false);
 const settingsOpen = ref(false);
+const clipsOpen = ref(false);
+const clipTime = (seconds) => useTimeFormatter(ref(seconds)).value;
 
 // WHIP publisher (screencast)
 const inputUid = computed(() => props.input.uid);
