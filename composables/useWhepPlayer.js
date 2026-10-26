@@ -122,7 +122,13 @@ export function useWhepPlayer(props, { onError, onRecover } = {}) {
     };
 
     try {
-      resourceUrl = await negotiateWebRTC(pc, `/whep/${props.uid}`);
+      const url = await negotiateWebRTC(pc, `/whep/${props.uid}`);
+      // A newer attempt has replaced this one meanwhile: the session it got is not needed
+      if (pc !== currentPc) {
+        if (url) deleteWebRTCResource(url);
+        return;
+      }
+      resourceUrl = url;
       startStatsMonitor();
 
       // Autoplay
@@ -134,6 +140,8 @@ export function useWhepPlayer(props, { onError, onRecover } = {}) {
         try { await videoPlayer.value.play(); } catch {}
       }
     } catch (error) {
+      // Replaced by a newer attempt, which closed this connection: nothing to reconnect
+      if (pc !== currentPc) return;
       console.error('WHEP player error:', error);
       reconnect('negotiation failed');
     }
