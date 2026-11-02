@@ -24,8 +24,8 @@ const props = defineProps({ input: Object });
 const stats = computed(() => props.input.stats || {});
 const protocol = computed(() => (props.input.uri || '').split(':')[0].toUpperCase() || 'Live');
 
-// Losses and dropouts are worth a look: the icon turns amber
-const warn = computed(() => (stats.value.packets_lost || 0) > 0 || (stats.value.packets_late || 0) > 0 || (stats.value.dropouts || 0) > 0);
+// Packets that never arrived and dropouts are worth a look: the icon turns amber
+const warn = computed(() => (stats.value.packets_late || 0) > 0 || (stats.value.dropouts || 0) > 0);
 
 const rows = computed(() => {
   const s = stats.value;
@@ -37,8 +37,8 @@ const rows = computed(() => {
   if (s.audio_codec) out.push({ label: 'Audio', value: s.audio_codec });
   if (s.rtt_ms != null) out.push({ label: 'Round trip', value: `${Math.round(s.rtt_ms)} ms` });
   if (s.latency_ms) out.push({ label: 'SRT latency', value: `${s.latency_ms} ms` });
-  if (s.packets_lost != null) out.push({ label: 'Lost packets', value: s.packets_lost, warn: s.packets_lost > 0 });
-  if (s.packets_late != null) out.push({ label: 'Late packets', value: s.packets_late, warn: s.packets_late > 0 });
+  if (s.packets_received) out.push({ label: 'Resent', value: `${((s.packets_retransmitted || 0) / s.packets_received * 100).toFixed(2)} %` });
+  if (s.packets_late != null) out.push({ label: 'Dropped packets', value: s.packets_late, warn: s.packets_late > 0 });
   if (s.dropouts != null) out.push({ label: 'Dropouts', value: s.dropouts, warn: s.dropouts > 0 });
   return out;
 });
