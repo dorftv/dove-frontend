@@ -5,6 +5,14 @@
     <Icon name="ph:spinner" size="32px" class="animate-spin" />
   </div>
 
+  <!-- Logged in, but in none of DOVE's groups -->
+  <div v-else-if="authEnabled && authChecked && !hasAccess"
+       class="flex flex-col items-center justify-center gap-3 min-h-screen text-sm text-gray-600 dark:text-gray-300">
+    <Icon name="ph:lock-simple" size="32px" class="text-gray-400" />
+    <p>{{ user?.username }} has no access to DOVE. Ask an administrator to add you to a DOVE group.</p>
+    <button @click="logout" class="icon-btn px-3 py-1 border border-gray-300 dark:border-gray-600 rounded">Logout</button>
+  </div>
+
   <div v-else class="min-h-screen flex flex-col">
     <header class="sticky top-0 z-50 bg-gray-50/90 dark:bg-gray-800/90 backdrop-blur border-b border-gray-200 dark:border-gray-700">
       <nav class="px-3 h-10 flex items-center text-sm" aria-label="Main navigation">
@@ -160,7 +168,7 @@ const mobileMenuOpen = ref(false)
 const { wsStatus } = useEntities()
 const { previewMode, cycle: cyclePreviewMode } = usePlayerMode()
 const { inputPreview, audioMeters } = useUserState()
-const { user, authEnabled, authChecked, isAuthenticated, canAdmin, logout } = useAuth()
+const { user, authEnabled, authChecked, isAuthenticated, hasAccess, canAdmin, logout } = useAuth()
 const configExportOpen = ref(false)
 
 const previewModeLabel = computed(() => {

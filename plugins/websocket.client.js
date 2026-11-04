@@ -262,13 +262,15 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   nuxtApp.hook('app:mounted', async () => {
     // Check auth state before loading entities
-    const { checkAuth, isAuthenticated, login } = useAuth();
+    const { checkAuth, isAuthenticated, hasAccess, login } = useAuth();
     await checkAuth();
     if (!isAuthenticated.value) {
       authRedirecting = true;
       login();
       return;
     }
+    // The layout says why; nothing to load
+    if (!hasAccess.value) return;
     await fetchStatic();
     connect();
     startHealthCheck();

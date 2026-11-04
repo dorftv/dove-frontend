@@ -4,6 +4,8 @@ export function useAuth() {
   const authChecked = useState('auth-checked', () => false)
 
   const isAuthenticated = computed(() => !authEnabled.value || !!user.value)
+  // Logged in, but in none of DOVE's groups: the backend shows nothing
+  const hasAccess = computed(() => !authEnabled.value || (user.value?.roles?.length ?? 0) > 0)
 
   const hasRole = (role) => {
     if (!authEnabled.value) return true
@@ -47,5 +49,5 @@ export function useAuth() {
     window.location.href = `/auth/logout?redirect_base=${encodeURIComponent(origin)}`
   }
 
-  return { user, authEnabled, authChecked, isAuthenticated, hasRole, canUser, canSupervisor, canOutputs, canAdmin, canBypassLock, checkAuth, login, logout }
+  return { user, authEnabled, authChecked, isAuthenticated, hasAccess, hasRole, canUser, canSupervisor, canOutputs, canAdmin, canBypassLock, checkAuth, login, logout }
 }
