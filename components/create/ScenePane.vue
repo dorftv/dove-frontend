@@ -50,6 +50,17 @@
                 />
               </div>
               <div>
+                <label for="epg_auth" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Guide login</label>
+                <UInput
+                  v-model="formData.scene.epg_auth"
+                  id="epg_auth"
+                  placeholder="Bearer <token> or Basic <user>:<password> (optional)"
+                  autocomplete="off"
+                  class="w-full"
+                  size="sm"
+                />
+              </div>
+              <div>
                 <label for="epg_title" class="block font-bold text-sm mb-1 text-gray-700 dark:text-gray-300">Guide title</label>
                 <UInput
                   v-model="formData.scene.epg_title"
@@ -88,7 +99,7 @@ const {
 
 // A guide field left empty is not sent: the backend takes an empty source for a wrong one
 const submit = () => {
-  for (const field of ['epg_src', 'epg_title']) {
+  for (const field of ['epg_src', 'epg_auth', 'epg_title']) {
     const value = formData.scene[field]?.trim();
     if (value) formData.scene[field] = value;
     else delete formData.scene[field];

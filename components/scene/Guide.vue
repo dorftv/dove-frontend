@@ -24,6 +24,17 @@
           />
         </div>
         <div>
+          <label :for="`epg-auth-${scene.uid}`" class="block font-bold text-xs mb-1 text-gray-700 dark:text-gray-300">Guide login</label>
+          <UInput
+            v-model="login"
+            :id="`epg-auth-${scene.uid}`"
+            placeholder="Bearer <token> or Basic <user>:<password>"
+            autocomplete="off"
+            class="w-full"
+            size="sm"
+          />
+        </div>
+        <div>
           <label :for="`epg-title-${scene.uid}`" class="block font-bold text-xs mb-1 text-gray-700 dark:text-gray-300">Guide title</label>
           <UInput
             v-model="title"
@@ -53,11 +64,14 @@ const open = ref(false);
 const saving = ref(false);
 const src = ref('');
 const title = ref('');
+// The backend says a login that is set as "***", never the login itself
+const login = ref('');
 
 watch(open, (isOpen) => {
   if (isOpen) {
     src.value = props.scene.epg_src ?? '';
     title.value = props.scene.epg_title ?? '';
+    login.value = props.scene.epg_auth ?? '';
   }
 });
 
@@ -66,6 +80,8 @@ const save = async () => {
   try {
     // An empty field clears it
     const body = { epg_src: src.value.trim() || null, epg_title: title.value.trim() || null };
+    // Left as it was shown, the login stays as it is
+    if (login.value !== (props.scene.epg_auth ?? '')) body.epg_auth = login.value.trim() || null;
     await useApiFetch(`/api/v2/scenes/${props.scene.uid}`, { method: 'PATCH', body });
     open.value = false;
   } catch (error) {
