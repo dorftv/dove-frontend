@@ -191,7 +191,7 @@ const end = (item) => item.start + item.duration
 const isOn = (item) => item.start <= now.value && now.value < end(item)
 const progress = (item) => Math.min(100, Math.max(0, ((now.value - item.start) / item.duration) * 100))
 const remaining = (item) => span(end(item) - now.value)
-const clock = (seconds) => new Date(seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+const clock = (seconds) => new Date(seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 const span = (seconds) => {
   const minutes = Math.max(0, Math.round(seconds / 60))
   if (minutes < 60) return `${minutes} min`
