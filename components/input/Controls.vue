@@ -45,11 +45,6 @@
 
       <div class="flex-grow" />
 
-      <!-- Volume indicator -->
-      <button :disabled="!canEditInput" @click="toggleMute" class="transport-btn" :class="{ 'text-orange-400': volume === 0 }" :title="volume === 0 ? 'Unmute' : 'Mute (' + volume + '%)'">
-        <Icon :name="volumeIcon(volume)" size="13px" />
-      </button>
-
       <!-- Filter badges (clickable when active) -->
       <button v-if="filterCount > 0 && canEditInput" @click="filtersOpen = true" class="transport-btn relative" title="Audio filters">
         <Icon name="ph:waveform" size="11px" class="text-blue-400" />
