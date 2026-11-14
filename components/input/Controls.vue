@@ -45,10 +45,11 @@
 
       <div class="flex-grow" />
 
-      <!-- Volume indicator -->
-      <button :disabled="!canEditInput" @click="toggleMute" class="transport-btn" :class="{ 'text-orange-400': volume === 0 }" :title="volume === 0 ? 'Unmute' : 'Mute (' + volume + '%)'">
+      <!-- Muted: shown, not a button. Muting is in the settings, away from the gear,
+           so it is not hit by accident on air. -->
+      <span v-if="volume === 0" class="flex items-center justify-center w-6 h-6 text-orange-400" title="Muted: unmute in the settings" role="img" aria-label="Muted">
         <Icon :name="volumeIcon(volume)" size="13px" />
-      </button>
+      </span>
 
       <!-- Filter badges (clickable when active) -->
       <button v-if="filterCount > 0 && canEditInput" @click="filtersOpen = true" class="transport-btn relative" title="Audio filters">
