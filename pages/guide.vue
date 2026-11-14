@@ -36,7 +36,7 @@
         <div class="rounded-lg border border-primary/40 bg-primary/5 p-3">
           <div class="text-[11px] uppercase tracking-wide text-primary font-semibold mb-1">On air</div>
           <template v-if="guide.present">
-            <div class="font-semibold text-gray-800 dark:text-gray-100">{{ guide.present.title }}</div>
+            <div class="font-semibold text-gray-800 dark:text-gray-100">{{ guide.present.title }}<span v-if="guide.present.live" class="ml-1.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-white bg-red-600 rounded px-1 py-px">live</span></div>
             <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
               {{ clock(guide.present.start) }}–{{ clock(end(guide.present)) }}
               <template v-if="guide.present.duration"> · {{ remaining(guide.present) }} left</template>
@@ -51,7 +51,7 @@
         <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
           <div class="text-[11px] uppercase tracking-wide text-gray-500 font-semibold mb-1">Next</div>
           <template v-if="guide.following">
-            <div class="font-semibold text-gray-800 dark:text-gray-100">{{ guide.following.title }}</div>
+            <div class="font-semibold text-gray-800 dark:text-gray-100">{{ guide.following.title }}<span v-if="guide.following.live" class="ml-1.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-white bg-red-600 rounded px-1 py-px">live</span></div>
             <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
               {{ clock(guide.following.start) }}–{{ clock(end(guide.following)) }} · in {{ span(guide.following.start - now) }}
             </div>
@@ -101,8 +101,8 @@
             :style="place(item)"
             @click="select(item)"
           >
-            <div class="font-medium truncate">{{ item.title }}</div>
-            <div class="text-[10px] opacity-70 truncate">{{ clock(item.start) }}</div>
+            <div class="font-medium truncate"><span v-if="item.live" class="inline-block w-1.5 h-1.5 rounded-full bg-red-600 mr-1 align-middle" title="Live" />{{ item.title }}</div>
+            <div class="text-[10px] opacity-70 truncate">{{ clock(item.start) }}<template v-if="item.live"> · live</template></div>
           </button>
           <div
             v-if="now >= dayStart && now < dayStart + 86400"
@@ -130,6 +130,7 @@
             <div class="w-12 shrink-0 text-sm tabular-nums whitespace-nowrap text-gray-600 dark:text-gray-300">{{ clock(item.start) }}</div>
             <div class="min-w-0 flex-1 text-sm font-medium text-gray-800 dark:text-gray-100 flex items-center gap-2">
               <span class="truncate">{{ item.title }}</span>
+              <span v-if="item.live" class="text-[10px] font-semibold uppercase tracking-wide text-white bg-red-600 rounded px-1 py-px shrink-0">live</span>
               <span v-if="isOn(item)" class="text-[10px] font-semibold uppercase text-primary shrink-0">on air</span>
             </div>
             <div class="w-14 shrink-0 text-right text-xs text-gray-400 tabular-nums whitespace-nowrap">{{ item.duration ? span(item.duration) : '' }}</div>
