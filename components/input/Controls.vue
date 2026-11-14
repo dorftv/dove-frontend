@@ -129,7 +129,7 @@
     <!-- The next list cannot be fetched: the same clips play again -->
     <div v-if="input.next_error" class="flex items-center gap-1 text-[11px] text-orange-500 px-0.5 mt-0.5" :title="input.next_error.error">
       <Icon name="ph:warning" size="12px" class="shrink-0" />
-      <span class="truncate">Next list not loaded since {{ clockTime(input.next_error.since * 1000) }}</span>
+      <span class="truncate">Next list not loaded since {{ sinceText(input.next_error.since) }}</span>
     </div>
 
     <!-- Playlist details -->
@@ -159,6 +159,7 @@
 </template>
 
 <script setup>
+import { sinceText } from '~/utils/since';
 const props = defineProps({
   input: Object,
 });
