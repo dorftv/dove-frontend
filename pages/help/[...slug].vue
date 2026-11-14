@@ -100,7 +100,7 @@
                  prose-headings:font-semibold prose-h1:text-2xl
                  prose-a:text-emerald-600 dark:prose-a:text-emerald-400
                  prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-                 prose-table:text-sm
+                 prose-table:text-sm prose-table:block prose-table:max-w-full prose-table:overflow-x-auto
                  prose-th:text-left prose-th:font-medium prose-th:text-gray-500 dark:prose-th:text-gray-400
                  prose-td:py-2"
           v-html="html"
@@ -124,6 +124,7 @@ const navSections = [
   { slug: 'index', title: 'Overview' },
   { slug: 'interface', title: 'Interface' },
   { slug: 'scenes', title: 'Scenes' },
+  { slug: 'epg', title: 'Programme Guide (EPG)' },
   { slug: 'config', title: 'Configuration' },
   {
     type: 'group', title: 'Outputs',

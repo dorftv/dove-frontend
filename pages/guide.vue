@@ -21,12 +21,13 @@
       <div class="flex-grow" />
       <span v-if="error" class="text-xs text-red-500">{{ error }}</span>
       <span v-else-if="updated" class="text-[11px] text-gray-400">as sent, updated {{ clock(updated) }}</span>
+      <UButton icon="ph:question" color="neutral" variant="ghost" size="sm" to="/help/epg" aria-label="How the guide works" title="How the guide works" />
       <UButton icon="ph:x" color="neutral" variant="ghost" size="sm" aria-label="Close guide" title="Close (Esc)" @click="close" />
     </div>
 
     <div v-if="!channels.length" class="text-sm text-gray-500 dark:text-gray-400 py-12 text-center">
       No output carries a channel yet. An SRT output with a channel name sends the guide shown here:
-      see <NuxtLink to="/help/outputs" class="text-primary hover:underline">Outputs</NuxtLink>.
+      see <NuxtLink to="/help/epg" class="text-primary hover:underline">Programme Guide (EPG)</NuxtLink>.
     </div>
 
     <template v-else-if="guide">
