@@ -126,6 +126,12 @@
       </template>
     </div>
 
+    <!-- The next list cannot be fetched: the same clips play again -->
+    <div v-if="input.next_error" class="flex items-center gap-1 text-[11px] text-orange-500 px-0.5 mt-0.5" :title="input.next_error.error">
+      <Icon name="ph:warning" size="12px" class="shrink-0" />
+      <span class="truncate">Next list not loaded since {{ clockTime(input.next_error.since * 1000) }}</span>
+    </div>
+
     <!-- Playlist details -->
     <div v-if="input.type === 'playlist'" class="h-4 flex items-center text-[11px] text-gray-500 dark:text-gray-400 px-0.5 mt-0.5">
       <span v-if="input.details" class="truncate min-w-0">{{ input.details }}</span>

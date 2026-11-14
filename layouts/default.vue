@@ -59,6 +59,7 @@
           </NuxtLink>
 
           <!-- Server status -->
+          <PlaylistFetchWarning />
           <ServerStatus />
 
           <!-- Desktop-only icons -->
