@@ -8,9 +8,18 @@ export function useKeyboardShortcuts() {
 
   const { getByVisualIndex } = useEntityOrder('dove-scene-order', scenes);
 
+  // A dialog with an overlay (add input, shortcuts, a confirmation) has the keys, not the
+  // program. The outputs drawer has no overlay and leaves cutting to the keys.
+  const modalOpen = () => !!document.querySelector('[data-slot="overlay"]');
+
   const onKeyDown = (event) => {
     const tag = event.target.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || event.target.isContentEditable) return;
+    if (event.defaultPrevented) return;
+
+    // What goes on air: never while a dialog is open
+    const onAir = event.key === 'Enter' || event.key === 't' || (event.key >= '1' && event.key <= '9');
+    if (onAir && modalOpen()) return;
 
     if (event.key >= '1' && event.key <= '9') {
       const scene = getByVisualIndex(Number(event.key) - 1);

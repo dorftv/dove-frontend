@@ -13,6 +13,18 @@
     >
       {{ program.state === 'PLAYING' ? 'LIVE' : program.state }}
     </span>
+    <!-- What the channel's programme guide says is on, and what is next -->
+    <NuxtLink
+      v-if="epg?.present"
+      to="/guide"
+      class="min-w-0 flex items-center gap-1 ml-1 text-[11px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+      :title="`Programme guide: ${epg.present.title}${epg.following ? ' · then ' + epg.following.title : ''}`"
+    >
+      <Icon name="ph:television-simple" size="12px" class="shrink-0" />
+      <span class="truncate"><span class="font-medium text-gray-800 dark:text-gray-200">{{ epg.present.title }}</span><template v-if="epg.present.duration"> until {{ clock(epg.present.start + epg.present.duration) }}</template></span>
+      <span v-if="epg.present.live" class="shrink-0 text-[9px] font-semibold uppercase text-white bg-red-600 rounded px-1">live</span>
+      <span v-if="epg.following" class="hidden md:inline truncate">· then {{ epg.following.title }} {{ clock(epg.following.start) }}</span>
+    </NuxtLink>
     <div class="flex-grow" />
     <template v-if="canSupervisor">
       <button
@@ -45,7 +57,7 @@
 </template>
 
 <script setup>
-const { program } = useEntities();
+const { program, outputs } = useEntities();
 const { canSupervisor } = useAuth();
 const filtersOpen = ref(false);
 const vfOpen = ref(false);
@@ -53,4 +65,21 @@ const afCtx = useAudioFilters({ mixer: () => program.value });
 const vfCtx = useVideoFilters({ mixer: () => program.value });
 const programFilterCount = afCtx.filterCount;
 const programVfCount = vfCtx.filterCount;
+
+// The programme guide of the channel: the first output that names one, asked every ten seconds
+const channel = computed(() => outputs.value.find((output) => output.service_name));
+const epg = ref(null);
+const loadEpg = async () => {
+  if (!channel.value) { epg.value = null; return; }
+  try {
+    epg.value = await useApiFetch(`/api/v2/outputs/${channel.value.uid}/epg`);
+  } catch {
+    epg.value = null;
+  }
+};
+const clock = (seconds) => new Date(seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+watch(() => channel.value?.uid, loadEpg, { immediate: true });
+let epgTimer;
+onMounted(() => { epgTimer = setInterval(loadEpg, 10000); });
+onBeforeUnmount(() => clearInterval(epgTimer));
 </script>

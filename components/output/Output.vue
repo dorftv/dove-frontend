@@ -27,6 +27,15 @@
         <Icon :name="deleting ? 'ph:spinner' : 'ph:trash'" size="11px" :class="{ 'animate-spin': deleting }" />
       </button>
     </div>
+    <!-- The DVB channel it carries, with its programme guide -->
+    <div
+      v-if="output.service_name"
+      :title="output.provider_name ? `DVB channel of ${output.provider_name}, with programme guide` : 'DVB channel, with programme guide'"
+      class="flex items-center gap-1 ml-3.5 mt-0.5 text-[11px] text-gray-500 dark:text-gray-400"
+    >
+      <Icon name="ph:television-simple" size="11px" class="text-gray-400 shrink-0" />
+      <span class="truncate">{{ output.service_name }}</span>
+    </div>
     <!-- Stats row -->
     <div v-if="output.details" class="ml-3.5 mt-0.5 text-[11px] text-gray-500 dark:text-gray-400 truncate">
       {{ output.details }}

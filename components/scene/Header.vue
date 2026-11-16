@@ -28,6 +28,7 @@
     >
       <Icon name="ph:frame-corners" size="11px" />
     </button>
+    <SceneGuide v-if="canAdmin" :scene="scene" />
     <DetailPopover :entity="scene" />
     <button
       v-if="canSupervisor && (!scene.locked || canBypassLock)"
@@ -44,7 +45,7 @@
 
 <script setup>
 const { stateColor } = useStateClass()
-const { canSupervisor, canBypassLock } = useAuth()
+const { canSupervisor, canAdmin, canBypassLock } = useAuth()
 const { slotOverlay } = useUserState()
 
 const props = defineProps({

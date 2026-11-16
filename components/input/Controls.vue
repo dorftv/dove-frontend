@@ -45,6 +45,12 @@
 
       <div class="flex-grow" />
 
+      <!-- Muted: shown, not a button. Muting is in the settings, away from the gear,
+           so it is not hit by accident on air. -->
+      <span v-if="volume === 0" class="flex items-center justify-center w-6 h-6 text-orange-400" title="Muted: unmute in the settings" role="img" aria-label="Muted">
+        <Icon :name="volumeIcon(volume)" size="13px" />
+      </span>
+
       <!-- Filter badges (clickable when active) -->
       <button v-if="filterCount > 0 && canEditInput" @click="filtersOpen = true" class="transport-btn relative" title="Audio filters">
         <Icon name="ph:waveform" size="11px" class="text-blue-400" />
@@ -120,6 +126,12 @@
       </template>
     </div>
 
+    <!-- The next list cannot be fetched: the same clips play again -->
+    <div v-if="input.next_error" class="flex items-center gap-1 text-[11px] text-orange-500 px-0.5 mt-0.5" :title="input.next_error.error">
+      <Icon name="ph:warning" size="12px" class="shrink-0" />
+      <span class="truncate">Next list not loaded since {{ sinceText(input.next_error.since) }}</span>
+    </div>
+
     <!-- Playlist details -->
     <div v-if="input.type === 'playlist'" class="h-4 flex items-center text-[11px] text-gray-500 dark:text-gray-400 px-0.5 mt-0.5">
       <span v-if="input.details" class="truncate min-w-0">{{ input.details }}</span>
@@ -147,6 +159,7 @@
 </template>
 
 <script setup>
+import { sinceText } from '~/utils/since';
 const props = defineProps({
   input: Object,
 });

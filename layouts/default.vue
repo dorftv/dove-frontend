@@ -59,6 +59,7 @@
           </NuxtLink>
 
           <!-- Server status -->
+          <PlaylistFetchWarning />
           <ServerStatus />
 
           <!-- Desktop-only icons -->
@@ -67,6 +68,9 @@
           </NuxtLink>
           <NuxtLink v-if="canAdmin" to="/api/v2/debug/docs" external target="_blank" class="hidden md:flex icon-btn" title="API Docs" aria-label="API Docs">
             <Icon name="ph:code" size="16px" />
+          </NuxtLink>
+          <NuxtLink to="/guide" class="hidden md:flex icon-btn" title="Programme guide" aria-label="Programme guide">
+            <Icon name="ph:television-simple" size="16px" />
           </NuxtLink>
           <NuxtLink to="/help" class="hidden md:flex icon-btn" title="Help" aria-label="Help">
             <Icon name="ph:question" size="16px" />
@@ -105,6 +109,9 @@
       <div v-if="mobileMenuOpen" class="md:hidden border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2 space-y-1">
         <NuxtLink to="/" @click="mobileMenuOpen = false" class="mobile-link">
           <Icon name="ph:house" size="16px" /> Home
+        </NuxtLink>
+        <NuxtLink to="/guide" @click="mobileMenuOpen = false" class="mobile-link">
+          <Icon name="ph:television-simple" size="16px" /> Programme guide
         </NuxtLink>
         <NuxtLink to="/help" @click="mobileMenuOpen = false" class="mobile-link">
           <Icon name="ph:question" size="16px" /> Help

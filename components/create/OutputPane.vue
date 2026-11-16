@@ -33,7 +33,7 @@
           <template v-if="selectedType && formData[selectedType.key]">
             <form @submit.prevent="submitCreate(selectedType.key)" class="space-y-2">
               <div v-for="field in selectedType.fields" :key="field.name">
-                <div v-if="field.name !== 'type'" class="mb-2">
+                <div v-if="field.name !== 'type' && (canAdmin || !CHANNEL.includes(field.name))" class="mb-2">
                   <div v-if="!isEncoderField(field.name)" class="encoder-field mb-4">
                     <label :for="field.name" class="block font-bold text-sm mt-2 text-gray-700 dark:text-gray-300">{{ field.label }}</label>
                     <USelect
@@ -238,7 +238,10 @@
 </template>
 
 <script setup>
-const { canOutputs, canBypassLock } = useAuth()
+const { canOutputs, canBypassLock, canAdmin } = useAuth()
+
+// An SRT output's DVB channel (name, provider, guide): the admins' to set
+const CHANNEL = ['service_name', 'provider_name', 'epg_language', 'original_network_id']
 
 const {
   isOpen,

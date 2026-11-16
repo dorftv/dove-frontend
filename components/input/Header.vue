@@ -19,7 +19,12 @@
       displayClass="truncate text-sm text-gray-800 dark:text-gray-200 font-medium"
       inputClass="text-sm text-gray-800 dark:text-gray-200 font-medium w-20"
     />
-    <span class="text-[11px] text-gray-500">{{ input.type }}</span>
+    <!-- The list that plays, as its source names it; else the input's type -->
+    <span
+      class="text-[11px] truncate min-w-0"
+      :class="input.list_name ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500'"
+      :title="input.list_name ? `${input.type}: list ${input.list_name}` : input.type"
+    >{{ input.list_name || input.type }}</span>
 
     <!-- Spacer -->
     <div class="flex-grow" />
